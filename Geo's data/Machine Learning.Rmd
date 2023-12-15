@@ -1,0 +1,278 @@
+---
+title: "Logistic Regression Classification (Python)"
+author: "Gepoliano Chaves, Ph. D."
+date: "September 18th, 2023"
+# output: html_document
+output: pdf_document
+# runtime: shiny
+---
+
+# Activity goal
+
+The goal of the present activity was to construct a Machine Learning model to classify a neuroblastoma patient as high risk or low risk based on 22 phenotypic scores derived from genetic material of that patient.
+
+# Considerations for this activity
+
+* Neuroblastoma, a cancer of the peripheral nervous system of children, has two main clinical risk groups: low risk and high risk.
+
+* Epigenetic modification on cell free DNA present in the blood of patients may inform the state of disease progression such as cancer in that patient.
+
+* We can apply Machine Learning algorithms on that information to classify a patient to the disease risk category using classifiers that inform disease state.
+
+* We previously investigated hypoxia as a signal that modulates a cellular transition important in neuroblastoma disease progression.
+
+* To test if a therapy decreased or changed disease risk category, we can compare the pattern of gene expression or the epigenetic pattern present in the blood of a patient before and after a specific therapy.
+
+* Here we will go through a logistic regression model using 22 features isolated from the study of hypoxia in driving aggressive disease, to classify neuroblastoma tumors.
+
+* Accuracy of the model measures how efficient it is in predicting the risk category.
+
+## 
+
+![Diagnostic pipeline using liquid biopsies.](../figures/real time liquid biopsy.png){width=80%}
+
+# References
+
+How to remember classification concepts was found in @JerryAn2020
+
+#
+
+![Probability function:  Foundations of the Logistic Regression model.](../figures/model.png){width=80%}
+
+#
+
+![Features that contribute to probability function.](../figures/LogisticRegressionEquation2.png){width=80%}
+
+# Load package reticulate
+
+Correct path did not show up using the which command.
+
+Ask reticulate what the possible paths are:
+
+```{r}
+reticulate::conda_list()
+```
+
+Change the python path to include the path corresponding to the r-tutorial, above.
+Then set up the chunk to run python in rmarkdown.
+
+```{r setup, include=F, message=F, warning=F}
+
+knitr::opts_chunk$set(echo = TRUE)
+
+library(reticulate)
+use_python("/Users/gepolianochaves/anaconda3/envs/r-tutorial/bin/python")
+
+```
+
+There was an error at the end regarding matplotlib. One reference link mentioned installing matplotlib before pandas.
+
+```{bash}
+pip install matplotlib
+```
+
+Install pandas in this environment
+
+```{bash}
+pip install pandas
+```
+
+# Machine Learning definition
+
+Machine learning is the use of algorithms and statistical models to analyze and draw inferences from *patterns* in data. 
+
+# Part 1: Data Pre-processing; Get started on data analysis
+
+Import pandas and dataset
+
+```{python}
+import pandas as pd
+dataset_kocak = pd.read_csv("r2_gse62564_GSVA_Metadata_selected.csv")
+dataset_kocak.head(10)
+```
+
+Getting the inputs and output
+
+Get inputs and outputs from the Kocak dataset
+
+```{python}
+X = dataset_kocak.iloc[:, 1:-1].values
+y = dataset_kocak.iloc[:, -1]
+```
+
+```{python}
+X
+```
+
+```{python}
+y
+```
+
+# Creating the Training Set and the Test Set
+
+```{bash, eval=F}
+pip install -U scikit-learn
+```
+
+```{python}
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.2, random_state=0)
+```
+
+```{python}
+X_train
+```
+
+```{python}
+X_test
+```
+
+```{python}
+y_train
+```
+
+```{python}
+y_test
+```
+
+# 
+
+![Features that contribute to probability function.](../figures/feature scaling 1.png){width=80%}
+
+![The two main feature scaling methods are Normalization and Standardization.](../figures/feature scaling 2.png){width=80%}
+
+# Feature Scaling the Feature Array
+
+```{python}
+from sklearn.preprocessing import StandardScaler
+# Standardization based on the features of the whole dataset (?)
+# Compute in the training set (?)
+# instance of the class
+sc = StandardScaler()
+# compute average and sd of the features
+# Takes on the array of independent variables you want to scale
+sc.fit_transform(X_train)
+# We will only need the new array of independent variables in the training set
+X_train = sc.fit_transform(X_train)
+```
+
+# Part 2 - Building and training the model
+
+Building the model
+
+```{python}
+from sklearn.linear_model import LogisticRegression
+model = LogisticRegression(random_state = 0 )
+```
+
+Training the model
+
+```{python}
+model.fit(X_train, y_train)
+```
+
+Access coefficients and variable importance
+
+```{python}
+coefficients = model.coef_[0]
+coefficients
+```
+
+## Plot variable importance
+
+Deal with Variable Importance in Kocak dataset. Get features from feature dataframe using the column method
+
+```{python}
+X_test_kocak = dataset_kocak.drop('high_risk', axis=1)
+X_test_kocak = X_test_kocak.drop('sample id', axis=1)
+X_test_kocak
+X_test_kocak.columns
+```
+
+```{python}
+import matplotlib
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+
+feature_importance = pd.DataFrame({'Feature': X_test_kocak.columns, 'Importance': np.abs(coefficients)})
+# feature_importance = feature_importance.sort_values('Importance', ascending=True).head(70)
+feature_importance = feature_importance.sort_values('Importance', ascending=True)
+# feature_importance = feature_importance[:5000]
+feature_importance.plot(x='Feature', y='Importance', kind='barh', figsize=(10, 6))
+```
+
+# Inference
+
+Predictions for the test set and for a particular patient
+
+```{python}
+y_pred = model.predict(sc.transform(X_test)) # First, call the scaler object
+```
+
+Prediction in our model for all patients in the test set
+
+```{python}
+y_pred
+```
+
+Prediction in our model for one patient
+
+```{python}
+model.predict(sc.transform([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]])) # an array of two dimensions
+```
+
+# Part 3: Evaluating the Model
+
+##
+
+![The construction of a confusion matrix.](../figures/confusion matrix 2.png){width=80%}
+
+To calculate the confusion matrix, we need the vector of ground-truth and the vector of predictions. 
+
+ground-truth vector
+
+```{python}
+y_test
+```
+
+prediction vector
+
+```{python}
+y_pred
+```
+
+## Construct confusion matrix
+
+```{python}
+from sklearn.metrics import confusion_matrix
+confusion_matrix(y_test, y_pred)
+```
+
+## Acuracy
+
+Acuracy = (number of correct predictions)/(total number of observations)
+
+Manually calculate acuracy
+
+```{python}
+(55+28)/(55+28+9+8)
+```
+
+Calculate acuracy using sklearn
+
+```{python}
+from sklearn.metrics import accuracy_score
+accuracy_score(y_test, y_pred)
+```
+
+# References
+
+<div id="refs"></div>
+
+# Session Info
+
+```{r session}
+sessionInfo()
+```
