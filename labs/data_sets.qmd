@@ -11,6 +11,14 @@ library(tidyverse)
 
 ## Data sets to try
 
+### Viral mutation rates
+
+<https://github.com/lauringlab/JVI_Gem_2018>
+
+```{r}
+viral_mut_rates <- read_csv("https://raw.githubusercontent.com/lauringlab/JVI_Gem_2018/master/Figure_1_mu_and_K_data.csv")
+```
+
 ### Bird feeder watch
 
 <https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-01-10/readme.md>
@@ -57,4 +65,10 @@ Data taken from here: <https://github.com/rfordatascience/tidytuesday/blob/maste
 
 ```{r}
 numbats <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-03-07/numbats.csv')
+```
+
+### Geo's data
+
+```{r}
+geo_data <- read_csv("data/r2_gse62564_GSVA_Metadata_selected.csv")
 ```

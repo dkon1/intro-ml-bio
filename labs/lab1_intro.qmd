@@ -1,0 +1,32 @@
+---
+title: "Intro to data (lab 1 for BIOS 26122)"
+author: "Dmitry Kondrashov"
+format: html
+editor: visual
+---
+
+## Description
+
+The goal of this assignment is to introduce basic data description and visualization using base R and tidyverse packages. Specifically, you should be able to:
+
+1.  Read in a data set as a data frame (or tibble) and report the number and types of variables, as well as the number of observations.
+2.  Visualize a variable using a method appropriate for its type; observe the general shape of the distribution.
+3.  Report descriptive statistics (e.g. counts, means, standard deviations) for numeric variables and generate cross tables for categorical variables.
+4.  Perform an assessment of missing values and outliers and do basic data cleaning.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
