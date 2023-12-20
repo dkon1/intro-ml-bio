@@ -58,15 +58,18 @@ heart_rates |> group_by(Year) |> summarise(num = n(), mean_ex2 = mean(Ex2), sd_e
 4.  Report if there are any missing values and if any points may be considered outliers.
 
 ```{r}
-# base R
-print(paste("The number of missing values is", sum(is.na(heart_rates$Ex2))))
-heart_rates$sum_na <- rowSums(is.na(heart_rates))
-# tidyverse
-heart_rates |> 
-  rowwise() |> 
+# base R to calculate by column
+cat("The number of NAs in each column: ")
+cat(colSums(is.na(heart_rates)))
+cat("\n")
+# tidyverse to calculate by row
+heart_rates %>%
+  rowwise() %>%
   mutate(sum_na = sum(is.na(c_across())))
 
 ```
+
+In the histogram you can see some points that are
 
 ### Viral mutation rates
 
@@ -92,13 +95,31 @@ viral_mut_rates |> ggplot() + aes(x=G) + geom_histogram() + ggtitle('Histogram o
 3.  Compute the counts, means, and standard deviations of one of the numeric variables of your choice, separated by `group` category.
 
 ```{r}
+# base R
+group_list = unique(viral_mut_rates$group)
+for (g in group_list) {
+  slice <- viral_mut_rates$group == g
+  print(paste("In group", g, "number of observations of G is:", length(viral_mut_rates$G[slice])))
+  print(paste("In group", g, "mean value of G is:", mean(viral_mut_rates$G[slice])))
+  print(paste("In group", g, "standard deviation of G is:", sd(viral_mut_rates$G[slice])))
+}
+# tidyverse
 
+viral_mut_rates |> group_by(group) |> summarise(num = n(), mean_G = mean(G), sd_G = sd(G))
 ```
 
 4.  Report if there are any missing values and if any points may be considered outliers.
 
 ```{r}
-
+# base R to calculate by column
+cat("The number of NAs in each column: ")
+cat(colSums(is.na(viral_mut_rates)))
+cat("\n")
+# tidyverse to calculate by row
+viral_mut_rates |> 
+  select(G,K, mu) |> 
+  rowwise() |> 
+  mutate(sum_na = sum(is.na(c_across())))
 ```
 
 ### Neuroblastoma data
@@ -111,20 +132,46 @@ neuro_blast <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/ma
 
 1.  Report the number and types of variables and the number of observations
 
+    There are 24 columns, of which 22 are numeric, and two are categorical: sample id is a unique id so it won't be used in calculations, and high_risk is a logical variable (yes/no)
+
 2.  Compare the distributions of two or more of the numeric variables of your choice using boxplots or other visualizations; describe how the distributions differ.
 
 ```{r}
-
+# base R:
+hist(neuro_blast$MYCN, main = 'Histogram of MYCN', xlab = "size (Kbp?)")
+# ggplot
+neuro_blast |> ggplot() + aes(x=MYCN) + geom_histogram() + ggtitle('Histogram of MYCN') + xlab("MYCN")
 ```
+
+The histogram of MYCN is very non-normal, the biggest peak is at 0, with a long tail of higher values.
 
 3.  Compute the counts, means, and standard deviations of one of the numeric variables of your choice, separated by `high_risk` category.
 
 ```{r}
+# base R
+risk_list = unique(neuro_blast$high_risk)
+for (risk in risk_list) {
+  slice <- neuro_blast$high_risk == risk
+  print(paste("In group", risk, "number of observations of G is:", length(neuro_blast$MYCN[slice])))
+  print(paste("In group", risk, "mean value of G is:", mean(neuro_blast$MYCN[slice])))
+  print(paste("In group", risk, "standard deviation of G is:", sd(neuro_blast$MYCN[slice])))
+}
+# tidyverse
 
+neuro_blast |> group_by(high_risk) |> summarise(num = n(), mean_MYCN = mean(MYCN), sd_MYCN = sd(MYCN))
 ```
+
+You can see major differences in mean values of MYCN between high and low risk groups.
 
 4.  Report if there are any missing values and if any points may be considered outliers.
 
 ```{r}
-
+# base R to calculate by column
+cat("The number of NAs in each column: ")
+cat(colSums(is.na(neuro_blast)))
+cat("\n")
+# tidyverse to calculate by row
+neuro_blast |>  select(-c(`sample id`, high_risk)) |> 
+  rowwise() |> 
+  mutate(sum_na = sum(is.na(c_across())))
 ```
