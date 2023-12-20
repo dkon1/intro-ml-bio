@@ -52,12 +52,19 @@ for (year in year_list) {
 }
 # tidyverse
 
-heart_rates |> group_by(Year) |> summarise(num = n(), mean = mean(Ex2), sd = sd(Ex2))
+heart_rates |> group_by(Year) |> summarise(num = n(), mean_ex2 = mean(Ex2), sd_ex2 = sd(Ex2))
 ```
 
 4.  Report if there are any missing values and if any points may be considered outliers.
 
 ```{r}
+# base R
+print(paste("The number of missing values is", sum(is.na(heart_rates$Ex2))))
+heart_rates$sum_na <- rowSums(is.na(heart_rates))
+# tidyverse
+heart_rates |> 
+  rowwise() |> 
+  mutate(sum_na = sum(is.na(c_across())))
 
 ```
 
@@ -71,10 +78,15 @@ viral_mut_rates <- read_csv("https://raw.githubusercontent.com/lauringlab/JVI_Ge
 
 1.  Report the number and types of variables and the number of observations
 
+    11 columns, of which 3 are numeric: G, K, mu, one logical, and the rest are categorical, 111 observations
+
 2.  Make a histogram of one of the numeric variables of your choice; describe its shape (e.g. normal, uniform, bimodal) and comment on any interesting features.
 
 ```{r}
-
+# base R:
+hist(viral_mut_rates$G, main = 'Histogram of gene size', xlab = "size (Kbp?)")
+# ggplot
+viral_mut_rates |> ggplot() + aes(x=G) + geom_histogram() + ggtitle('Histogram of gene size') + xlab("size (Kbp?)")
 ```
 
 3.  Compute the counts, means, and standard deviations of one of the numeric variables of your choice, separated by `group` category.
@@ -89,7 +101,7 @@ viral_mut_rates <- read_csv("https://raw.githubusercontent.com/lauringlab/JVI_Ge
 
 ```
 
-### Geo's data
+### Neuroblastoma data
 
 The following data set contains 22 scores of different from patients with neuroblastoma (a type of cancer) derived from cell-free DNA samples.
 
