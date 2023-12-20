@@ -26,16 +26,33 @@ heart_rates <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/ma
 
 1.  Report the number and types of variables and the number of observations
 
+    There are 5 variables (columns), of which 4 are numeric and the 5th (year) is (arguably) categorical (even though it's a number, it's not meant for calculations).
+
 2.  Make a histogram of one of the numeric variables of your choice; describe its shape (e.g. normal, uniform, bimodal) and comment on any interesting features.
 
 ```{r}
-
+# base R:
+hist(heart_rates$Ex2, main = 'Histogram of Ex2', xlab = "heart rate (bpm)")
+# ggplot
+heart_rates |> ggplot() + aes(x=Ex2) + geom_histogram() + ggtitle("Histogram of Ex2") + xlab("heart rate (bpm)")
 ```
+
+The graph is fairly normal-shaped, but with a longer right tail.
 
 3.  Compute the counts, means, and standard deviations of one of the numeric variables of your choice, separated by `Year` category.
 
 ```{r}
+# base R
+year_list = unique(heart_rates$Year)
+for (year in year_list) {
+  slice <- heart_rates$Year == year
+  print(paste("In year", year, "number of observations of Ex2 is:", length(heart_rates$Ex2[slice])))
+  print(paste("In year", year, "mean value of Ex2 is:", mean(heart_rates$Ex2[slice])))
+  print(paste("In year", year, "standard deviation of Ex2 is:", sd(heart_rates$Ex2[slice])))
+}
+# tidyverse
 
+heart_rates |> group_by(Year) |> summarise(num = n(), mean = mean(Ex2), sd = sd(Ex2))
 ```
 
 4.  Report if there are any missing values and if any points may be considered outliers.
