@@ -14,7 +14,13 @@ The goal of this assignment is to introduce basic data description and visualiza
 3.  Report descriptive statistics (e.g. counts, means, standard deviations) for numeric variables and generate cross tables for categorical variables.
 4.  Perform an assessment of missing values and outliers and do basic data cleaning.
 
-These are athe first steps that one needs to do to begin working with a data set. Below you will see several real data sets to practice on.
+These are the first steps that one needs to do to begin working with a data set. Below you will see several real data sets to practice on.
+
+```{r setup}
+#| include: false
+#| echo: false
+library(tidyverse)
+```
 
 ## Heart rates
 
@@ -24,7 +30,7 @@ The following data set contains heart rates measured and reported by students in
 heart_rates <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/HR_data_combined.csv")
 ```
 
-1.  Report the number and types of variables and the number of observations
+1.  Examine the data frame (tibble) and report the number and types of variables and the number of observations
 
     There are 5 variables (columns), of which 4 are numeric and the 5th (year) is (arguably) categorical (even though it's a number, it's not meant for calculations).
 
@@ -55,7 +61,16 @@ for (year in year_list) {
 heart_rates |> group_by(Year) |> summarise(num = n(), mean_ex2 = mean(Ex2), sd_ex2 = sd(Ex2))
 ```
 
-4.  Report if there are any missing values and if any points may be considered outliers.
+4.  Visualize one of the numeric variables as a box plot or violin plot, separated by different years.
+
+```{r}
+# base R
+boxplot(Ex2 ~ Year, data = heart_rates, main= "Ex2 for different years")
+# ggplot
+heart_rates |> ggplot() + aes(x=as.factor(Year), y = Ex2) + geom_boxplot() + ggtitle("Ex2 for different years") + xlab("year")
+```
+
+5.  Report if there are any missing values and if any points may be considered outliers.
 
 ```{r}
 # base R to calculate by column
@@ -79,7 +94,7 @@ The following data set comes from <https://github.com/lauringlab/JVI_Gem_2018> a
 viral_mut_rates <- read_csv("https://raw.githubusercontent.com/lauringlab/JVI_Gem_2018/master/Figure_1_mu_and_K_data.csv")
 ```
 
-1.  Report the number and types of variables and the number of observations
+1.  Examine the data frame (tibble) and report the number and types of variables and the number of observations
 
     11 columns, of which 3 are numeric: G, K, mu, one logical, and the rest are categorical, 111 observations
 
@@ -108,7 +123,16 @@ for (g in group_list) {
 viral_mut_rates |> group_by(group) |> summarise(num = n(), mean_G = mean(G), sd_G = sd(G))
 ```
 
-4.  Report if there are any missing values and if any points may be considered outliers.
+4.  Visualize one of the numeric variables as a box plot or violin plot, separated by group.
+
+```{r}
+# base R
+boxplot(G ~ group, data = viral_mut_rates, main= "Genome size for different groups of viruses")
+# ggplot
+viral_mut_rates |> ggplot() + aes(x=group, y = G) + geom_boxplot() + ggtitle("Genome size for different groups of viruses") + xlab("virus group")
+```
+
+5.  Report if there are any missing values and if any points may be considered outliers.
 
 ```{r}
 # base R to calculate by column
@@ -130,7 +154,7 @@ The following data set contains 22 scores of different from patients with neurob
 neuro_blast <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/r2_gse62564_GSVA_Metadata_selected.csv")
 ```
 
-1.  Report the number and types of variables and the number of observations
+1.  Examine the data frame (tibble) and report the number and types of variables and the number of observations
 
     There are 24 columns, of which 22 are numeric, and two are categorical: sample id is a unique id so it won't be used in calculations, and high_risk is a logical variable (yes/no)
 
@@ -163,7 +187,16 @@ neuro_blast |> group_by(high_risk) |> summarise(num = n(), mean_MYCN = mean(MYCN
 
 You can see major differences in mean values of MYCN between high and low risk groups.
 
-4.  Report if there are any missing values and if any points may be considered outliers.
+4.  Visualize one of the numeric variables as a box plot or violin plot, separated by high_risk category.
+
+```{r}
+# base R
+boxplot(MYCN ~ high_risk, data = neuro_blast, main= "MYCN for different risk groups")
+# ggplot
+neuro_blast |> ggplot() + aes(x=high_risk, y = MYCN) + geom_boxplot() + ggtitle("MYCN for different risk groups") + xlab("High risk status")
+```
+
+5.  Report if there are any missing values and if any points may be considered outliers.
 
 ```{r}
 # base R to calculate by column

@@ -14,7 +14,13 @@ The goal of this assignment is to introduce basic data description and visualiza
 3.  Report descriptive statistics (e.g. counts, means, standard deviations) for numeric variables and generate cross tables for categorical variables.
 4.  Perform an assessment of missing values and outliers and do basic data cleaning.
 
-These are athe first steps that one needs to do to begin working with a data set. Below you will see several real data sets to practice on.
+These are the first steps that one needs to do to begin working with a data set. Below you will see several real data sets to practice on.
+
+```{r setup}
+#| include: false
+#| echo: false
+library(tidyverse)
+```
 
 ## Heart rates
 
@@ -24,7 +30,8 @@ The following data set contains heart rates measured and reported by students in
 heart_rates <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/HR_data_combined.csv")
 ```
 
-1.  Report the number and types of variables and the number of observations
+1.  Examine the data frame (tibble) and report the number and types of variables and the number of observations
+
 
 2.  Make a histogram of one of the numeric variables of your choice; describe its shape (e.g. normal, uniform, bimodal) and comment on any interesting features.
 
@@ -38,7 +45,13 @@ heart_rates <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/ma
 
 ```
 
-4.  Report if there are any missing values and if any points may be considered outliers.
+4.  Visualize one of the numeric variables as a box plot or violin plot, separated by different years.
+
+```{r}
+
+```
+
+5.  Report if there are any missing values and if any points may be considered outliers.
 
 ```{r}
 
@@ -52,7 +65,8 @@ The following data set comes from <https://github.com/lauringlab/JVI_Gem_2018> a
 viral_mut_rates <- read_csv("https://raw.githubusercontent.com/lauringlab/JVI_Gem_2018/master/Figure_1_mu_and_K_data.csv")
 ```
 
-1.  Report the number and types of variables and the number of observations
+1.  Examine the data frame (tibble) and report the number and types of variables and the number of observations
+
 
 2.  Make a histogram of one of the numeric variables of your choice; describe its shape (e.g. normal, uniform, bimodal) and comment on any interesting features.
 
@@ -66,13 +80,20 @@ viral_mut_rates <- read_csv("https://raw.githubusercontent.com/lauringlab/JVI_Ge
 
 ```
 
-4.  Report if there are any missing values and if any points may be considered outliers.
+4.  Visualize one of the numeric variables as a box plot or violin plot, separated by group.
 
 ```{r}
 
 ```
 
-### Geo's data
+
+5.  Report if there are any missing values and if any points may be considered outliers.
+
+```{r}
+
+```
+
+### Neuroblastoma data
 
 The following data set contains 22 scores of different from patients with neuroblastoma (a type of cancer) derived from cell-free DNA samples.
 
@@ -80,7 +101,7 @@ The following data set contains 22 scores of different from patients with neurob
 neuro_blast <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/r2_gse62564_GSVA_Metadata_selected.csv")
 ```
 
-1.  Report the number and types of variables and the number of observations
+1.  Examine the data frame (tibble) and report the number and types of variables and the number of observations
 
 2.  Compare the distributions of two or more of the numeric variables of your choice using boxplots or other visualizations; describe how the distributions differ.
 
@@ -94,7 +115,13 @@ neuro_blast <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/ma
 
 ```
 
-4.  Report if there are any missing values and if any points may be considered outliers.
+4.  Visualize one of the numeric variables as a box plot or violin plot, separated by high_risk category.
+
+```{r}
+
+```
+
+5.  Report if there are any missing values and if any points may be considered outliers.
 
 ```{r}
 
