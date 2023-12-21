@@ -1,0 +1,128 @@
+---
+title: "Intro to data (lab 1 for BIOS 26122)"
+author: "Dmitry Kondrashov"
+format: html
+editor: visual
+---
+
+## Description
+
+The goal of this assignment is to introduce basic data description and visualization using base R and tidyverse packages. Specifically, you should be able to:
+
+1.  Read in a data set as a data frame (or tibble) and report the number and types of variables, as well as the number of observations.
+2.  Visualize a variable using a method appropriate for its type; observe the general shape of the distribution.
+3.  Report descriptive statistics (e.g. counts, means, standard deviations) for numeric variables and generate cross tables for categorical variables.
+4.  Perform an assessment of missing values and outliers and do basic data cleaning.
+
+These are the first steps that one needs to do to begin working with a data set. Below you will see several real data sets to practice on.
+
+```{r setup}
+#| include: false
+#| echo: false
+library(tidyverse)
+```
+
+## Heart rates
+
+The following data set contains heart rates measured and reported by students in my class Introduction to Quantitative Modeling for Biology. There are four different heart rates measured (two at rest and two after exercise) and the year it was measured.
+
+```{r}
+heart_rates <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/HR_data_combined.csv")
+```
+
+1.  Examine the data frame (tibble) and report the number and types of variables and the number of observations
+
+
+2.  Make a histogram of one of the numeric variables of your choice; describe its shape (e.g. normal, uniform, bimodal) and comment on any interesting features.
+
+```{r}
+
+```
+
+3.  Compute the counts, means, and standard deviations of one of the numeric variables of your choice, separated by `Year` category.
+
+```{r}
+
+```
+
+4.  Visualize one of the numeric variables as a box plot or violin plot, separated by different years.
+
+```{r}
+
+```
+
+5.  Report if there are any missing values and if any points may be considered outliers.
+
+```{r}
+
+```
+
+### Viral mutation rates
+
+The following data set comes from <https://github.com/lauringlab/JVI_Gem_2018> and contains measurements of different viral species. The three numeric variables are evolutionary rate K, mutation rate mu, and genome size G. The categorical variables are fairly self-explanatory.
+
+```{r}
+viral_mut_rates <- read_csv("https://raw.githubusercontent.com/lauringlab/JVI_Gem_2018/master/Figure_1_mu_and_K_data.csv")
+```
+
+1.  Examine the data frame (tibble) and report the number and types of variables and the number of observations
+
+
+2.  Make a histogram of one of the numeric variables of your choice; describe its shape (e.g. normal, uniform, bimodal) and comment on any interesting features.
+
+```{r}
+
+```
+
+3.  Compute the counts, means, and standard deviations of one of the numeric variables of your choice, separated by `group` category.
+
+```{r}
+
+```
+
+4.  Visualize one of the numeric variables as a box plot or violin plot, separated by group.
+
+```{r}
+
+```
+
+
+5.  Report if there are any missing values and if any points may be considered outliers.
+
+```{r}
+
+```
+
+### Neuroblastoma data
+
+The following data set contains 22 scores of different from patients with neuroblastoma (a type of cancer) derived from cell-free DNA samples.
+
+```{r}
+neuro_blast <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/r2_gse62564_GSVA_Metadata_selected.csv")
+```
+
+1.  Examine the data frame (tibble) and report the number and types of variables and the number of observations
+
+2.  Compare the distributions of two or more of the numeric variables of your choice using boxplots or other visualizations; describe how the distributions differ.
+
+```{r}
+
+```
+
+3.  Compute the counts, means, and standard deviations of one of the numeric variables of your choice, separated by `high_risk` category.
+
+```{r}
+
+```
+
+4.  Visualize one of the numeric variables as a box plot or violin plot, separated by high_risk category.
+
+```{r}
+
+```
+
+5.  Report if there are any missing values and if any points may be considered outliers.
+
+```{r}
+
+```

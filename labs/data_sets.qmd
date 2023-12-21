@@ -1,0 +1,74 @@
+---
+title: "Data sets for ML"
+author: "Dmitry Kondrashov"
+format: html
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+```
+
+## Data sets to try
+
+### Viral mutation rates
+
+<https://github.com/lauringlab/JVI_Gem_2018>
+
+```{r}
+viral_mut_rates <- read_csv("https://raw.githubusercontent.com/lauringlab/JVI_Gem_2018/master/Figure_1_mu_and_K_data.csv")
+```
+
+### Bird feeder watch
+
+<https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-01-10/readme.md>
+
+```{r}
+feederwatch <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-01-10/PFW_2021_public.csv')
+```
+
+### COVID data
+
+```{r}
+covid_global <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv")
+covid_us <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv")
+```
+
+Global was downloaded from <https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_time_series>
+
+```{r}
+covid_italy <- covid_global %>% 
+  filter(`Country/Region` == 'Italy')
+italy_tidy <- covid_italy %>% 
+  pivot_longer(cols = !c(`Province/State`, `Country/Region`, Long, Lat), names_to = "date", values_to = "cases")
+
+italy_short <- italy_tidy %>% select(`Country/Region`, date, cases) %>%  filter (mdy(date) %in% seq(ymd('2020-02-01'),ymd('2020-03-29'), by = 'days'))
+```
+
+Data for US was downloaded from <https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_time_serieson>
+
+```{r}
+covid_chi <- covid_us %>% 
+  filter(Admin2== 'Cook',Province_State== 'Illinois') %>%
+  select(!(UID:Long_))
+chi_tidy <- covid_chi %>% 
+  pivot_longer(cols = !c(`Combined_Key`), names_to = "date", values_to = "cumulative")
+
+num <- length(chi_tidy$cumulative)
+
+chi_tidy <- chi_tidy %>% mutate(new = c(cumulative[1],cumulative[2:num]) - c(0,cumulative[1:(num-1)]))
+```
+
+### Numbats in Australia
+
+Data taken from here: <https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-03-07/readme.md>
+
+```{r}
+numbats <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-03-07/numbats.csv')
+```
+
+### Geo's data
+
+```{r}
+geo_data <- read_csv("data/r2_gse62564_GSVA_Metadata_selected.csv")
+```
