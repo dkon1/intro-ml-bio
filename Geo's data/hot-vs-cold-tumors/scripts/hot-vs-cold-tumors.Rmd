@@ -1,0 +1,310 @@
+---
+title: "Comparison of Hot and Cold Tumors"
+author: "Gepoliano Chaves (Ph. D.)"
+date: "December 16th, 2023"
+#output: revealjs::revealjs_presentation
+#output: html_notebook
+#output: beamer_presentation
+#output: github_document
+#output: html_vignette
+#output: ioslides_presentation
+#output: slidy_presentation 
+#output: tufte::tufte_book
+output: pdf_document
+---
+
+To prepare material for this notebook I used notebooks ADRN-MES-Sengupta-Final.Rmd and "Survial MES.Rmd".
+
+# 1) Library installation
+
+```{r, some libraries, message=F, warning=F}
+library(ggplot2)
+library(GSVA)
+library(GSVAdata)
+library(data.table)
+library(stringr)
+library(tibble)
+library(viridis)
+library(expss)
+library(ggpubr)
+```
+
+# 2) Gene Expression and GSVA
+
+Load data-frames
+
+```{r, load data-frame, warning=F, message=F}
+GSE49711 <- readRDS("../../../../../Hypoxia_Paper/for loop MES/data/GSE49711.rds")
+GSE49711_GeneMatrix <- as.matrix(GSE49711)
+```
+
+Load gene sets
+
+```{r}
+cfDNA_PCA_gene_list <- getGmt("~/Desktop/Gepoliano/Analysis/cfDNA_genes_PCA.txt")
+```
+
+Construct GSVA data-frame
+
+```{r Construct GSVA data-frame}
+# Needs to re-run this step if there are new gene sets
+GSE49711_GSVA <- gsva(GSE49711_GeneMatrix, 
+                          cfDNA_PCA_gene_list, 
+                          min.sz=1, max.sz=Inf, 
+                          verbose=TRUE)
+```
+
+Merge Gene Expression and GSVA data-frames
+
+```{r, Merge Gene Expression and GSVA data-frames}
+GSVA_GeneExpression_Matrix <- rbind(GSE49711_GSVA, GSE49711_GeneMatrix)
+```
+
+# 2) Process GSVA DF with Phenotype Scores
+
+Previous chunk used was from notebook "Multiple Test Correction Kocak.Rmd". Below we will transpose and Name Column with Sample Names
+
+```{r, 2) Process GSVA DF with Phenotype Scores}
+GSVA_GeneExpression_Matrix_t <- t(GSVA_GeneExpression_Matrix)
+GSVA_GeneExpression_Matrix_t_df <- as.data.frame(GSVA_GeneExpression_Matrix_t)
+GSVA_GeneExpression_Matrix_t_df["Sample_ID"] <- rownames(GSVA_GeneExpression_Matrix_t_df)
+```
+
+## 2.1) Inflammatory Response vs Hot
+
+```{r}
+qplot(data = GSVA_GeneExpression_Matrix_t_df,
+        HALLMARK_INFLAMMATORY_RESPONSE, 
+        results_immunogenicity_hot,
+        xlab = "HALLMARK_INFLAMMATORY_RESPONSE",
+        ylab = "results_immunogenicity_hot",
+      main = "Hallmark Inflammation vs. Hot")+
+  geom_smooth(method=lm)+
+  stat_cor(label.x = (-.3), label.y = 0.5) +
+  stat_regline_equation(label.x = (-.3), label.y = 0.4)+
+  theme_bw()
+```
+
+## 2.2) Inflammatory Response vs Cold
+
+```{r}
+qplot(data = GSVA_GeneExpression_Matrix_t_df,
+        HALLMARK_INFLAMMATORY_RESPONSE, 
+        results_immunogenicity_cold,
+        xlab = "HALLMARK_INFLAMMATORY_RESPONSE",
+        ylab = "results_immunogenicity_cold",
+      main = "Hallmark Inflammation vs. Cold")+
+  geom_smooth(method=lm)+
+  stat_cor(label.x = (-.3), label.y = 0.5) +
+  stat_regline_equation(label.x = (-.3), label.y = 0.4)+
+  theme_bw()
+```
+
+## 2.3) Inflammatory Response vs ADRN
+
+```{r}
+qplot(data = GSVA_GeneExpression_Matrix_t_df,
+        HALLMARK_INFLAMMATORY_RESPONSE, 
+        List_RNA_Normoxia_ADRN_vs_MES_Up.txt,
+        xlab = "HALLMARK_INFLAMMATORY_RESPONSE",
+        ylab = "ADRN (1298)",
+      main = "Hallmark Inflammation vs. ADRN (1298)")+
+  geom_smooth(method=lm)+
+  stat_cor(label.x = (-.3), label.y = 0.5) +
+  stat_regline_equation(label.x = (-.3), label.y = 0.4)+
+  theme_bw()
+```
+
+## 2.4) Inflammatory Response vs MES
+
+```{r}
+qplot(data = GSVA_GeneExpression_Matrix_t_df,
+        HALLMARK_INFLAMMATORY_RESPONSE, 
+        List_RNA_Normoxia_ADRN_vs_MES_Down.txt,
+        xlab = "HALLMARK_INFLAMMATORY_RESPONSE",
+        ylab = "MES (1469)",
+      main = "Hallmark Inflammation vs. MES (1469)")+
+  geom_smooth(method=lm)+
+  stat_cor(label.x = (-.3), label.y = 0.5) +
+  stat_regline_equation(label.x = (-.3), label.y = 0.4)+
+  theme_bw()
+```
+
+## 2.5) Inflammatory Response vs ADRN_Norm_vs_Hypo_Up_554.txt
+
+```{r}
+qplot(data = GSVA_GeneExpression_Matrix_t_df,
+        HALLMARK_INFLAMMATORY_RESPONSE, 
+        ADRN_Norm_vs_Hypo_Up_554.txt,
+        xlab = "HALLMARK_INFLAMMATORY_RESPONSE",
+        ylab = "Hypoxia Up (554)",
+      main = "Hallmark Inflammation vs. ADRN Hypoxia Up (554)")+
+  geom_smooth(method=lm)+
+  stat_cor(label.x = (-.3), label.y = 0.5) +
+  stat_regline_equation(label.x = (-.3), label.y = 0.4)+
+  theme_bw()
+```
+
+## 2.6) Inflammatory Response vs ADRN_Norm_vs_Hypo_Down_635.txt
+
+```{r}
+qplot(data = GSVA_GeneExpression_Matrix_t_df,
+        HALLMARK_INFLAMMATORY_RESPONSE, 
+        ADRN_Norm_vs_Hypo_Down_635.txt,
+        xlab = "HALLMARK_INFLAMMATORY_RESPONSE",
+        ylab = "Hypoxia Down (635)",
+      main = "Hallmark Inflammation vs. ADRN Hypoxia Down (635)")+
+  geom_smooth(method=lm)+
+  stat_cor(label.x = (-.3), label.y = 0.5) +
+  stat_regline_equation(label.x = (-.3), label.y = 0.4)+
+  theme_bw()
+```
+
+## 2.7) Check MES vs. Hypoxia Up
+
+```{r}
+qplot(data = GSVA_GeneExpression_Matrix_t_df,
+        List_RNA_Normoxia_ADRN_vs_MES_Down.txt, 
+        ADRN_Norm_vs_Hypo_Up_554.txt,
+        xlab = "MES (1469)",
+        ylab = "Hypoxia Up (554)",
+      main = "MES (1469) vs. ADRN Hypoxia Up (554)")+
+  geom_smooth(method=lm)+
+  stat_cor(label.x = (-.3), label.y = 0.5) +
+  stat_regline_equation(label.x = (-.3), label.y = 0.4)+
+  theme_bw()
+```
+
+## 2.8) Check ADRN vs. Hypoxia Down
+
+```{r}
+qplot(data = GSVA_GeneExpression_Matrix_t_df,
+        List_RNA_Normoxia_ADRN_vs_MES_Down.txt, 
+        ADRN_Norm_vs_Hypo_Down_635.txt,
+        xlab = "ADRN (1298)",
+        ylab = "Hypoxia Down (635)",
+      main = "ADRN (1298) vs. ADRN Hypoxia Down (635)")+
+  geom_smooth(method=lm)+
+  stat_cor(label.x = (-.3), label.y = 0.5) +
+  stat_regline_equation(label.x = (-.3), label.y = 0.4)+
+  theme_bw()
+```
+
+## 2.9) Check Hot vs. Hypoxia Up
+
+```{r}
+qplot(data = GSVA_GeneExpression_Matrix_t_df,
+        results_immunogenicity_hot, 
+        ADRN_Norm_vs_Hypo_Up_554.txt,
+        xlab = "results_immunogenicity_hot",
+        ylab = "Hypoxia Up (554)",
+      main = "Immunologicaly Hot vs. ADRN Hypoxia Up (554)")+
+  geom_smooth(method=lm)+
+  stat_cor(label.x = (-.3), label.y = 0.5) +
+  stat_regline_equation(label.x = (-.3), label.y = 0.4)+
+  theme_bw()
+```
+
+## 2.10) Check Cold vs. Hypoxia Down
+
+```{r}
+qplot(data = GSVA_GeneExpression_Matrix_t_df,
+        results_immunogenicity_cold, 
+        ADRN_Norm_vs_Hypo_Down_635.txt,
+        xlab = "results_immunogenicity_cold",
+        ylab = "Hypoxia Down (635)",
+      main = "Immunologicaly Cold vs. ADRN Hypoxia Down (635)")+
+  geom_smooth(method=lm)+
+  stat_cor(label.x = (-.3), label.y = 0.5) +
+  stat_regline_equation(label.x = (-.3), label.y = 0.4)+
+  theme_bw()
+```
+
+# Correlation Matrix
+
+```{r, eval=F}
+r2_gse62564_gsva_genes_df <- t(r2_gse62564_GSVA_genes)
+```
+
+# Select terms to be plotted
+
+```{r}
+GSVA_GeneExpression_Matrix <- GSVA_GeneExpression_Matrix_t_df[,
+                                                              c("HALLMARK_INFLAMMATORY_RESPONSE",
+                                                                "results_immunogenicity_hot",
+                                                                "results_immunogenicity_cold",
+                                                                "List_RNA_Normoxia_ADRN_vs_MES_Up.txt",
+                                                                "List_RNA_Normoxia_ADRN_vs_MES_Down.txt",
+                                                                "ADRN_Norm_vs_Hypo_Up_554.txt",
+                                                                "ADRN_Norm_vs_Hypo_Down_635.txt"#, This part needs to be commented w/ part below
+                                                                # "MES_Norm_vs_Hypo.compCas_Up_287.txt",
+                                                                # "MES_Norm_vs_Hypo.compCas_Down_171.txt",
+                                                                # "MES_Norm_vs_Hypo.compCas_Up_212.txt",
+                                                                # "MES_Norm_vs_Hypo.compCas_Down_103.txt"
+                                                        )]
+
+
+GSVA_GeneExpression_Matrix_df <- as.data.frame(GSVA_GeneExpression_Matrix)
+
+GSVA_GeneExpression_Matrix_df <- GSVA_GeneExpression_Matrix_df %>% dplyr::rename(Inflam_Response = HALLMARK_INFLAMMATORY_RESPONSE)
+GSVA_GeneExpression_Matrix_df <- GSVA_GeneExpression_Matrix_df %>% dplyr::rename(Hot = results_immunogenicity_hot)
+GSVA_GeneExpression_Matrix_df <- GSVA_GeneExpression_Matrix_df %>% dplyr::rename(Cold = results_immunogenicity_cold)
+GSVA_GeneExpression_Matrix_df <- GSVA_GeneExpression_Matrix_df %>% dplyr::rename(ADRN_1298 = List_RNA_Normoxia_ADRN_vs_MES_Up.txt)
+GSVA_GeneExpression_Matrix_df <- GSVA_GeneExpression_Matrix_df %>% dplyr::rename(MES_1469 = List_RNA_Normoxia_ADRN_vs_MES_Down.txt)
+GSVA_GeneExpression_Matrix_df <- GSVA_GeneExpression_Matrix_df %>% dplyr::rename(Hypo_Up_554 = ADRN_Norm_vs_Hypo_Up_554.txt)
+GSVA_GeneExpression_Matrix_df <- GSVA_GeneExpression_Matrix_df %>% dplyr::rename(Hypo_Down_635 = ADRN_Norm_vs_Hypo_Down_635.txt)
+
+# GSVA_GeneExpression_Matrix_df <- GSVA_GeneExpression_Matrix_df %>% dplyr::rename(Hypo_UP_287 = MES_Norm_vs_Hypo.compCas_Up_287.txt)
+# GSVA_GeneExpression_Matrix_df <- GSVA_GeneExpression_Matrix_df %>% dplyr::rename(Hypo_DN_171 = MES_Norm_vs_Hypo.compCas_Down_171.txt)
+# GSVA_GeneExpression_Matrix_df <- GSVA_GeneExpression_Matrix_df %>% dplyr::rename(Hypo_UP_212 = MES_Norm_vs_Hypo.compCas_Up_212.txt)
+# GSVA_GeneExpression_Matrix_df <- GSVA_GeneExpression_Matrix_df %>% dplyr::rename(Hypo_DN_103 = MES_Norm_vs_Hypo.compCas_Down_103.txt)
+```
+
+Make character, numeric
+
+```{r}
+library(dplyr)
+GSVA_GeneExpression_Matrix_df <- GSVA_GeneExpression_Matrix_df %>% mutate_if(is.character, as.numeric)
+```
+
+# Calculate correlation
+
+```{r}
+GSVA_GeneExpression_Matrix_cor_df <- cor(GSVA_GeneExpression_Matrix_df)
+```
+
+# Plot correlation matrix
+
+Plot with colorful number
+
+```{r, corrplot colorful numbers}
+library(corrplot )
+corrplot(GSVA_GeneExpression_Matrix_cor_df, method = 'number', order="hclust", addrect = 3) 
+```
+
+Plot correlations as circles. This figure intentionally compares the correlations of cellular MES signatures and hot/cold tumors.
+
+```{r corrplot circles}
+corrplot(GSVA_GeneExpression_Matrix_cor_df, 
+         type="lower",
+         order="hclust",
+         #method = c(pie),
+         title = "Correlation Matrix Hot and Cold Tumors",
+         tl.col = "black",
+         #tl.offset=1,
+         tl.srt = 45,
+         addrect = 4,
+         col=colorRampPalette(c("#053061",
+                                "#2166AC",
+                                "#4393C3",
+                                "#92C5DE",
+                                "#D1E5F0",
+                                "#FFFFFF",
+                                "#FDDBC7",
+                                "#F4A582",
+                                "#D6604D", 
+                                "#B2182B",
+                                "#67001F"
+                                ))(200)
+         )
+```
