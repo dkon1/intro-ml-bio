@@ -1,5 +1,5 @@
 ---
-title: "Intro to data (lab 1 for BIOS 26122)"
+title: "Introduction to data (lab 1 for BIOS 26122)"
 author: "Dmitry Kondrashov"
 format: html
 editor: visual
@@ -148,7 +148,7 @@ viral_mut_rates |>
 
 ### Neuroblastoma data
 
-The following data set contains 22 scores of different from patients with neuroblastoma (a type of cancer) derived from cell-free DNA samples.
+The following data set is gene expression data from tumors of patients with neuroblastoma (a type of cancer), accession number [**GSE62564**](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE62564)**.** It contains 22 phenotypic scores, 6 of which (MYCN, STC1, P4HA1, BHLHE40, HIF1A and ST8SIA1) are gene expressions measured in log2RPM (log 2 reads per million). The other 16 are quantified by R package GSVA (Gene Set Enrichment Analysis).
 
 ```{r}
 neuro_blast <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/r2_gse62564_GSVA_Metadata_selected.csv")

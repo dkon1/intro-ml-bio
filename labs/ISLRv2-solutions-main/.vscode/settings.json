@@ -1,0 +1,29 @@
+{
+    "cSpell.words": [
+        "ANOVA",
+        "Bonferroni",
+        "boxplots",
+        "covariate",
+        "dendrogram",
+        "dendrograms",
+        "exponentiating",
+        "FWER",
+        "hypergeometric",
+        "Kaplan",
+        "logit",
+        "LOOCV",
+        "multinomial",
+        "overfit",
+        "overfitting",
+        "quantile",
+        "quantiles",
+        "scalings",
+        "scatterplot",
+        "scatterplots",
+        "softmax",
+        "stochasticity",
+        "timepoint"
+    ],
+    "cSpell.enabled": true,
+    "cSpell.language": "en-US"
+}
