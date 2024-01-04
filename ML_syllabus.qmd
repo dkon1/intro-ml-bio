@@ -3,7 +3,7 @@ title: "Introduction to Machine Learning for Biology (BIOS 26122)"
 subtitle: "winter 2024"
 author: "Dmitry Kondrashov"
 format: 
-  pdf:
+  html:
     self-contained: true
 editor: visual
 ---
@@ -11,6 +11,12 @@ editor: visual
 ## Instructors:
 
 Dmitry Kondrashov [dkon\@uchicago.edu](mailto:dkon@uchicago.edu){.email}
+
+### TAs: 
+
+Robbie Sucholeiki [rsucholeiki\@uchicago.edu](mailto:rsucholeiki@uchicago.edu){.email}
+
+Jared Montney [jaredmontney\@uchicago.edu](mailto:jaredmontney@uchicago.edu){.email}
 
 ## Course logistics
 
@@ -54,7 +60,7 @@ You are welcome to email the instructors with personal requests, but please ask 
 ## Weekly Schedule
 
 | Week   | Day      | Topic                                                                | Date      |
-|-----------|-----------|-----------------------------------------|-----------|
+|-------------|-------------|---------------------------------|-------------|
 | Week 1 | Thursday | Learning from data                                                   | 4-Jan-24  |
 | Week 2 | Tuesday  | Bias-variance tradeoff (chapter 2 ISLR)                              | 9-Jan-24  |
 | Week 2 | Thursday | K nearest neighbors (chapter 2 ISLR)                                 | 11-Jan-24 |
@@ -77,13 +83,14 @@ You are welcome to email the instructors with personal requests, but please ask 
 
 The final course grade will be calculated as follows:
 
-| Category       | Work               | Final grade percentage |
-|----------------|--------------------|------------------------|
-| R labs         | 8 assignments      | 40%                    |
-| Weekly quizzes | take on Canvas     | 20%                    |
-| Midterm        | in-class exam      | 10%                    |
-| Final exam     | in-class exam      | 20%                    |
-| Surveys        | complete on Canvas | 10%                    |
+| Category             | Work                  | Final grade percentage |
+|----------------------|-----------------------|------------------------|
+| R labs               | 8 assignments         | 40 %                   |
+| Weekly quizzes       | take on Canvas        | 20 %                   |
+| Project proposal     | short proposal        | 5 %                    |
+| Project presentation | in-class presentation | 20 %                   |
+| Final report         | submit on Canvas      | 10 %                   |
+| Surveys              | complete on Canvas    | 5 %                    |
 
 ## Course policies
 
