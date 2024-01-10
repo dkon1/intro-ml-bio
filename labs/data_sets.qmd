@@ -67,8 +67,144 @@ Data taken from here: <https://github.com/rfordatascience/tidytuesday/blob/maste
 numbats <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-03-07/numbats.csv')
 ```
 
-### Geo's data
+```{r}
+# Cleaning script provided at
+# https://github.com/numbats/numbats-tidytuesday/blob/main/code/data.R Slightly
+# updated here.
+
+library(galah) # API to ALA
+library(lubridate)
+library(tidyverse)
+library(rnoaa)
+library(here)
+
+# Downloading data is free but you need to 
+# create an account https://www.ala.org.au then
+# use this email address to pull data.
+# galah_config(email = YOUR_EMAIL_ADDRESS)
+id <- galah_identify("numbat")
+
+numbats <- atlas_occurrences(identify = id)
+numbats <- numbats %>%
+  mutate(
+    year = year(eventDate),
+    month = month(eventDate, label=TRUE, abbr=TRUE),
+    wday = wday(eventDate, label=TRUE, abbr=TRUE, week_start = 1),
+    hour = hour(eventDate),
+    day = ymd(as.Date(eventDate))
+  )
+
+narrogin <- meteo_pull_monitors(
+  monitors = "ASN00010614",
+  var = c("PRCP", "TMAX", "TMIN"),
+  date_min = "2005-01-01",
+  date_max = "2023-02-23")
+
+narrogin %>%
+  pivot_longer(cols = prcp:tmin, names_to = "var", values_to = "value") %>%
+  mutate(day = lubridate::yday(date), year = lubridate::year(date)) %>%
+  ggplot(aes(x = day, y= year, fill = is.na(value))) +
+  geom_tile() +
+  theme_minimal() +
+  theme(panel.grid = element_blank()) +
+  facet_wrap(vars(var), ncol = 1) +
+  scale_fill_brewer(palette = "Dark2", name = "missing") +
+  xlab("Day of the year")
+
+narrogin_latlon <- tibble(lon = 117.1782, lat = -32.9310)
+
+within_rad <- function(x, y, lon, lat, km) {
+  deg <- km/111
+  inside <- sqrt((lon-x)^2 + (lat-y)^2) < deg
+  return(inside)
+}
+
+# Only sites within 50km radius of Narrogin weather station
+# which is Dryandra Woodlands
+numbats <- numbats %>%
+  mutate(
+    dryandra = within_rad(
+      decimalLongitude, decimalLatitude, 
+      narrogin_latlon$lon, narrogin_latlon$lat,
+      50
+    )
+  )
+  
+numbats <- numbats %>% 
+  left_join(narrogin, by = join_by(day == date)) %>%
+  mutate(
+    prcp = if_else(dryandra, prcp, NA, missing = NA),
+    tmax = if_else(dryandra, tmax, NA, missing = NA),
+    tmin = if_else(dryandra, tmin, NA, missing = NA)
+  ) %>%
+  select(-id)
+
+# Things are only in this dataset if they were PRESENT.
+numbats <- numbats |> 
+  select(-occurrenceStatus)
+
+# Those last three values are in values to coerce them to integers, and might be
+# confusing. Translate them to doubles.
+numbats <- numbats |> 
+  mutate(
+    prcp = prcp/10,
+    tmax = tmax/10,
+    tmin = tmin/10
+  )
+
+write_csv(
+  numbats, 
+  file = here::here(
+    "data",
+    "2023",
+    "2023-03-07",
+    "numbats.csv"
+  )
+)
+```
+
+### Geo's neuroblastoma data
 
 ```{r}
 geo_data <- read_csv("data/r2_gse62564_GSVA_Metadata_selected.csv")
+```
+
+## Portal Project
+
+<https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-05-02>
+
+The data this week comes from the [Portal Project](https://portal.weecology.org/). This is a long-term ecological research site studying the dynamics of desert rodents, plants, ants and weather in Arizona.
+
+> The Portal Project is a long-term ecological study being conducted
+> near Portal, AZ. Since 1977, the site has been used to study the
+> interactions among rodents, ants and plants and their respective
+> responses to climate. To study the interactions among organisms, they
+> experimentally manipulate access to 24 study plots. This study has
+> produced over 100 scientific papers and is one of the longest running
+> ecological studies in the U.S.
+
+The [Weecology research group](https://www.weecology.org/) monitors rodents, plants, ants, and weather. All data from the Portal Project are made openly available in near real-time so that they can provide the maximum benefit to scientific research and outreach. The core dataset is managed using an automated living data workflow run using GitHub and Continuous Analysis.
+
+This dataset focuses on the rodent data. Full data is available through
+these resources:
+
+-   [GitHub Data Repository](https://github.com/weecology/PortalData)
+
+-   [Live Updating Zenodo
+    Archive](https://doi.org/10.5281/zenodo.1215988)
+
+-   [DataPaper](https://www.biorxiv.org/content/early/2018/05/28/332783)
+
+-   [Methods
+    Documentation](https://github.com/weecology/PortalData/blob/master/SiteandMethods/Methods.md)
+
+    A teaching focused version of the dataset is also maintained with some of the complexities of the data removed to make it easy to use for computational training purposes. This dataset serves as the core dataset for the [Data CarpentryEcology](https://datacarpentry.org/ecology-workshop/) material and has been downloaded almost 50,000 times.
+
+```{r}
+# Or read in the data manually
+
+plots <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-05-02/plots.csv')
+species <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-05-02/species.csv')
+surveys <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-05-02/surveys.csv')
+
 ```

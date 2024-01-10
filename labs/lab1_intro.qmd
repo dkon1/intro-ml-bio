@@ -1,7 +1,9 @@
 ---
 title: "Introduction to data (lab 1 for BIOS 26122)"
 author: "Dmitry Kondrashov"
-format: html
+format: 
+  html:
+    self-contained: true
 editor: visual
 ---
 

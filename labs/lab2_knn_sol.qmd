@@ -1,0 +1,228 @@
+---
+title: "KNN and tradeoffs (lab 2 for BIOS 26122)"
+author: "Dmitry Kondrashov"
+format: 
+  html:
+    self-contained: true
+editor: visual
+---
+
+## Description
+
+The goal of this assignment is to demonstrate fundamental concepts of machine learning, such as error in training and test sets, bias-variance tradeoff, using knn regression and classification. Here is what you will do:
+
+1.  Clean a given data set by removing missing values and outliers and selecting the variables you want to work with.
+
+2.  Apply knn method either for classification or regression on a training set and validate on a test set.
+
+3.  Report the error of the classification or regression on both training and test sets.
+
+4.  Repeat the process for different number of nearest neighbors (hyperparameter k) and compare the results.
+
+```{r setup}
+#| include: false
+#| echo: false
+library(tidyverse)
+library(class)
+library(FNN)
+```
+
+## Heart rates
+
+The following data set contains heart rates measured and reported by students in my class Introduction to Quantitative Modeling for Biology. There are four different heart rates measured (two at rest and two after exercise) and the year it was measured.
+
+```{r}
+heart_rates <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/HR_data_combined.csv")
+```
+
+1.  Select a response and an explanatory variable and clean the data to remove any outliers or missing values in these variables. Split the data set into training and test sets.
+
+    ```{r}
+    heart_data <- heart_rates |> 
+      select(Ex1, Rest1) |> 
+      drop_na() |> 
+      arrange(Rest1)
+
+
+    train_index <- sample(nrow(heart_data), size = floor(0.75 * nrow(heart_data)))
+    heart_train <- heart_data[train_index, ]
+    heart_test <- heart_data[-train_index, ]
+    ```
+
+2.  Make a prediction using knn regression with k=5, and plot the predicted values over the actual data
+
+```{r}
+num = 5
+heart_pred = knn.reg(train = heart_data$Rest1,  y=heart_data$Ex1,  k = num)
+# base R:
+plot(Ex1 ~ Rest1, data = heart_data, cex = .8, col = "blue", main = paste("KNN regression with k =", num))
+lines(heart_data$Rest1, heart_pred$pred, col = "darkorange", lwd = 2)
+# ggplot:
+heart_data |> ggplot() + 
+  aes(x = Rest1, y = Ex1) + geom_point(color = 'blue') +
+  geom_line(aes(x = Rest1, y = heart_pred$pred), color = 'darkorange')
+```
+
+3.  Compute the error and its components.
+
+```{r}
+total_var <- var(heart_data$Ex1)
+#res_var <- var(heart_pred$residuals)
+res_var <- var(heart_pred$pred - heart_data$Ex1)
+model_var <- var(heart_pred$pred)
+
+print(paste("Total variance:", total_var, "model variance:", model_var, "residual variance:", res_var))
+```
+
+4.  Visualize one of the numeric variables as a box plot or violin plot, separated by different years.
+
+```{r}
+# base R
+boxplot(Ex2 ~ Year, data = heart_rates, main= "Ex2 for different years")
+# ggplot
+heart_rates |> ggplot() + aes(x=as.factor(Year), y = Ex2) + geom_boxplot() + ggtitle("Ex2 for different years") + xlab("year")
+```
+
+5.  Report if there are any missing values and if any points may be considered outliers.
+
+```{r}
+# base R to calculate by column
+cat("The number of NAs in each column: ")
+cat(colSums(is.na(heart_rates)))
+cat("\n")
+# tidyverse to calculate by row
+heart_rates %>%
+  rowwise() %>%
+  mutate(sum_na = sum(is.na(c_across())))
+
+```
+
+In the histogram you can see some points that are
+
+### Viral mutation rates
+
+The following data set comes from <https://github.com/lauringlab/JVI_Gem_2018> and contains measurements of different viral species. The three numeric variables are evolutionary rate K, mutation rate mu, and genome size G. The categorical variables are fairly self-explanatory.
+
+```{r}
+viral_mut_rates <- read_csv("https://raw.githubusercontent.com/lauringlab/JVI_Gem_2018/master/Figure_1_mu_and_K_data.csv")
+```
+
+1.  Examine the data frame (tibble) and report the number and types of variables and the number of observations
+
+    11 columns, of which 3 are numeric: G, K, mu, one logical, and the rest are categorical, 111 observations
+
+2.  Make a histogram of one of the numeric variables of your choice; describe its shape (e.g. normal, uniform, bimodal) and comment on any interesting features.
+
+```{r}
+# base R:
+hist(viral_mut_rates$G, main = 'Histogram of gene size', xlab = "size (Kbp?)")
+# ggplot
+viral_mut_rates |> ggplot() + aes(x=G) + geom_histogram() + ggtitle('Histogram of gene size') + xlab("size (Kbp?)")
+```
+
+3.  Compute the counts, means, and standard deviations of one of the numeric variables of your choice, separated by `group` category.
+
+```{r}
+# base R
+group_list = unique(viral_mut_rates$group)
+for (g in group_list) {
+  slice <- viral_mut_rates$group == g
+  print(paste("In group", g, "number of observations of G is:", length(viral_mut_rates$G[slice])))
+  print(paste("In group", g, "mean value of G is:", mean(viral_mut_rates$G[slice])))
+  print(paste("In group", g, "standard deviation of G is:", sd(viral_mut_rates$G[slice])))
+}
+# tidyverse
+
+viral_mut_rates |> group_by(group) |> summarise(num = n(), mean_G = mean(G), sd_G = sd(G))
+```
+
+4.  Visualize one of the numeric variables as a box plot or violin plot, separated by group.
+
+```{r}
+# base R
+boxplot(G ~ group, data = viral_mut_rates, main= "Genome size for different groups of viruses")
+# ggplot
+viral_mut_rates |> ggplot() + aes(x=group, y = G) + geom_boxplot() + ggtitle("Genome size for different groups of viruses") + xlab("virus group")
+```
+
+5.  Report if there are any missing values and if any points may be considered outliers.
+
+```{r}
+# base R to calculate by column
+cat("The number of NAs in each column: ")
+cat(colSums(is.na(viral_mut_rates)))
+cat("\n")
+# tidyverse to calculate by row
+viral_mut_rates |> 
+  select(G,K, mu) |> 
+  rowwise() |> 
+  mutate(sum_na = sum(is.na(c_across())))
+```
+
+### Neuroblastoma data
+
+The following data set is gene expression data from tumors of patients with neuroblastoma (a type of cancer), accession number [**GSE62564**](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE62564)**.** It contains 22 phenotypic scores, 6 of which (MYCN, STC1, P4HA1, BHLHE40, HIF1A and ST8SIA1) are gene expressions measured in log2RPM (log 2 reads per million). The other 16 are quantified by R package GSVA (Gene Set Enrichment Analysis).
+
+```{r}
+neuro_blast <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/r2_gse62564_GSVA_Metadata_selected.csv")
+```
+
+1.  Clean the data to remove any outliers or missing values in these variables, and select all the variables except for \`sample id\`. Split the data set into training and test sets.
+
+    ```{r}
+    neuro_data <- neuro_blast |> select(-`sample id`) |> drop_na()
+    train_index <- sample(nrow(neuro_data), size = floor(0.75 * nrow(neuro_data)))
+    neuro_train <- neuro_data[train_index, ]
+    neuro_test <- neuro_data[-train_index, ]
+    ```
+
+2.  Compare the distributions of two or more of the numeric variables of your choice using boxplots or other visualizations; describe how the distributions differ.
+
+```{r}
+# base R:
+hist(neuro_blast$MYCN, main = 'Histogram of MYCN', xlab = "size (Kbp?)")
+# ggplot
+neuro_blast |> ggplot() + aes(x=MYCN) + geom_histogram() + ggtitle('Histogram of MYCN') + xlab("MYCN")
+```
+
+The histogram of MYCN is very non-normal, the biggest peak is at 0, with a long tail of higher values.
+
+3.  Compute the counts, means, and standard deviations of one of the numeric variables of your choice, separated by `high_risk` category.
+
+```{r}
+# base R
+risk_list = unique(neuro_blast$high_risk)
+for (risk in risk_list) {
+  slice <- neuro_blast$high_risk == risk
+  print(paste("In group", risk, "number of observations of G is:", length(neuro_blast$MYCN[slice])))
+  print(paste("In group", risk, "mean value of G is:", mean(neuro_blast$MYCN[slice])))
+  print(paste("In group", risk, "standard deviation of G is:", sd(neuro_blast$MYCN[slice])))
+}
+# tidyverse
+
+neuro_blast |> group_by(high_risk) |> summarise(num = n(), mean_MYCN = mean(MYCN), sd_MYCN = sd(MYCN))
+```
+
+You can see major differences in mean values of MYCN between high and low risk groups.
+
+4.  Visualize one of the numeric variables as a box plot or violin plot, separated by high_risk category.
+
+```{r}
+# base R
+boxplot(MYCN ~ high_risk, data = neuro_blast, main= "MYCN for different risk groups")
+# ggplot
+neuro_blast |> ggplot() + aes(x=high_risk, y = MYCN) + geom_boxplot() + ggtitle("MYCN for different risk groups") + xlab("High risk status")
+```
+
+5.  Report if there are any missing values and if any points may be considered outliers.
+
+```{r}
+# base R to calculate by column
+cat("The number of NAs in each column: ")
+cat(colSums(is.na(neuro_blast)))
+cat("\n")
+# tidyverse to calculate by row
+neuro_blast |>  select(-c(`sample id`, high_risk)) |> 
+  rowwise() |> 
+  mutate(sum_na = sum(is.na(c_across())))
+```

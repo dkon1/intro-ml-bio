@@ -12,7 +12,7 @@ editor: visual
 
 Dmitry Kondrashov [dkon\@uchicago.edu](mailto:dkon@uchicago.edu){.email}
 
-### TAs: 
+### TAs:
 
 Robbie Sucholeiki [rsucholeiki\@uchicago.edu](mailto:rsucholeiki@uchicago.edu){.email}
 
@@ -60,7 +60,7 @@ You are welcome to email the instructors with personal requests, but please ask 
 ## Weekly Schedule
 
 | Week   | Day      | Topic                                                                | Date      |
-|-------------|-------------|---------------------------------|-------------|
+|--------|----------|----------------------------------------------------------------------|-----------|
 | Week 1 | Thursday | Learning from data                                                   | 4-Jan-24  |
 | Week 2 | Tuesday  | Bias-variance tradeoff (chapter 2 ISLR)                              | 9-Jan-24  |
 | Week 2 | Thursday | K nearest neighbors (chapter 2 ISLR)                                 | 11-Jan-24 |
