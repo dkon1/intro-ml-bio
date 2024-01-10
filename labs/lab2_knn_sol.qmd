@@ -74,7 +74,7 @@ model_var <- var(heart_pred$pred)
 print(paste("Total variance:", total_var, "model variance:", model_var, "residual variance:", res_var))
 ```
 
-4.  Visualize one of the numeric variables as a box plot or violin plot, separated by different years.
+4.  Repeat knn regression for several other values of k, both smaller and larger than 5. Plot the residual variance as a function of k.
 
 ```{r}
 # base R
@@ -170,14 +170,15 @@ neuro_blast <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/ma
 1.  Clean the data to remove any outliers or missing values in these variables, and select all the numeric variables. Split the data set into training and test sets.
 
     ```{r}
-    neuro_data <- neuro_blast |> select(-`sample id`, high_risk) |> drop_na()
+    neuro_data <- neuro_blast |> select(-c(`sample id`, high_risk)) |> drop_na()
     train_index <- sample(nrow(neuro_data), size = floor(0.75 * nrow(neuro_data)))
     neuro_train <- neuro_data[train_index, ]
     neuro_test <- neuro_data[-train_index, ]
     risk_train <- neuro_blast$high_risk[train_index]
+    risk_test <- neuro_blast$high_risk[-train_index]
     ```
 
-2.  Use the `knn` function from package `class` to predict the risk status (`high_risk` response variable) on the basis of your choice of numeric variables, using k=5.
+2.  Use the `knn` function from package `class` to predict the risk status (`high_risk` response variable) for the test set using k=5.
 
 ```{r}
 # base R:
@@ -185,34 +186,21 @@ knn_out <- knn(train = neuro_train,
          test = neuro_test, 
          cl = risk_train, 
          k = 5)
-
 ```
 
-3.  Compute the accuracy of knn classification of high_risk, by printing the table of true vs predicted classes (confusion matrix) as well as the accuracy (fraction of agreement between true and predicted classes).
+3.  Compute the accuracy of knn classification of high_risk, by printing the table of true vs predicted classes (confusion matrix) as well as the accuracy (fraction of agreement between true and predicted classes out of all predictions).
 
 ```{r}
 # base R
-risk_list = unique(neuro_blast$high_risk)
-for (risk in risk_list) {
-  slice <- neuro_blast$high_risk == risk
-  print(paste("In group", risk, "number of observations of G is:", length(neuro_blast$MYCN[slice])))
-  print(paste("In group", risk, "mean value of G is:", mean(neuro_blast$MYCN[slice])))
-  print(paste("In group", risk, "standard deviation of G is:", sd(neuro_blast$MYCN[slice])))
-}
-# tidyverse
-
-neuro_blast |> group_by(high_risk) |> summarise(num = n(), mean_MYCN = mean(MYCN), sd_MYCN = sd(MYCN))
+print(table(knn_out, risk_test))
+print(sum(knn_out==risk_test)/length(knn_out))
 ```
 
-You can see major differences in mean values of MYCN between high and low risk groups.
-
-4.  Visualize one of the numeric variables as a box plot or violin plot, separated by high_risk category.
+4.  Repeat the classification for several other values of k, both smaller and larger than 5. Plot the resulting accuracy scores as a function of k.
 
 ```{r}
 # base R
-boxplot(MYCN ~ high_risk, data = neuro_blast, main= "MYCN for different risk groups")
-# ggplot
-neuro_blast |> ggplot() + aes(x=high_risk, y = MYCN) + geom_boxplot() + ggtitle("MYCN for different risk groups") + xlab("High risk status")
+
 ```
 
 5.  Report if there are any missing values and if any points may be considered outliers.
