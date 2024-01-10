@@ -167,27 +167,28 @@ The following data set is gene expression data from tumors of patients with neur
 neuro_blast <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/r2_gse62564_GSVA_Metadata_selected.csv")
 ```
 
-1.  Clean the data to remove any outliers or missing values in these variables, and select all the variables except for \`sample id\`. Split the data set into training and test sets.
+1.  Clean the data to remove any outliers or missing values in these variables, and select all the numeric variables. Split the data set into training and test sets.
 
     ```{r}
-    neuro_data <- neuro_blast |> select(-`sample id`) |> drop_na()
+    neuro_data <- neuro_blast |> select(-`sample id`, high_risk) |> drop_na()
     train_index <- sample(nrow(neuro_data), size = floor(0.75 * nrow(neuro_data)))
     neuro_train <- neuro_data[train_index, ]
     neuro_test <- neuro_data[-train_index, ]
+    risk_train <- neuro_blast$high_risk[train_index]
     ```
 
-2.  Compare the distributions of two or more of the numeric variables of your choice using boxplots or other visualizations; describe how the distributions differ.
+2.  Use the `knn` function from package `class` to predict the risk status (`high_risk` response variable) on the basis of your choice of numeric variables, using k=5.
 
 ```{r}
 # base R:
-hist(neuro_blast$MYCN, main = 'Histogram of MYCN', xlab = "size (Kbp?)")
-# ggplot
-neuro_blast |> ggplot() + aes(x=MYCN) + geom_histogram() + ggtitle('Histogram of MYCN') + xlab("MYCN")
+knn_out <- knn(train = neuro_train, 
+         test = neuro_test, 
+         cl = risk_train, 
+         k = 5)
+
 ```
 
-The histogram of MYCN is very non-normal, the biggest peak is at 0, with a long tail of higher values.
-
-3.  Compute the counts, means, and standard deviations of one of the numeric variables of your choice, separated by `high_risk` category.
+3.  Compute the accuracy of knn classification of high_risk, by printing the table of true vs predicted classes (confusion matrix) as well as the accuracy (fraction of agreement between true and predicted classes).
 
 ```{r}
 # base R
