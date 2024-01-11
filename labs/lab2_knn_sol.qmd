@@ -1,5 +1,5 @@
 ---
-title: "KNN and tradeoffs (lab 2 for BIOS 26122)"
+title: "KNN and bias-variance tradeoff (lab 2 for BIOS 26122)"
 author: "Dmitry Kondrashov"
 format: 
   html:
@@ -9,7 +9,7 @@ editor: visual
 
 ## Description
 
-The goal of this assignment is to demonstrate fundamental concepts of machine learning, such as error in training and test sets, bias-variance tradeoff, using knn regression and classification. Here is what you will do:
+The goal of this assignment is to demonstrate fundamental concepts of machine learning, such as error in training and test sets, bias-variance tradeoff, using KNN regression and classification. Here is what you will do:
 
 1.  Clean a given data set by removing missing values and outliers and selecting the variables you want to work with.
 
@@ -39,125 +39,85 @@ heart_rates <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/ma
 
     ```{r}
     heart_data <- heart_rates |> 
-      select(Ex1, Rest1) |> 
-      drop_na() |> 
-      arrange(Rest1)
+      dplyr::select(Rest2, Ex2) |> 
+      drop_na() #|> 
+    # arrange(Rest2) 
 
 
-    train_index <- sample(nrow(heart_data), size = floor(0.75 * nrow(heart_data)))
-    heart_train <- heart_data[train_index, ]
-    heart_test <- heart_data[-train_index, ]
+    train_index <- sample(nrow(heart_data), size = floor(0.5 * nrow(heart_data)))
+
+    heart_train <- heart_data %>% 
+      slice(train_index) %>% 
+      arrange(Rest2)
+
+    heart_test <- heart_data %>% 
+      slice(-train_index) |> 
+      arrange(Rest2) 
+
+    X_train <- heart_train %>% 
+      dplyr::select(Rest2) 
+    X_test <- heart_test %>% 
+      dplyr::select(Rest2) 
+    Y_train <- heart_train %>% 
+      dplyr::select(Ex2) 
+    Y_test <- heart_test %>% 
+      dplyr::select(Ex2)
     ```
 
-2.  Make a prediction using knn regression with k=5, and plot the predicted values over the actual data
+2.  Make a prediction for the test set using knn regression with k=5, and plot the predicted values over the actual data for the test set. Report the variance of the residuals for the test set.
 
 ```{r}
-num = 5
-heart_pred = knn.reg(train = heart_data$Rest1,  y=heart_data$Ex1,  k = num)
+num = 1
+heart_pred <- knn.reg(train = X_train, test = X_test, y=Y_train$Ex2,  k = num)
 # base R:
-plot(Ex1 ~ Rest1, data = heart_data, cex = .8, col = "blue", main = paste("KNN regression with k =", num))
-lines(heart_data$Rest1, heart_pred$pred, col = "darkorange", lwd = 2)
+plot(X_test$Rest2, Y_test$Ex2, cex = .8, col = "blue", main = paste("KNN regression with k =", num))
+lines(X_test$Rest2, heart_pred$pred, col = "darkorange", lwd = 2)
 # ggplot:
-heart_data |> ggplot() + 
-  aes(x = Rest1, y = Ex1) + geom_point(color = 'blue') +
-  geom_line(aes(x = Rest1, y = heart_pred$pred), color = 'darkorange')
+ ggplot() + 
+  aes(x = X_test$Rest2, y = Y_test$Ex2) + geom_point(color = 'blue') +
+  geom_line(aes(x = X_test$Rest2, y = heart_pred$pred), color = 'darkorange') + ggtitle(paste("KNN regression with k =", num))
+ 
+ print(paste("residual variance for test set is", var(Y_test$Ex2-heart_pred$pred)))
 ```
 
-3.  Compute the error and its components.
+3.  Use knn regression with k=5 and the training set the same as the test set, and plot the predicted values over the actual data for the training set. Report the variance of the residuals for the test set.
 
 ```{r}
-total_var <- var(heart_data$Ex1)
-#res_var <- var(heart_pred$residuals)
-res_var <- var(heart_pred$pred - heart_data$Ex1)
-model_var <- var(heart_pred$pred)
-
-print(paste("Total variance:", total_var, "model variance:", model_var, "residual variance:", res_var))
-```
-
-4.  Repeat knn regression for several other values of k, both smaller and larger than 5. Plot the residual variance as a function of k.
-
-```{r}
-# base R
-boxplot(Ex2 ~ Year, data = heart_rates, main= "Ex2 for different years")
-# ggplot
-heart_rates |> ggplot() + aes(x=as.factor(Year), y = Ex2) + geom_boxplot() + ggtitle("Ex2 for different years") + xlab("year")
-```
-
-5.  Report if there are any missing values and if any points may be considered outliers.
-
-```{r}
-# base R to calculate by column
-cat("The number of NAs in each column: ")
-cat(colSums(is.na(heart_rates)))
-cat("\n")
-# tidyverse to calculate by row
-heart_rates %>%
-  rowwise() %>%
-  mutate(sum_na = sum(is.na(c_across())))
-
-```
-
-In the histogram you can see some points that are
-
-### Viral mutation rates
-
-The following data set comes from <https://github.com/lauringlab/JVI_Gem_2018> and contains measurements of different viral species. The three numeric variables are evolutionary rate K, mutation rate mu, and genome size G. The categorical variables are fairly self-explanatory.
-
-```{r}
-viral_mut_rates <- read_csv("https://raw.githubusercontent.com/lauringlab/JVI_Gem_2018/master/Figure_1_mu_and_K_data.csv")
-```
-
-1.  Examine the data frame (tibble) and report the number and types of variables and the number of observations
-
-    11 columns, of which 3 are numeric: G, K, mu, one logical, and the rest are categorical, 111 observations
-
-2.  Make a histogram of one of the numeric variables of your choice; describe its shape (e.g. normal, uniform, bimodal) and comment on any interesting features.
-
-```{r}
+num = 1
+heart_pred <- knn.reg(train = X_train, test = X_train, y=Y_train$Ex2,  k = num)
 # base R:
-hist(viral_mut_rates$G, main = 'Histogram of gene size', xlab = "size (Kbp?)")
-# ggplot
-viral_mut_rates |> ggplot() + aes(x=G) + geom_histogram() + ggtitle('Histogram of gene size') + xlab("size (Kbp?)")
+plot(X_train$Rest2, Y_train$Ex2, cex = .8, col = "blue", main = paste("KNN regression with k =", num))
+lines(X_train$Rest2, heart_pred$pred, col = "darkorange", lwd = 2)
+# ggplot:
+ ggplot() + 
+  aes(x = X_train$Rest2, y = Y_train$Ex2) + geom_point(color = 'blue') +
+  geom_line(aes(x = X_train$Rest2, y = heart_pred$pred), color = 'darkorange') + ggtitle(paste("KNN regression with k =", num))
+ 
+ print(paste("residual variance for training set is", var(Y_train$Ex2-heart_pred$pred)))
 ```
 
-3.  Compute the counts, means, and standard deviations of one of the numeric variables of your choice, separated by `group` category.
+4.  Repeat knn regression on the test and training sets for a range of k, both smaller and larger than 5 (you can use a loop or write a function and use `replicate`.) For each k, calculate the variance of the residuals on the test set and on the training set, and assign each to a vector. Make a plot of the variance of the errors for the test set and for the training set as a function of k as two lines of different colors and add a legend.
 
 ```{r}
 # base R
-group_list = unique(viral_mut_rates$group)
-for (g in group_list) {
-  slice <- viral_mut_rates$group == g
-  print(paste("In group", g, "number of observations of G is:", length(viral_mut_rates$G[slice])))
-  print(paste("In group", g, "mean value of G is:", mean(viral_mut_rates$G[slice])))
-  print(paste("In group", g, "standard deviation of G is:", sd(viral_mut_rates$G[slice])))
+ks <- c(1, 3, 5, 7, 10, 15, 20, 40, 100, 200)
+test_err<- c()
+train_err<- c()
+for (num in ks) {
+  heart_pred <- knn.reg(train = X_train, test = X_test, y=Y_train$Ex2,  k = num)
+  test_err <- c(test_err, var(heart_pred$pred - Y_test$Ex2))
+  heart_pred <- knn.reg(train = X_train, test = X_train, y=Y_train$Ex2,  k = num)
+  train_err <- c(train_err, var(heart_pred$pred - Y_train$Ex2))
 }
-# tidyverse
 
-viral_mut_rates |> group_by(group) |> summarise(num = n(), mean_G = mean(G), sd_G = sd(G))
+plot(ks, train_err, type = 'l', main = "Variance of residuals for different k")
+lines(ks, test_err, col = 'red')
+legend("topright", c("train", "test"), col=c(1,2), lty = 1)
 ```
 
-4.  Visualize one of the numeric variables as a box plot or violin plot, separated by group.
+5.  What seems to be the optimal number of nearest neighbors? Explain how you see bias-variance tradeoff playing out in this example.
 
-```{r}
-# base R
-boxplot(G ~ group, data = viral_mut_rates, main= "Genome size for different groups of viruses")
-# ggplot
-viral_mut_rates |> ggplot() + aes(x=group, y = G) + geom_boxplot() + ggtitle("Genome size for different groups of viruses") + xlab("virus group")
-```
-
-5.  Report if there are any missing values and if any points may be considered outliers.
-
-```{r}
-# base R to calculate by column
-cat("The number of NAs in each column: ")
-cat(colSums(is.na(viral_mut_rates)))
-cat("\n")
-# tidyverse to calculate by row
-viral_mut_rates |> 
-  select(G,K, mu) |> 
-  rowwise() |> 
-  mutate(sum_na = sum(is.na(c_across())))
-```
+The error for both test and training scores is highest for k=1, for larger k it decreases and then increases; but the training set has lower error for smaller k, and then for k\>30 it has higher error than the test set. The optimal value of k is around 20-30.
 
 ### Neuroblastoma data
 
@@ -170,7 +130,7 @@ neuro_blast <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/ma
 1.  Clean the data to remove any outliers or missing values in these variables, and select all the numeric variables. Split the data set into training and test sets.
 
     ```{r}
-    neuro_data <- neuro_blast |> select(-c(`sample id`, high_risk)) |> drop_na()
+    neuro_data <- neuro_blast |> dplyr::select(-c(`sample id`, high_risk)) |> drop_na()
     train_index <- sample(nrow(neuro_data), size = floor(0.75 * nrow(neuro_data)))
     neuro_train <- neuro_data[train_index, ]
     neuro_test <- neuro_data[-train_index, ]
@@ -196,22 +156,32 @@ print(table(knn_out, risk_test))
 print(sum(knn_out==risk_test)/length(knn_out))
 ```
 
-4.  Repeat the classification for several other values of k, both smaller and larger than 5. Plot the resulting accuracy scores as a function of k.
+4.  Repeat the classification for a range of values of k, both smaller and larger than 5; calculate the accuracy both for the test set and the training set and assign them as vectors. Plot the resulting accuracy scores as functions of k with different colors, and add a legend.
 
 ```{r}
-# base R
+ks <- c(1, 3, 5, 10, 20, 40, 100)
+acc_train <- c()
+acc_test <- c()
+for (i in ks) {
+  knn_out <- knn(train = neuro_train, 
+         test = neuro_test, 
+         cl = risk_train, 
+         k = i)
+  print(table(knn_out, risk_test))
+  acc_test <- c(acc_test,sum(knn_out==risk_test)/length(knn_out))
+  knn_out <- knn(train = neuro_train, 
+         test = neuro_train, 
+         cl = risk_train, 
+         k = i)
+  print(table(knn_out, risk_train))
+  acc_train <- c(acc_train,sum(knn_out==risk_train)/length(knn_out))
+}
 
+plot(ks, acc_test, type = 'l', ylim = c(0.8,1), main = "Mean classification accuracy for different k")
+lines(ks, acc_train, col = 'red')
+legend("topright", c("test", "train"), col=c(1,2), lty = 1)
 ```
 
-5.  Report if there are any missing values and if any points may be considered outliers.
+5.  What seems to be the optimal number of nearest neighbors? Explain how you see bias-variance tradeoff playing out in this example.
 
-```{r}
-# base R to calculate by column
-cat("The number of NAs in each column: ")
-cat(colSums(is.na(neuro_blast)))
-cat("\n")
-# tidyverse to calculate by row
-neuro_blast |>  select(-c(`sample id`, high_risk)) |> 
-  rowwise() |> 
-  mutate(sum_na = sum(is.na(c_across())))
-```
+The complexity of the model decreases as k increases, and the accuracy (the opposite of error) first increases and then goes down. There is an optimal number of nearest neighbors which seems to be 3.
