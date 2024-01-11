@@ -1,6 +1,6 @@
 ---
 title: "KNN and bias-variance tradeoff (lab 2 for BIOS 26122)"
-author: "Dmitry Kondrashov"
+author: "Your Name"
 format: 
   html:
     self-contained: true
