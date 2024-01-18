@@ -133,7 +133,7 @@ The outliers look like a shapeless blob, and the p-values for both the slope and
     print(paste("Residual variance from quadratic model for the for the test set:", var(y_pred - heart_test$Ex2))) 
     ```
 
-    Neither the training nor the test set residual variance is improved dramatically by adding the quadratic terms, but for most splits, the training set is improved more, and sometimes the error in the test set goes up, indicating overfitting.
+    Neither the training nor the test set residual variance is improved dramatically by adding the quadratic terms, but for most splits, the training set is improved more, and sometimes the error in the test set goes up, indicating potential overfitting (though nothing dramatic).
 
 5.  Redo the random split of the original data set into training and test sets, leaving progressively smaller fractions of the data in the training set, and calculate linear regression on the training set. Calculate and print the variance of the residuals of the training and test sets, and report whether you observe overfitting.
 
@@ -289,11 +289,11 @@ The error improved dramatically for both the training and the test sets with add
 
     y_pred <- cub_out$coefficients[1] + cub_out$coefficients[2]*mack_train$length_1_mm + cub_out$coefficients[3]*mack_train$length_1_mm^2 + cub_out$coefficients[4]*mack_train$length_1_mm^3
 
-    lines(mack_train$length_1_mm, y_pred, lwd = 3, col = 'darkorange')
+    lines(mack_train$length_1_mm,fitted(cub_out), lwd = 3, col = 'darkorange')
 
 
     #produce residual vs. fitted plot
-    plot(fitted(quad_out), resid(quad_out), main = "Residuals of cubic regression on mack data")
+    plot(fitted(cub_out), resid(cub_out), main = "Residuals of cubic regression on mack data")
 
     #add a horizontal line at 0 
     abline(0,0)
@@ -305,7 +305,7 @@ The error improved dramatically for both the training and the test sets with add
       geom_smooth( method = 'lm', formula = 'y ~ poly(x, degree = 3, raw = TRUE)', color = 'darkorange') + ggtitle(paste("Cubic regression on mack data"))
 
      
-     quad_out |>  ggplot() + aes(x = .fitted, y = .resid) +
+     cub_out |>  ggplot() + aes(x = .fitted, y = .resid) +
       geom_point() +
       geom_hline(yintercept = 0) +
       ggtitle(paste("Residuals of cubic regression on mack data"))
