@@ -281,7 +281,7 @@ The error improved dramatically for both the training and the test sets with add
 5.  Perform a cubic polynomial fit on the same data, print out the summary, and produce the same plots as before. Then compute and print the variance of the residuals for the training and test sets, and compare them. How did adding the cubic parameter impact the error for the training and test sets?
 
     ```{r}
-    cub_out <- lm(weight_g ~ poly(length_1_mm, degree = 3), data = mack_train)
+    cub_out <- lm(weight_g ~ poly(length_1_mm, degree = 3, raw = T), data = mack_train)
     summary(cub_out)
 
     # base R:
@@ -320,4 +320,4 @@ The error improved dramatically for both the training and the test sets with add
      
     ```
 
-Adding a cubic term improves the error for the training set by a small amount, but it completely blows up the error for the test set! This is a dramatic example of overfitting.
+Adding a cubic term improves the error for the training set by a small amount, but it goes up for the test set, indicating overfitting.
