@@ -1,0 +1,295 @@
+---
+title: "Classification methods (lab 4 for BIOS 26122)"
+author: "Your Name"
+format: 
+  html:
+    self-contained: true
+editor: visual
+---
+
+## Description
+
+The goal of this assignment is to perform classification tasks by training a model and then validating its performance on the test set. You will learn to use the following models:
+
+1.  Generalized linear model
+
+2.  Naive Bayes
+
+3.  Linear Discriminant Analysis
+
+4.  Quadratic Discriminant Analysis
+
+The use of these models is demonstrated in the week 4 tutorials using the tools from package `tidymodels`; I recommend that you use them to perform the tasks below.
+
+```{r setup}
+#| include: false
+#| echo: false
+library(tidyverse)
+library(tidymodels)
+library(ggfortify) # for autoplot
+library(discrim)
+library(klaR)
+library(rpart.plot)
+library(vip)
+library(factoextra)
+
+```
+
+### Neuroblastoma data
+
+The following data set is gene expression data from tumors of patients with neuroblastoma (a type of cancer), accession number [**GSE62564**](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE62564)**.** It contains 22 phenotypic scores, 6 of which (MYCN, STC1, P4HA1, BHLHE40, HIF1A and ST8SIA1) are gene expressions measured in log2RPM (log 2 reads per million). The other 16 are quantified by R package GSVA (Gene Set Enrichment Analysis).
+
+```{r}
+neuro_blast <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/r2_gse62564_GSVA_Metadata_selected.csv")
+```
+
+1.  Clean the data to remove any outliers or missing values. Split the data set into training and test sets of equal size. Set up a tidymodels recipe to predict the variable `high_risk` (make sure to convert it to a factor!) using all other variables, except for `sample_id`
+
+    ```{r}
+    neuro_clean <- neuro_blast |>  drop_na() |>
+      mutate(high_risk = factor(high_risk))
+
+    # Put 1/2 of the data into the training set 
+    neuro_split <- initial_split(neuro_clean, prop = 1/2)
+
+    # Create data frames for the two sets:
+    neuro_train <- training(neuro_split)
+    neuro_test  <- testing(neuro_split)
+
+
+    neuro_recipe <- 
+      recipe(high_risk ~ ., data = neuro_train) |>  
+      update_role(`sample id`, new_role = "ID")
+    ```
+
+2.  Train a *generalized linear model* (using engine "glm") to predict the `high_risk`; specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.
+
+```{r}
+glm_spec <- 
+    logistic_reg() |>  
+    set_engine("glm")
+
+workflow_glm <- workflow() |> 
+  add_model(glm_spec) |> 
+  add_recipe(neuro_recipe)
+
+fit_neuro <- workflow_glm |> 
+  fit(neuro_train)
+
+#fit_neuro %>% 
+ # extract_fit_parsnip() 
+
+compare_pred <- augment(fit_neuro, new_data = neuro_test) 
+
+compare_pred |>  accuracy(truth = high_risk, estimate = .pred_class)
+
+compare_pred |>  conf_mat(truth = high_risk, estimate = .pred_class)
+```
+
+3.  Train a *Naive Bayes model* (using engine "naivebayes") to predict the variable `high_risk`: specify the model, create a workflow, fit it to the training set, and report its accuracy on the test set.
+
+    ```{r}
+    nb_spec <- naive_Bayes() |>  
+      set_mode("classification") |>  
+      set_engine("naivebayes") |>  
+      set_args(usekernel = FALSE) 
+
+
+    workflow_nb <- workflow() |> 
+      add_model(nb_spec) |> 
+      add_recipe(neuro_recipe)
+
+    fit_neuro <- workflow_nb |> 
+      fit(neuro_train)
+
+    #fit_neuro %>% 
+     # extract_fit_parsnip() 
+
+    compare_pred <- augment(fit_neuro, new_data = neuro_test) 
+
+    compare_pred |>  accuracy(truth = high_risk, estimate = .pred_class)
+
+    compare_pred |>  conf_mat(truth = high_risk, estimate = .pred_class)
+    ```
+
+4.  Train a *linear discriminant model* (using function `discrim_linear` with engine "MASS") to predict the variable `high_risk`: specify the model, create a workflow, fit it to the training set, and report its accuracy on the test set.
+
+    ```{r}
+    ld_spec <- discrim_linear() |> 
+      set_mode("classification") |>  
+      set_engine("MASS") |>  
+      set_args(penalty = NULL, regularization_method = NULL) 
+
+
+    workflow_ld <- workflow() |> 
+      add_model(ld_spec) |> 
+      add_recipe(neuro_recipe)
+
+    fit_neuro <- workflow_ld |> 
+      fit(neuro_train)
+
+    #fit_neuro %>% 
+     # extract_fit_parsnip() 
+
+    compare_pred <- augment(fit_neuro, new_data = neuro_test) 
+
+    compare_pred |>  accuracy(truth = high_risk, estimate = .pred_class)
+
+    compare_pred |>  conf_mat(truth = high_risk, estimate = .pred_class)
+    ```
+
+5.  Train a *quadratic discriminant model* (using function `discrim_quad` with engine "MASS") to predict the variable `high_risk`: specify the model, create a workflow, fit it to the training set, and report its accuracy on the test set.
+
+```{r}
+ qd_spec <- discrim_quad()  |> 
+  set_mode("classification") |>  
+  set_engine("MASS") |>  
+  set_args(penalty = NULL, regularization_method = NULL) 
+
+
+workflow_qd <- workflow() |> 
+  add_model(qd_spec) |> 
+  add_recipe(neuro_recipe)
+
+fit_neuro <- workflow_qd |> 
+  fit(neuro_train)
+
+#fit_neuro %>% 
+ # extract_fit_parsnip() 
+
+compare_pred <- augment(fit_neuro, new_data = neuro_test) 
+
+compare_pred |>  accuracy(truth = high_risk, estimate = .pred_class)
+
+compare_pred |>  conf_mat(truth = high_risk, estimate = .pred_class)
+```
+
+### Ecological data
+
+The following data set contains observations of the populations of one species of fish (cutthroat trout) and two species of salamander in Mack Creek, Andrews Forest, Willamette National Forest, Oregon. The data set contains 16 variables and over thirty-two thousand observations. The variables include time and date, location, and measurements, such as size and weight. The metadata (descriptions of data) are provided [here](https://portal.edirepository.org/nis/metadataviewer?packageid=knb-lter-and.4027.14) (click on "Data entities" tab for explanations of each variable.)
+
+```{r}
+mack_data <- read_csv("https://raw.githubusercontent.com/dkon1/quant_life_quarto/main/data/mack_data.csv")
+```
+
+1.  Clean the data to remove any outliers or missing values, and filter the data to contain observations from only one species, either: 'Cutthroat trout' or 'Coastal giant salamander' . Split the data set into training and test sets of equal size. Set up a `tidymodels` recipe to predict the variable \`section\` (make sure it's converted to a factor) using the numeric variables `length_1_mm` and `weight_g`.
+
+    ```{r}
+    mack_clean <- mack_data |> 
+      filter(species == 'Coastal giant salamander') |>  
+      dplyr::select(section, length_1_mm, weight_g) |> 
+      drop_na() |> mutate(section = factor(section))
+
+    # Put 3/4 of the data into the training set 
+    mack_split <- initial_split(mack_clean, prop = 1/2)
+
+    # Create data frames for the two sets:
+    mack_train <- training(mack_split)
+    mack_test  <- testing(mack_split)
+
+
+    mack_recipe <- 
+      recipe(section ~ ., data = mack_train)
+    ```
+
+2.  Train a *generalized linear model* (using engine "glm") to predict the variable `section`; specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.
+
+```{r}
+glm_spec <- logistic_reg() |>  
+    set_engine("glm")
+
+workflow_glm <- workflow() |> 
+  add_model(glm_spec) |> 
+  add_recipe(mack_recipe)
+
+fit_mack <- workflow_glm |> 
+  fit(mack_train)
+
+#fit_mack %>% 
+ # extract_fit_parsnip() 
+
+compare_pred <- augment(fit_mack, new_data = mack_test) 
+
+compare_pred |>  accuracy(truth = section, estimate = .pred_class)
+
+compare_pred |>  conf_mat(truth = section, estimate = .pred_class)
+```
+
+3.  Train a *Naive Bayes model* to predict the variable `section`: specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.
+
+    ```{r}
+    nb_spec <- naive_Bayes() %>% 
+      set_mode("classification") %>% 
+      set_engine("naivebayes") %>% 
+      set_args(usekernel = FALSE) 
+
+
+    workflow_nb <- workflow() |> 
+      add_model(nb_spec) |> 
+      add_recipe(mack_recipe)
+
+    fit_mack <- workflow_nb |> 
+      fit(mack_train)
+
+    #fit_mack %>% 
+     # extract_fit_parsnip() 
+
+    compare_pred <- augment(fit_mack, new_data = mack_test) 
+
+    compare_pred |>  accuracy(truth = section, estimate = .pred_class)
+
+    compare_pred |>  conf_mat(truth = section, estimate = .pred_class)
+    ```
+
+4.  Train a *linear discriminant model* to predict the variable `section`: specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.
+
+    ```{r}
+    ld_spec <- discrim_linear(
+      mode = "classification",
+      penalty = NULL,
+      regularization_method = NULL,
+      engine = "MASS"
+    )
+
+    workflow_ld <- workflow() |> 
+      add_model(ld_spec) |> 
+      add_recipe(mack_recipe)
+
+    fit_mack <- workflow_ld |> 
+      fit(mack_train)
+
+    #fit_mack %>% 
+     # extract_fit_parsnip() 
+
+    compare_pred <- augment(fit_mack, new_data = mack_test) 
+
+    compare_pred |>  accuracy(truth = section, estimate = .pred_class)
+
+    compare_pred |>  conf_mat(truth = section, estimate = .pred_class)
+    ```
+
+5.  Train a *quadratic discriminant model* to predict the variable `section`: specify the model, create a workflow, fit it to the training set, and report its accuracy on the test set.
+
+```{r}
+ qd_spec <- discrim_quad(
+  mode = "classification",
+  regularization_method = NULL,
+  engine = "MASS"
+)
+
+workflow_qd <- workflow() |> 
+  add_model(qd_spec) |> 
+  add_recipe(mack_recipe)
+
+fit_mack <- workflow_qd |> 
+  fit(mack_train)
+
+#fit_neuro %>% 
+ # extract_fit_parsnip() 
+
+compare_pred <- augment(fit_mack, new_data = mack_test) 
+
+compare_pred |>  accuracy(truth = section, estimate = .pred_class)
+
+compare_pred |>  conf_mat(truth = section, estimate = .pred_class)
+```
