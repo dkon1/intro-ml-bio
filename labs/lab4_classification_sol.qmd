@@ -40,31 +40,122 @@ neuro_blast <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/ma
 1.  Clean the data to remove any outliers or missing values. Split the data set into training and test sets of equal size. Set up a tidymodels recipe to predict the variable `high_risk` (make sure to convert it to a factor!) using all other variables, except for `sample_id`
 
     ```{r}
+    neuro_clean <- neuro_blast |>  drop_na() |>
+      mutate(high_risk = factor(high_risk))
 
+    # Put 1/2 of the data into the training set 
+    neuro_split <- initial_split(neuro_clean, prop = 1/2)
+
+    # Create data frames for the two sets:
+    neuro_train <- training(neuro_split)
+    neuro_test  <- testing(neuro_split)
+
+
+    neuro_recipe <- 
+      recipe(high_risk ~ ., data = neuro_train) |>  
+      update_role(`sample id`, new_role = "ID")
     ```
 
 2.  Train a *generalized linear model* (using function \`logistic_reg\` and engine "glm") to predict the variable `high_risk`; specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.
 
 ```{r}
+glm_spec <- 
+    logistic_reg() |>  
+    set_engine("glm")
 
+workflow_glm <- workflow() |> 
+  add_model(glm_spec) |> 
+  add_recipe(neuro_recipe)
+
+fit_neuro <- workflow_glm |> 
+  fit(neuro_train)
+
+#fit_neuro %>% 
+ # extract_fit_parsnip() 
+
+compare_pred <- augment(fit_neuro, new_data = neuro_test) 
+
+compare_pred |>  accuracy(truth = high_risk, estimate = .pred_class)
+
+compare_pred |>  conf_mat(truth = high_risk, estimate = .pred_class)
 ```
 
 3.  Train a *Naive Bayes model* (using function `naive_Bayes` and engine "naivebayes") to predict the variable `high_risk`: specify the model, create a workflow, fit it to the training set, and report its accuracy on the test set.
 
     ```{r}
+    nb_spec <- naive_Bayes() |>  
+      set_mode("classification") |>  
+      set_engine("naivebayes") |>  
+      set_args(usekernel = FALSE) 
 
+
+    workflow_nb <- workflow() |> 
+      add_model(nb_spec) |> 
+      add_recipe(neuro_recipe)
+
+    fit_neuro <- workflow_nb |> 
+      fit(neuro_train)
+
+    #fit_neuro %>% 
+     # extract_fit_parsnip() 
+
+    compare_pred <- augment(fit_neuro, new_data = neuro_test) 
+
+    compare_pred |>  accuracy(truth = high_risk, estimate = .pred_class)
+
+    compare_pred |>  conf_mat(truth = high_risk, estimate = .pred_class)
     ```
 
 4.  Train a *linear discriminant model* (using function `discrim_linear` with engine "MASS") to predict the variable `high_risk`: specify the model, create a workflow, fit it to the training set, and report its accuracy on the test set.
 
     ```{r}
+    ld_spec <- discrim_linear() |> 
+      set_mode("classification") |>  
+      set_engine("MASS") |>  
+      set_args(penalty = NULL, regularization_method = NULL) 
 
+
+    workflow_ld <- workflow() |> 
+      add_model(ld_spec) |> 
+      add_recipe(neuro_recipe)
+
+    fit_neuro <- workflow_ld |> 
+      fit(neuro_train)
+
+    #fit_neuro %>% 
+     # extract_fit_parsnip() 
+
+    compare_pred <- augment(fit_neuro, new_data = neuro_test) 
+
+    compare_pred |>  accuracy(truth = high_risk, estimate = .pred_class)
+
+    compare_pred |>  conf_mat(truth = high_risk, estimate = .pred_class)
     ```
 
 5.  Train a *quadratic discriminant model* (using function `discrim_quad` with engine "MASS") to predict the variable `high_risk`: specify the model, create a workflow, fit it to the training set, and report its accuracy on the test set.
 
 ```{r}
+ qd_spec <- discrim_quad()  |> 
+  set_mode("classification") |>  
+  set_engine("MASS") |>  
+  set_args(penalty = NULL, regularization_method = NULL) 
 
+
+workflow_qd <- workflow() |> 
+  add_model(qd_spec) |> 
+  add_recipe(neuro_recipe)
+
+fit_neuro <- workflow_qd |> 
+  fit(neuro_train)
+
+#fit_neuro %>% 
+ # extract_fit_parsnip() 
+
+compare_pred <- augment(fit_neuro, new_data = neuro_test) 
+
+compare_pred |>  accuracy(truth = high_risk, estimate = .pred_class)
+
+compare_pred |>  conf_mat(truth = high_risk, estimate = .pred_class)
 ```
 
 ### Ecological data
@@ -78,31 +169,123 @@ mack_data <- read_csv("https://raw.githubusercontent.com/dkon1/quant_life_quarto
 1.  Clean the data to remove any outliers or missing values, and filter the data to contain observations from only one species, either: 'Cutthroat trout' or 'Coastal giant salamander' . Split the data set into training and test sets of equal size. Set up a `tidymodels` recipe to predict the variable \`section\` (make sure it's converted to a factor) using the numeric variables `length_1_mm` and `weight_g`.
 
     ```{r}
+    mack_clean <- mack_data |> 
+      filter(species == 'Coastal giant salamander') |>  
+      dplyr::select(section, length_1_mm, weight_g) |> 
+      drop_na() |> mutate(section = factor(section))
 
+    # Put 3/4 of the data into the training set 
+    mack_split <- initial_split(mack_clean, prop = 1/2)
+
+    # Create data frames for the two sets:
+    mack_train <- training(mack_split)
+    mack_test  <- testing(mack_split)
+
+
+    mack_recipe <- 
+      recipe(section ~ ., data = mack_train)
     ```
 
 2.  Train a *generalized linear model* (using engine "glm") to predict the variable `section`; specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.
 
 ```{r}
+glm_spec <- logistic_reg() |>  
+    set_engine("glm")
 
+workflow_glm <- workflow() |> 
+  add_model(glm_spec) |> 
+  add_recipe(mack_recipe)
+
+fit_mack <- workflow_glm |> 
+  fit(mack_train)
+
+#fit_mack %>% 
+ # extract_fit_parsnip() 
+
+compare_pred <- augment(fit_mack, new_data = mack_test) 
+
+compare_pred |>  accuracy(truth = section, estimate = .pred_class)
+
+compare_pred |>  conf_mat(truth = section, estimate = .pred_class)
 ```
 
 3.  Train a *Naive Bayes model* to predict the variable `section`: specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.
 
     ```{r}
+    nb_spec <- naive_Bayes() %>% 
+      set_mode("classification") %>% 
+      set_engine("naivebayes") %>% 
+      set_args(usekernel = FALSE) 
 
+
+    workflow_nb <- workflow() |> 
+      add_model(nb_spec) |> 
+      add_recipe(mack_recipe)
+
+    fit_mack <- workflow_nb |> 
+      fit(mack_train)
+
+    #fit_mack %>% 
+     # extract_fit_parsnip() 
+
+    compare_pred <- augment(fit_mack, new_data = mack_test) 
+
+    compare_pred |>  accuracy(truth = section, estimate = .pred_class)
+
+    compare_pred |>  conf_mat(truth = section, estimate = .pred_class)
     ```
 
 4.  Train a *linear discriminant model* to predict the variable `section`: specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.
 
     ```{r}
+    ld_spec <- discrim_linear(
+      mode = "classification",
+      penalty = NULL,
+      regularization_method = NULL,
+      engine = "MASS"
+    )
 
+    workflow_ld <- workflow() |> 
+      add_model(ld_spec) |> 
+      add_recipe(mack_recipe)
+
+    fit_mack <- workflow_ld |> 
+      fit(mack_train)
+
+    #fit_mack %>% 
+     # extract_fit_parsnip() 
+
+    compare_pred <- augment(fit_mack, new_data = mack_test) 
+
+    compare_pred |>  accuracy(truth = section, estimate = .pred_class)
+
+    compare_pred |>  conf_mat(truth = section, estimate = .pred_class)
     ```
 
 5.  Train a *quadratic discriminant model* to predict the variable `section`: specify the model, create a workflow, fit it to the training set, and report its accuracy on the test set.
 
 ```{r}
- 
+ qd_spec <- discrim_quad(
+  mode = "classification",
+  regularization_method = NULL,
+  engine = "MASS"
+)
+
+workflow_qd <- workflow() |> 
+  add_model(qd_spec) |> 
+  add_recipe(mack_recipe)
+
+fit_mack <- workflow_qd |> 
+  fit(mack_train)
+
+#fit_neuro %>% 
+ # extract_fit_parsnip() 
+
+compare_pred <- augment(fit_mack, new_data = mack_test) 
+
+compare_pred |>  accuracy(truth = section, estimate = .pred_class)
+
+compare_pred |>  conf_mat(truth = section, estimate = .pred_class)
 ```
 
 6.  (Optional) Go back to question 1 and add one or a few more predictor variables to the recipe for prediction of section (think about which one make sense to use as predictors) and report the results of fitting this model using your method of choice.
