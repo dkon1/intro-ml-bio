@@ -9,17 +9,17 @@ editor: visual
 
 ## Description
 
-The goal of this assignment is to perform classification tasks by training a model and then validating its performance on the test set. You will learn to use the following models:
+The goal of this assignment is to use resampling methods for cross-validation and performing statistical inference. You will learn to do the following:
 
-1.  Generalized linear model
+1.  use k-fold validation for estimation of testing error
 
-2.  Naive Bayes
+2.  use bootstrap to calculate confidence intervals for parameters
 
-3.  Linear Discriminant Analysis
+3.  use bootstrap to calculate p-values
 
-4.  Quadratic Discriminant Analysis
+4.  explain the meaning of these results
 
-The use of these models is demonstrated in the week 4 tutorials using the tools from package `tidymodels`; I recommend that you use them to perform the tasks below.
+The use of these models is demonstrated in the week 5 tutorials using the tools from package `tidymodels`; I recommend that you use them to perform the tasks below.
 
 ```{r setup}
 #| include: false
@@ -29,7 +29,7 @@ library(tidymodels)
 library(discrim)
 ```
 
-### Neuroblastoma data
+### Classificaiton using k-fold validation on the Neuroblastoma data
 
 The following data set is gene expression data from tumors of patients with neuroblastoma (a type of cancer), accession number [**GSE62564**](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE62564)**.** It contains 22 phenotypic scores, 6 of which (MYCN, STC1, P4HA1, BHLHE40, HIF1A and ST8SIA1) are gene expressions measured in log2RPM (log 2 reads per million). The other 16 are quantified by R package GSVA (Gene Set Enrichment Analysis).
 
@@ -37,104 +37,79 @@ The following data set is gene expression data from tumors of patients with neur
 neuro_blast <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/r2_gse62564_GSVA_Metadata_selected.csv")
 ```
 
-1.  Clean the data to remove any outliers or missing values. Split the data set into training and test sets of equal size. Set up a tidymodels recipe to predict the variable `high_risk` (make sure to convert it to a factor!) using all other variables, except for `sample_id`
+1.  Clean the data to remove any outliers or missing values. Set up a tidymodels recipe to predict the variable `high_risk` (make sure to convert it to a factor!) using all other variables, except for `sample_id.` Define a *generalized linear model* (using function \`logistic_reg\` and engine "glm") specification to predict the variable `high_risk`, and create a workflow by combining the recipe and the model spec. Use the function `vfold_cv` to split the cleaned data set, then `fit_resamples` to fit the model on different splits and perform k-fold cross-validation, then use the function `collect_metrics` to report the error for the test set.
 
     ```{r}
     neuro_clean <- neuro_blast |>  drop_na() |>
       mutate(high_risk = factor(high_risk))
 
-    # Put 1/2 of the data into the training set 
-    neuro_split <- initial_split(neuro_clean, prop = 1/2)
-
-    # Create data frames for the two sets:
-    neuro_train <- training(neuro_split)
-    neuro_test  <- testing(neuro_split)
-
 
     neuro_recipe <- 
-      recipe(high_risk ~ ., data = neuro_train) |>  
+      recipe(high_risk ~ ., data = neuro_clean) |>  
       update_role(`sample id`, new_role = "ID")
+
+
+    glm_spec <- 
+        logistic_reg() |>  
+        set_engine("glm")
+
+    workflow_glm <- workflow() |> 
+      add_model(glm_spec) |> 
+      add_recipe(neuro_recipe)
+
+    folds <- vfold_cv(neuro_clean, v = 10)
+
+    glm_fit <- 
+       workflow_glm |>  
+      fit_resamples(folds)
+
+    collect_metrics(glm_fit)
     ```
 
-2.  Train a *generalized linear model* (using function \`logistic_reg\` and engine "glm") to predict the variable `high_risk`; specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.
+2.  Repeat this process for Naive Bayes, LDA, and QDA classification engines, and report their error statistics from cross-validation.
 
 ```{r}
-glm_spec <- 
-    logistic_reg() |>  
-    set_engine("glm")
+nb_spec <- naive_Bayes() |>  
+  set_mode("classification") |>  
+  set_engine("naivebayes") |>  
+  set_args(usekernel = FALSE) 
 
-workflow_glm <- workflow() |> 
-  add_model(glm_spec) |> 
+
+
+workflow_nb <- workflow() |> 
+  add_model(nb_spec) |> 
   add_recipe(neuro_recipe)
 
-fit_neuro <- workflow_glm |> 
-  fit(neuro_train)
+folds <- vfold_cv(neuro_clean, v = 10)
 
-#fit_neuro %>% 
- # extract_fit_parsnip() 
+nb_fit <- 
+   workflow_nb |>  
+  fit_resamples(folds)
 
-compare_pred <- augment(fit_neuro, new_data = neuro_test) 
-
-compare_pred |>  accuracy(truth = high_risk, estimate = .pred_class)
-
-compare_pred |>  conf_mat(truth = high_risk, estimate = .pred_class)
-```
-
-3.  Train a *Naive Bayes model* (using function `naive_Bayes` and engine "naivebayes") to predict the variable `high_risk`: specify the model, create a workflow, fit it to the training set, and report its accuracy on the test set.
-
-    ```{r}
-    nb_spec <- naive_Bayes() |>  
-      set_mode("classification") |>  
-      set_engine("naivebayes") |>  
-      set_args(usekernel = FALSE) 
+print("The error stats for the Naive Bayes model are:")
+print(collect_metrics(nb_fit))
 
 
-    workflow_nb <- workflow() |> 
-      add_model(nb_spec) |> 
-      add_recipe(neuro_recipe)
-
-    fit_neuro <- workflow_nb |> 
-      fit(neuro_train)
-
-    #fit_neuro %>% 
-     # extract_fit_parsnip() 
-
-    compare_pred <- augment(fit_neuro, new_data = neuro_test) 
-
-    compare_pred |>  accuracy(truth = high_risk, estimate = .pred_class)
-
-    compare_pred |>  conf_mat(truth = high_risk, estimate = .pred_class)
-    ```
-
-4.  Train a *linear discriminant model* (using function `discrim_linear` with engine "MASS") to predict the variable `high_risk`: specify the model, create a workflow, fit it to the training set, and report its accuracy on the test set.
-
-    ```{r}
-    ld_spec <- discrim_linear() |> 
-      set_mode("classification") |>  
-      set_engine("MASS") |>  
-      set_args(penalty = NULL, regularization_method = NULL) 
+ld_spec <- discrim_linear() |> 
+  set_mode("classification") |>  
+  set_engine("MASS") |>  
+  set_args(penalty = NULL, regularization_method = NULL) 
 
 
-    workflow_ld <- workflow() |> 
-      add_model(ld_spec) |> 
-      add_recipe(neuro_recipe)
+workflow_ld <- workflow() |> 
+  add_model(ld_spec) |> 
+  add_recipe(neuro_recipe)
 
-    fit_neuro <- workflow_ld |> 
-      fit(neuro_train)
+folds <- vfold_cv(neuro_clean, v = 10)
 
-    #fit_neuro %>% 
-     # extract_fit_parsnip() 
+ld_fit <- 
+   workflow_ld |>  
+  fit_resamples(folds)
 
-    compare_pred <- augment(fit_neuro, new_data = neuro_test) 
+print("The error stats for the LDA model are:")
+print(collect_metrics(ld_fit))
 
-    compare_pred |>  accuracy(truth = high_risk, estimate = .pred_class)
 
-    compare_pred |>  conf_mat(truth = high_risk, estimate = .pred_class)
-    ```
-
-5.  Train a *quadratic discriminant model* (using function `discrim_quad` with engine "MASS") to predict the variable `high_risk`: specify the model, create a workflow, fit it to the training set, and report its accuracy on the test set.
-
-```{r}
  qd_spec <- discrim_quad()  |> 
   set_mode("classification") |>  
   set_engine("MASS") |>  
@@ -145,20 +120,22 @@ workflow_qd <- workflow() |>
   add_model(qd_spec) |> 
   add_recipe(neuro_recipe)
 
-fit_neuro <- workflow_qd |> 
-  fit(neuro_train)
 
-#fit_neuro %>% 
- # extract_fit_parsnip() 
+folds <- vfold_cv(neuro_clean, v = 10)
 
-compare_pred <- augment(fit_neuro, new_data = neuro_test) 
+qd_fit <- 
+   workflow_qd |>  
+  fit_resamples(folds)
 
-compare_pred |>  accuracy(truth = high_risk, estimate = .pred_class)
-
-compare_pred |>  conf_mat(truth = high_risk, estimate = .pred_class)
+print("The error stats for the QDA model are:")
+print(collect_metrics(qd_fit))
 ```
 
-### Ecological data
+3.  Compare the results from the four classification methods both in terms of the accuracy and the ROC area under the curve metric; explain the difference between the two and which one you would prefer to use.
+
+    YOUR ANSWERS HERE
+
+### Parameter estimation using the boostrap: Ecological data
 
 The following data set contains observations of the populations of one species of fish (cutthroat trout) and two species of salamander in Mack Creek, Andrews Forest, Willamette National Forest, Oregon. The data set contains 16 variables and over thirty-two thousand observations. The variables include time and date, location, and measurements, such as size and weight. The metadata (descriptions of data) are provided [here](https://portal.edirepository.org/nis/metadataviewer?packageid=knb-lter-and.4027.14) (click on "Data entities" tab for explanations of each variable.)
 
@@ -166,232 +143,75 @@ The following data set contains observations of the populations of one species o
 mack_data <- read_csv("https://raw.githubusercontent.com/dkon1/quant_life_quarto/main/data/mack_data.csv")
 ```
 
-1.  Clean the data to remove any outliers or missing values, and filter the data to contain observations from only one species, either: 'Cutthroat trout' or 'Coastal giant salamander' . Split the data set into training and test sets of equal size. Set up a `tidymodels` recipe to predict the variable \`section\` (make sure it's converted to a factor) using the numeric variables `length_1_mm` and `weight_g`.
+1.  Clean the data to remove any outliers or missing values, and filter the data to contain observations from only one species, either: 'Cutthroat trout' or 'Coastal giant salamander'. Use the function `bootstraps`to create many (\>1000) random splits of the cleaned data set; then define a new function to perform linear regression on a split, to predict the variable `weight_g` using the variable `length_1_mm` . The use the example from the resampling tutorial to train the model on all the random splits, and calculate and print the (95%) confidence intervals for the coefficients of linear regression based on the bootstrap calculation.
 
     ```{r}
-    mack_clean <- mack_data |> 
-      filter(species == 'Coastal giant salamander') |>  
-      dplyr::select(section, length_1_mm, weight_g) |> 
-      drop_na() |> mutate(section = factor(section))
+    mack_clean <- mack_data |>
+      filter(species == 'Cutthroat trout') |> 
+      drop_na(weight_g, length_1_mm)
+     
 
-    # Put 3/4 of the data into the training set 
-    mack_split <- initial_split(mack_clean, prop = 1/2)
+    boots <- bootstraps(mack_clean, times = 2000, apparent = TRUE)
 
-    # Create data frames for the two sets:
-    mack_train <- training(mack_split)
-    mack_test  <- testing(mack_split)
+    lm_bootstrap <- function(split) {
+        lm(weight_g ~ length_1_mm, analysis(split))
+    }
+
+    lm_boot_models <-
+      boots |> 
+      mutate(model = map(splits, lm_bootstrap),
+             coef_info = map(model, tidy))
 
 
-    mack_recipe <- 
-      recipe(section ~ ., data = mack_train)
+    #boot_aug <- 
+    #  boot_models |>  
+    #  sample_n(100) |>  
+    #  mutate(augmented = map(model, augment)) |> 
+    #  unnest(augmented)
+
+    #boot_aug |> ggplot( aes(x = length_1_mm, y = weight_g )) +
+    #  geom_line(aes(y = .fitted, group = id), alpha = .2, col = "blue") +
+    #  geom_point()
+
+    boot_coefs <- 
+      lm_boot_models |>  
+      unnest(coef_info)
+
+    percentile_intervals <- int_pctl(lm_boot_models, coef_info)
+    percentile_intervals
     ```
 
-2.  Train a *generalized linear model* (using engine "glm") to predict the variable `section`; specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.
+2.  Repeat the same process as in question 1, but by training a quadratic regression model on the bootsrapped splits of the data set; for this you'll needf to define a new auxiliary function with a quadratic model, then calculate and print out the parameters of the quadratic regression from the bootstrap calculation.\
 
 ```{r}
-glm_spec <- logistic_reg() |>  
-    set_engine("glm")
-
-workflow_glm <- workflow() |> 
-  add_model(glm_spec) |> 
-  add_recipe(mack_recipe)
-
-fit_mack <- workflow_glm |> 
-  fit(mack_train)
-
-#fit_mack %>% 
- # extract_fit_parsnip() 
-
-compare_pred <- augment(fit_mack, new_data = mack_test) 
-
-compare_pred |>  accuracy(truth = section, estimate = .pred_class)
-
-compare_pred |>  conf_mat(truth = section, estimate = .pred_class)
-```
-
-3.  Train a *Naive Bayes model* to predict the variable `section`: specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.
-
-    ```{r}
-    nb_spec <- naive_Bayes() %>% 
-      set_mode("classification") %>% 
-      set_engine("naivebayes") %>% 
-      set_args(usekernel = FALSE) 
-
-
-    workflow_nb <- workflow() |> 
-      add_model(nb_spec) |> 
-      add_recipe(mack_recipe)
-
-    fit_mack <- workflow_nb |> 
-      fit(mack_train)
-
-    #fit_mack %>% 
-     # extract_fit_parsnip() 
-
-    compare_pred <- augment(fit_mack, new_data = mack_test) 
-
-    compare_pred |>  accuracy(truth = section, estimate = .pred_class)
-
-    compare_pred |>  conf_mat(truth = section, estimate = .pred_class)
-    ```
-
-4.  Train a *linear discriminant model* to predict the variable `section`: specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.
-
-    ```{r}
-    ld_spec <- discrim_linear(
-      mode = "classification",
-      penalty = NULL,
-      regularization_method = NULL,
-      engine = "MASS"
-    )
-
-    workflow_ld <- workflow() |> 
-      add_model(ld_spec) |> 
-      add_recipe(mack_recipe)
-
-    fit_mack <- workflow_ld |> 
-      fit(mack_train)
-
-    #fit_mack %>% 
-     # extract_fit_parsnip() 
-
-    compare_pred <- augment(fit_mack, new_data = mack_test) 
-
-    compare_pred |>  accuracy(truth = section, estimate = .pred_class)
-
-    compare_pred |>  conf_mat(truth = section, estimate = .pred_class)
-    ```
-
-5.  Train a *quadratic discriminant model* to predict the variable `section`: specify the model, create a workflow, fit it to the training set, and report its accuracy on the test set.
-
-```{r}
- qd_spec <- discrim_quad(
-  mode = "classification",
-  regularization_method = NULL,
-  engine = "MASS"
-)
-
-workflow_qd <- workflow() |> 
-  add_model(qd_spec) |> 
-  add_recipe(mack_recipe)
-
-fit_mack <- workflow_qd |> 
-  fit(mack_train)
-
-#fit_neuro %>% 
- # extract_fit_parsnip() 
-
-compare_pred <- augment(fit_mack, new_data = mack_test) 
-
-compare_pred |>  accuracy(truth = section, estimate = .pred_class)
-
-compare_pred |>  conf_mat(truth = section, estimate = .pred_class)
-```
-
-6.  (Optional) Go back to question 1 and add one or a few more predictor variables to the recipe for prediction of section (think about which one make sense to use as predictors) and report the results of fitting this model using your method of choice.
-
-    ```{r}
-
-    ```
-
-### Ecological data
-
-The following data set contains observations of the populations of one species of fish (cutthroat trout) and two species of salamander in Mack Creek, Andrews Forest, Willamette National Forest, Oregon. The data set contains 16 variables and over thirty-two thousand observations. The variables include time and date, location, and measurements, such as size and weight. The metadata (descriptions of data) are provided [here](https://portal.edirepository.org/nis/metadataviewer?packageid=knb-lter-and.4027.14) (click on "Data entities" tab for explanations of each variable.)
-
-```{r}
-mack_data <- read_csv("https://raw.githubusercontent.com/dkon1/quant_life_quarto/main/data/mack_data.csv")
-```
-
-1.  You
-
-```{r}
-mack_clean <- mack_data |> 
-  filter(species == 'Coastal giant salamander') |>  
-  dplyr::select(section, length_1_mm, weight_g) |> 
-  drop_na() |> mutate(section = factor(section))
-
-# Put 3/4 of the data into the training set 
-mack_split <- initial_split(mack_clean, prop = 3/4)
-
-# Create data frames for the two sets:
-mack_train <- training(mack_split)
-mack_test  <- testing(mack_split)
-
-
-mack_recipe <- 
-  recipe(weight_g ~ ., data = mack_train)
-
-
-```
-
-Bootstrap that baby:\
-
-```{r}
-boots <- bootstraps(mack_train, times = 2000, apparent = TRUE)
-
-lm_bootstrap <- function(split) {
-    lm(weight_g ~ length_1_mm, analysis(split))
+quad_bootstrap <- function(split) {
+    lm(weight_g ~ poly(length_1_mm, degree = 2, raw = TRUE), analysis(split))
 }
 
-boot_models <-
+quad_boot_models <-
   boots %>% 
-  mutate(model = map(splits, lm_bootstrap),
+  mutate(model = map(splits, quad_bootstrap),
          coef_info = map(model, tidy))
 
-boot_coefs <- 
-  boot_models %>% 
+quad_boot_coefs <- 
+  quad_boot_models %>% 
   unnest(coef_info)
-```
 
-Show the confidence intervals:
 
-```{r}
-percentile_intervals <- int_pctl(boot_models, coef_info)
+percentile_intervals <- int_pctl(quad_boot_models, coef_info)
 percentile_intervals
 ```
 
-```{r}
-boot_aug <- 
-  boot_models %>% 
-  sample_n(20) %>% 
-  mutate(augmented = map(model, augment)) %>% 
-  unnest(augmented)
-
-
-```
-
-Plot the different fits:
+3.  Perform linear regression on the cleaned mack data set with the same variables, and print out the confidence intervals (at 95% level) for the two coefficients from the calculated statistics (you can use the function `confint`). Then perform quadratic regression and again print out the confidence intervals for the three coefficients. Compare these confidence intervals with those produced by bootsrap calculations; how close are the point estimates (means)? How do they compare in terms of the width of the confidence intervals? Discuss what you think might be the reason for the differences.
 
 ```{r}
-boot_aug |> ggplot( aes(x = length_1_mm, y = weight_g )) +
-  geom_line(aes(y = .fitted, group = id), alpha = .2, col = "blue") +
-  geom_point()
-```
+lm_out <- lm(weight_g ~ length_1_mm, data = mack_clean)
+summary(lm_out)
 
-```{r}
-boots <- bootstraps(mack_train, times = 2000, apparent = TRUE)
+print(confint(lm_out, "(Intercept)", level=0.95))
+print(confint(lm_out, "length_1_mm", level=0.95))
 
-lm_bootstrap <- function(split) {
-    lm(weight_g ~ poly(length_1_mm, degree = 2, raw = TRUE) + section, analysis(split))
-}
-
-boot_models <-
-  boots %>% 
-  mutate(model = map(splits, lm_bootstrap),
-         coef_info = map(model, tidy))
-
-boot_coefs <- 
-  boot_models %>% 
-  unnest(coef_info)
-```
-
-```{r}
-percentile_intervals <- int_pctl(boot_models, coef_info)
-percentile_intervals
-```
-
-```{r}
-quad_out <- lm(weight_g ~ poly(length_1_mm, degree = 2, raw = TRUE) + section, data = mack_train)
+quad_out <- lm(weight_g ~ poly(length_1_mm, degree = 2, raw = TRUE), data = mack_clean)
 summary(quad_out)
 
 
@@ -401,29 +221,57 @@ print(confint(quad_out, "poly(length_1_mm, degree = 2, raw = TRUE)1", level=0.95
 print(confint(quad_out, "poly(length_1_mm, degree = 2, raw = TRUE)2", level=0.95))
 ```
 
-## Hypothesis testing
+The point estimates are similar, but the bootstrapped confidence intervals are consistently wider (especially in the quadratic case). This is typical for using a non-parametric empirical distribution compared to a theoretical distribution (e.g. for the t-statistic) because it doesn't have the same computational power.
+
+## Hypothesis testing using the bootstrap
+
+Let us use the awesome power of the bootstrap to construct an empirical distribution for a null hypothesis.
+
+1.  Use the ecological data set and the pipeline for calculating statistics from the tutorial resampling tutorial to calculate the mean difference between the weight of trout by section "CC" and "OG". Use the same tools to generate a null distribution for the difference in means between the weight of trout in the two sections (use the function `generate` with the `type = "permute"` option.) The use the function `visualize` and `shade_p_value` with the mean difference between trout, to show how the observation compares to the null distribution. Estimate the p-value by comparing the observation to the null distribution.
 
 ```{r}
-null_dist <-mack_clean %>%
-  specify(weight_g   ~ section) %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 500, type = "permute") %>%
+null_dist <-mack_clean |> 
+  specify(weight_g   ~ section) |> 
+  hypothesize(null = "independence") |> 
+  generate(reps = 500, type = "permute") |> 
   calculate(stat="diff in means", order = c("CC", "OG"))
 
-```
-
-```{r}
-
-d_hat <- mack_clean %>%
-  specify(weight_g  ~ section) %>%
+d_hat <- mack_clean |> 
+  specify(weight_g  ~ section) |> 
   calculate(stat="diff in means", order = c("CC", "OG"))
 
-null_dist %>%
+null_dist |> 
   visualize()  +
-  shade_p_value(obs_stat = d_hat, direction = "two-sided")
+  shade_p_value(obs_stat = d_hat, direction = "one-sided")
 ```
+
+2.  Now repeat the process with the neuroblastoma data to test whether there is a difference in the variable `STC1` between high and low risk samples. Use the same tools to generate a null distribution for the difference in means between the weight of trout in the two sections (use the function `generate` with the `type = "permute"` option.) The use the function `visualize` and `shade_p_value` with the mean difference between expression values of this gene to show how the observation compares to the null distribution. Estimate the p-value by comparing the observation to the null distribution.
+
+```{r}
+
+null_dist <- neuro_clean |> 
+  specify(STC1 ~ high_risk ) |> 
+  hypothesize(null = "independence") |> 
+  generate(reps = 500, type = "permute") |> 
+  calculate(stat="diff in means", order = c('yes', 'no'))
+
+d_hat <- neuro_clean |> 
+  specify(STC1 ~ high_risk ) |> 
+  calculate(stat="diff in means", order = c('yes', 'no'))
+
+null_dist |> 
+  visualize()  +
+  shade_p_value(obs_stat = d_hat, direction = "one-sided")
+```
+
+3.  Calculate and print the p-value for the null hypothesis of equal weights of trout for both sections using the function `t.test`. Do the same for the null hypothesis of equal gene expression values of `STC1` for high and low risk samples. Discuss whether the conclusions of the hypothesis test are different between the bootstrap calculation and the standard statistical test.
 
 ```{r}
 result <- t.test(weight_g  ~ section, data = mack_clean)
 print(result)
+
+result <- t.test(STC1 ~ high_risk, data = neuro_clean)
+print(result)
 ```
+
+In the first case, the p-value is very low, which corresponds to the plot of the bootstrap distribution and the observed mean difference being way outside of its range. In the second case, the p-value is fairly high, consistent with the plot from the bootstrap calculation.
