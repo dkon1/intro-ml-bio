@@ -1,0 +1,267 @@
+---
+title: "Resampling: cross-validation and bootstrap (lab 5 for BIOS 26122)"
+author: "Dmitry Kondrashov"
+format: 
+  html:
+    self-contained: true
+editor: visual
+---
+
+## Description
+
+The goal of this assignment is to use selection and methods for cross-validation and performing statistical inference. You will learn to do the following:
+
+The use of these models is demonstrated in the week 5 tutorials using the tools from package `tidymodels`; I recommend that you use them to perform the tasks below.
+
+```{r setup}
+#| include: false
+#| echo: false
+library(tidyverse)
+library(tidymodels)
+library(discrim)
+```
+
+### Classification using ridge regression
+
+The following data set is gene expression data from tumors of patients with neuroblastoma (a type of cancer), accession number [**GSE62564**](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE62564)**.** It contains 22 phenotypic scores, 6 of which (MYCN, STC1, P4HA1, BHLHE40, HIF1A and ST8SIA1) are gene expressions measured in log2RPM (log 2 reads per million). The other 16 are quantified by R package GSVA (Gene Set Enrichment Analysis).
+
+```{r}
+neuro_blast <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/r2_gse62564_GSVA_Metadata_selected.csv")
+```
+
+1.  Clean the data to remove any outliers or missing values. Set up a tidymodels recipe to predict the variable `high_risk` (make sure to convert it to a factor!) using all other variables, except for `sample_id.` Define a *generalized linear model* (using function \`logistic_reg\` and engine "glm") specification to predict the variable `high_risk`, and create a workflow by combining the recipe and the model spec. Use the function `vfold_cv` to split the cleaned data set, then `fit_resamples` to fit the model on different splits and perform k-fold cross-validation, then use the function `collect_metrics` to report the error for the test set.
+
+    ```{r}
+    neuro_clean <- neuro_blast |>  drop_na() |>
+      mutate(high_risk = factor(high_risk))
+
+
+    neuro_recipe <- 
+      recipe(high_risk ~ ., data = neuro_clean) |>  
+      update_role(`sample id`, new_role = "ID")
+
+
+    ridge_spec <- linear_reg(mixture = 0, penalty = 0) |> 
+      set_mode("regression") |> 
+      set_engine("glmnet")
+
+    workflow_glm <- workflow() |> 
+      add_model(ridge_spec) |> 
+      add_recipe(neuro_recipe)
+
+    #folds <- vfold_cv(neuro_clean, v = 10)
+
+    glm_fit <- 
+       workflow_glm |>  
+        fit(neuro_clean)
+     # fit_resamples(folds)
+
+    collect_metrics(glm_fit)
+    ```
+
+2.  Repeat this process for Naive Bayes, LDA, and QDA classification engines, and report their error statistics from cross-validation.
+
+```{r}
+nb_spec <- naive_Bayes() |>  
+  set_mode("classification") |>  
+  set_engine("naivebayes") |>  
+  set_args(usekernel = FALSE) 
+
+
+
+workflow_nb <- workflow() |> 
+  add_model(nb_spec) |> 
+  add_recipe(neuro_recipe)
+
+folds <- vfold_cv(neuro_clean, v = 10)
+
+nb_fit <- 
+   workflow_nb |>  
+  fit_resamples(folds)
+
+print("The error stats for the Naive Bayes model are:")
+print(collect_metrics(nb_fit))
+
+
+ld_spec <- discrim_linear() |> 
+  set_mode("classification") |>  
+  set_engine("MASS") |>  
+  set_args(penalty = NULL, regularization_method = NULL) 
+
+
+workflow_ld <- workflow() |> 
+  add_model(ld_spec) |> 
+  add_recipe(neuro_recipe)
+
+folds <- vfold_cv(neuro_clean, v = 10)
+
+ld_fit <- 
+   workflow_ld |>  
+  fit_resamples(folds)
+
+print("The error stats for the LDA model are:")
+print(collect_metrics(ld_fit))
+
+
+ qd_spec <- discrim_quad()  |> 
+  set_mode("classification") |>  
+  set_engine("MASS") |>  
+  set_args(penalty = NULL, regularization_method = NULL) 
+
+
+workflow_qd <- workflow() |> 
+  add_model(qd_spec) |> 
+  add_recipe(neuro_recipe)
+
+
+folds <- vfold_cv(neuro_clean, v = 10)
+
+qd_fit <- 
+   workflow_qd |>  
+  fit_resamples(folds)
+
+print("The error stats for the QDA model are:")
+print(collect_metrics(qd_fit))
+```
+
+3.  Compare the results from the four classification methods both in terms of the accuracy and the ROC area under the curve metric; explain the difference between the two and which one you would prefer to use.
+
+    YOUR ANSWERS HERE
+
+### Ecological data
+
+The following data set contains observations of the populations of one species of fish (cutthroat trout) and two species of salamander in Mack Creek, Andrews Forest, Willamette National Forest, Oregon. The data set contains 16 variables and over thirty-two thousand observations. The variables include time and date, location, and measurements, such as size and weight. The metadata (descriptions of data) are provided [here](https://portal.edirepository.org/nis/metadataviewer?packageid=knb-lter-and.4027.14) (click on "Data entities" tab for explanations of each variable.)
+
+```{r}
+mack_data <- read_csv("https://raw.githubusercontent.com/dkon1/quant_life_quarto/main/data/mack_data.csv")
+```
+
+1.  Clean the data to remove any outliers or missing values, and filter the data to contain observations from only one species, either: 'Cutthroat trout' or 'Coastal giant salamander' . Split the data set into training and test sets of equal size. Set up a `tidymodels` recipe to predict the variable \`section\` (make sure it's converted to a factor) using the numeric variables `length_1_mm` and `weight_g`.
+
+    ```{r}
+    mack_clean <- mack_data |> 
+      filter(species == 'Coastal giant salamander') |>  
+      dplyr::select(length_1_mm, weight_g, length_2_mm, section, reach) |> 
+      drop_na() #|> mutate(section = factor(section))
+
+    # Put 3/4 of the data into the training set 
+    mack_split <- initial_split(mack_clean, prop = 1/2)
+
+    # Create data frames for the two sets:
+    mack_train <- training(mack_split)
+    mack_test  <- testing(mack_split)
+
+
+    mack_recipe <- 
+      recipe(weight_g ~ ., data = mack_train)
+    ```
+
+2.  Train a *generalized linear model* (using engine "glm") to predict the variable `section`; specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.
+
+```{r}
+ridge_spec <- linear_reg(mixture = 0, penalty = 0) |> 
+  set_mode("regression") |> 
+  set_engine("lm")
+
+workflow_ridge <- workflow() |> 
+  add_model(ridge_spec) |> 
+  add_recipe(mack_recipe)
+
+fit_ridge <- workflow_ridge |> 
+  fit(mack_train)
+
+tidy(fit_ridge)
+
+tidy(fit_ridge) %>% 
+  dwplot(dot_args = list(size = 2, color = "black"),
+         whisker_args = list(color = "black"),
+         vline = geom_vline(xintercept = 0, colour = "grey50", linetype = 2))
+
+compare_pred <- augment(fit_mack, new_data = mack_test) 
+
+
+compare_pred 
+
+#compare_pred |>  accuracy(truth = weight_g, estimate = .pred_class)
+
+#compare_pred |>  conf_mat(truth = section, estimate = .pred_class)
+```
+
+3.  Train a *Naive Bayes model* to predict the variable `section`: specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.
+
+    ```{r}
+    nb_spec <- naive_Bayes() %>% 
+      set_mode("classification") %>% 
+      set_engine("naivebayes") %>% 
+      set_args(usekernel = FALSE) 
+
+
+    workflow_nb <- workflow() |> 
+      add_model(nb_spec) |> 
+      add_recipe(mack_recipe)
+
+    fit_mack <- workflow_nb |> 
+      fit(mack_train)
+
+    #fit_mack %>% 
+     # extract_fit_parsnip() 
+
+    compare_pred <- augment(fit_mack, new_data = mack_test) 
+
+    compare_pred |>  accuracy(truth = section, estimate = .pred_class)
+
+    compare_pred |>  conf_mat(truth = section, estimate = .pred_class)
+    ```
+
+4.  Train a *linear discriminant model* to predict the variable `section`: specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.
+
+    ```{r}
+    ld_spec <- discrim_linear(
+      mode = "classification",
+      penalty = NULL,
+      regularization_method = NULL,
+      engine = "MASS"
+    )
+
+    workflow_ld <- workflow() |> 
+      add_model(ld_spec) |> 
+      add_recipe(mack_recipe)
+
+    fit_mack <- workflow_ld |> 
+      fit(mack_train)
+
+    #fit_mack %>% 
+     # extract_fit_parsnip() 
+
+    compare_pred <- augment(fit_mack, new_data = mack_test) 
+
+    compare_pred |>  accuracy(truth = section, estimate = .pred_class)
+
+    compare_pred |>  conf_mat(truth = section, estimate = .pred_class)
+    ```
+
+5.  Train a *quadratic discriminant model* to predict the variable `section`: specify the model, create a workflow, fit it to the training set, and report its accuracy on the test set.
+
+```{r}
+ qd_spec <- discrim_quad(
+  mode = "classification",
+  regularization_method = NULL,
+  engine = "MASS"
+)
+
+workflow_qd <- workflow() |> 
+  add_model(qd_spec) |> 
+  add_recipe(mack_recipe)
+
+fit_mack <- workflow_qd |> 
+  fit(mack_train)
+
+#fit_neuro %>% 
+ # extract_fit_parsnip() 
+
+compare_pred <- augment(fit_mack, new_data = mack_test) 
+
+compare_pred |>  accuracy(truth = section, estimate = .pred_class)
+
+compare_pred |>  conf_mat(truth = section, estimate = .pred_class)
+```
