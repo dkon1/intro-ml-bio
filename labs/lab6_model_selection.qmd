@@ -37,7 +37,7 @@ glimpse(fat)
 
 ```
 
-2.  Calculate the rmse of the predictions on the test set and report them. How does it compare to the r-squared from the summary of lm? Do you see evidence of overfitting?
+2.  Calculate the r squared of the predictions on the test set and report them. How does it compare to the r-squared from the summary of lm? Do you see evidence of overfitting?
 
     ```{r}
 
@@ -52,43 +52,43 @@ glimpse(fat)
 
 ```
 
-4.  Perform ridge regression on the training set with parameter tuning (choose a reasonable grid for lambda) using k-fold validation. Report the best value of lambda, then generate predictions on the test set, and report the parameter values and the rmse on the test set.
+4.  Perform ridge regression on the training set with parameter tuning, using k-fold validation. Make a plot of the rmse and r-squared as a function of lambda and report the best value of lambda.
 
     ```{r}
 
     ```
 
-5.  Scale every predictor variable by dividing it by its standard deviation, and perform ridge regression again; generate predictions using the optimal value of lambda, and report the parameter values and the rmse on the test set.
+5.  Get the final model using the best penalty value, generate predictions on the test set, and report the parameter values and the r-squared on the test set.
 
 ```{r}
 
 ```
 
-6.  Compare on the performance of ridge regression to plan linear regression in terms of tuning the parameter lambda and the impact it has on the prediction quality on the test set; did scaling help improve prediction quality?
+6.  Compare on the performance of ridge regression to plain linear regression in terms of tuning the parameter lambda and the impact it has on the prediction quality on the test set.
 
 YOUR ANSWER HERE
 
 ## Regression with LASSO
 
-7.  Perform LASSO regression on the training set using a couple of different values of penalty lambda and report the rmse of the predictions on the test set.
+7.  Perform LASSO regression on the training set using a couple of different values of penalty lambda and report the parameter values and the r-squared on the test set.
 
 ```{r}
 
 
 ```
 
-8.  Perform LASSO regression on the training set with parameter tuning (choose a reasonable grid for lambda) using k-fold validation. Report the best value of lambda, then generate predictions on the test set, and report the parameter values and the rmse on the test set.
+8.  Perform LASSO regression on the training set with parameter tuning, using k-fold validation. Make a plot of the rmse and r-squared as a function of lambda and report the best value of lambda.
 
     ```{r}
 
     ```
 
-9.  Scale every predictor variable by dividing it by its standard deviation, and perform LASSO regression again; generate predictions using the optimal value of lambda, and report the parameter values and the rmse on the test set.
+9.  Get the final model using the best penalty value, generate predictions on the test set, and report the parameter values and the r-squared on the test set.
 
 ```{r}
 
 ```
 
-10. Comment on the performance of LASSO regression in comparison to ridge, in terms of both prediction quality and the value of the parameter values from the optimally tuned models; did scaling help improve prediction quality?
+10. Comment on the performance of LASSO regression in comparison to ridge, in terms of both prediction quality and the value of the parameter values from the optimally tuned models.
 
 YOUR ANSWER HERE
