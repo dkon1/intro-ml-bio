@@ -1,5 +1,5 @@
 ---
-title: "Resampling: cross-validation and bootstrap (lab 5 for BIOS 26122)"
+title: "Regularization for regression (lab 6 for BIOS 26122)"
 author: "Dmitry Kondrashov"
 format: 
   html:
