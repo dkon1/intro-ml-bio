@@ -1,5 +1,5 @@
 ---
-title: "Resampling: cross-validation and bootstrap (lab 5 for BIOS 26122)"
+title: "Regularization for regression (lab 6 for BIOS 26122)"
 author: "Dmitry Kondrashov"
 format: 
   html:
@@ -9,191 +9,86 @@ editor: visual
 
 ## Description
 
-The goal of this assignment is to use selection and methods for cross-validation and performing statistical inference. You will learn to do the following:
+The goal of this assignment is to learn to use and understand regularization methods for multivariate linear regression, such as ridge and LASSO.
 
-The use of these models is demonstrated in the week 5 tutorials using the tools from package `tidymodels`; I recommend that you use them to perform the tasks below.
+The use of these models is demonstrated in the week 6 tutorials using the tools from package `tidymodels`; I recommend that you use them to perform the tasks below.
 
 ```{r setup}
 #| include: false
 #| echo: false
 library(tidyverse)
 library(tidymodels)
-library(discrim)
 library(faraway)
-library(ISLR2)
 ```
 
-###  Using ridge regression
-
-### 
+The data set `fat` loaded below from the package `faraway` contains variables age, weight, height, and 10 body circumference measurements measured for 252 men. There are four potential response variables `brozek`, `free`, `siri`, and `density`, which are all highly related measures of body fat percentage.
 
 ```{r}
-#lowbwt <- read_csv("data/lowbwt.csv")
-diabetes <- read_tsv("https://www4.stat.ncsu.edu/~boos/var.select/diabetes.tab.txt")
-
-data("Hitters")
+data("fat")
+glimpse(fat)
 ```
 
-1.  Clean the data to remove any outliers or missing values, and filter the data to contain observations from only species, either: 'Cutthroat trout' or 'Coastal giant salamander' . Split the data set into training and test sets of equal size. Set up a `tidymodels` recipe to predict the variable \`section\` (make sure it's converted to a factor) using the numeric variables `length_1_mm` and `weight_g`.
+## Multivariate regression
 
-    ```{r}
-    Hitters_clean <- Hitters |> 
-     #dplyr::select(-c(League, Division, NewLeague)) |> 
-     drop_na()
-
-
-    # Put 3/4 of the data into the training set 
-    Hitters_split <- initial_split(Hitters_clean, prop = 0.5)
-
-    # Create data frames for the two sets:
-    Hitters_train <- training(Hitters_split)
-    Hitters_test  <- testing(Hitters_split)
-
-
-    Hitters_recipe <- 
-      recipe(Salary ~ ., data = Hitters_train) #|> 
-    #  update_role(section, reach, new_role = "ID")
-    ```
-
-2.  Train a *generalized linear model* (using engine "glm") to predict the variable `section`; specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.
+1.  First, clean the data to keep only `brozek` of the above response variables and remove any missing values. Second, split the data into training and test sets. Third, perform standard linear regression using `lm` on the training set using `brozek` as the response variable and report which of the predictor variables have the most significant relationship with it.
 
 ```{r}
-ridge_spec <- linear_reg(mixture = 0, penalty= 0) |> 
-  set_mode("regression") |> 
-  set_engine("glmnet")
 
-workflow_ridge <- workflow() |> 
-  add_model(ridge_spec) |> 
-  add_recipe(Hitters_recipe)
-
-fit_ridge <- workflow_ridge |> 
-  fit(Hitters_train)
-
-tidy(fit_ridge)
-
-#tidy(fit_ridge) |>  
-#  dwplot(dot_args = list(size = 2, color = "black"),
-#         whisker_args = list(color = "black"),
-#         vline = geom_vline(xintercept = 0, colour = "grey50", linetype = 2))
-
-compare_pred <- augment(fit_ridge, new_data = Hitters_test) 
-
-
-compare_pred |> rmse(Salary, .pred)
 
 ```
 
-Try different values of penalty:
-
-```{r}
-ridge_spec <- linear_reg(mixture = 0, penalty = 10) |> 
-  set_mode("regression") |> 
-  set_engine("glmnet")
-
-workflow_ridge <- workflow() |> 
-  add_model(ridge_spec) |> 
-  add_recipe(Hitters_recipe)
-
-
-fit_ridge <- workflow_ridge |> 
-  fit(Hitters_train)
-
-tidy(fit_ridge, penalty= 10)
-
-#tidy(fit_ridge) %>% 
-#  dwplot(dot_args = list(size = 2, color = "black"),
-#         whisker_args = list(color = "black"),
-#         vline = geom_vline(xintercept = 0, colour = "grey50", linetype = 2))
-
-compare_pred <- augment(fit_ridge, new_data = Hitters_test) 
-
-
-compare_pred |> rmse(Salary, .pred)
-```
-
-3.  Use the tools of parameter tuning to select the best penaltyvalue lambda
+2.  Calculate the rmse of the predictions on the test set and report them. How does it compare to the r-squared from the summary of lm? Do you see evidence of overfitting?
 
     ```{r}
 
-    Hitters_fold <- vfold_cv(Hitters_train, v = 10)
-
-    ridge_recipe <- 
-      recipe(Salary~ ., data = Hitters_train) |> 
-      step_novel(all_nominal_predictors()) |>  
-      step_dummy(all_nominal_predictors()) |>  
-      step_zv(all_predictors()) |> 
-      step_normalize(all_predictors())
-
-    ridge_spec <- 
-      linear_reg(penalty= tune(), mixture = 1) |> 
-      set_mode("regression") |> 
-      set_engine("glmnet")
-
-    ridge_workflow <- workflow() |> 
-      add_recipe(ridge_recipe) |> 
-      add_model(ridge_spec)
-
-
-    penalty_grid <- grid_regular(penalty(range = c(-5, 5)), levels = 50)
-
-
-
-    tune_res <- tune_grid(
-      ridge_workflow,
-      resamples = Hitters_fold, 
-      grid = penalty_grid
-    )
     ```
 
-4.  Plot the results and print out the best value of the penaltyparameter
+## Ridge regression
+
+3.  Perform ridge regression on the training set using a couple of different values of penalty lambda and report the rmse of the predictions on the test set.
+
+```{r}
+
+
+```
+
+4.  Perform ridge regression on the training set with parameter tuning (choose a reasonable grid for lambda) using k-fold validation. Report the best value of lambda, then generate predictions on the test set, and report the parameter values and the rmse on the test set.
 
     ```{r}
-    autoplot(tune_res)
-
-    collect_metrics(tune_res)
-
-    best_penalty<- select_best(tune_res, metric = "rmse")
-
-    best_penalty
-
 
     ```
 
-5.  Validate the final model with the best fit value of lambda and compare the results to those from the (penalty=0) fit
+5.  Scale every predictor variable by dividing it by its standard deviation, and perform ridge regression again; generate predictions using the optimal value of lambda, and report the parameter values and the rmse on the test set.
 
 ```{r}
- 
-ridge_final <- finalize_workflow(ridge_workflow, best_penalty)
 
-ridge_final_fit <- fit(ridge_final, data = Hitters_train)
-
-augment(ridge_final_fit, new_data = Hitters_test) |>
-  rmse(truth = Salary, estimate = .pred)
-
-tidy(ridge_final_fit, penalty= best_penalty$penalty)
 ```
+
+6.  Compare on the performance of ridge regression to plan linear regression in terms of tuning the parameter lambda and the impact it has on the prediction quality on the test set; did scaling help improve prediction quality?
+
+YOUR ANSWER HERE
+
+## Regression with LASSO
+
+7.  Perform LASSO regression on the training set using a couple of different values of penalty lambda and report the rmse of the predictions on the test set.
 
 ```{r}
-grid <- 10^seq(10, -2, length = 100)
-x_train <- model.matrix(Salary ~ ., Hitters_train)[, -1]
-x_test <- model.matrix(Salary ~ ., Hitters_test)[, -1]
 
-lasso.mod <- glmnet(x_train, Hitters_train$Salary, alpha = 1,
-    lambda = grid)
-plot(lasso.mod)
-###
-#set.seed(1)
-cv.out <- cv.glmnet(x_train, Hitters_train$Salary, alpha = 1)
-plot(cv.out)
-bestlam <- cv.out$lambda.min
-lasso.pred <- predict(lasso.mod, s = bestlam,
-    newx = x_test)
-print(paste("Root mean squared error:", sqrt(mean((lasso.pred - Hitters_test$Salary)^2))))
-print(paste("correlation:", cor(lasso.pred,Hitters_test$Salary)))
-###
-out <- glmnet(model.matrix(Salary ~ ., Hitters), Hitters$Salary, alpha = 1, lambda = grid)
-lasso.coef <- predict(out, type = "coefficients",
-    s = bestlam)[1:20, ]
-lasso.coef
-lasso.coef[lasso.coef != 0]
+
 ```
+
+8.  Perform LASSO regression on the training set with parameter tuning (choose a reasonable grid for lambda) using k-fold validation. Report the best value of lambda, then generate predictions on the test set, and report the parameter values and the rmse on the test set.
+
+    ```{r}
+
+    ```
+
+9.  Scale every predictor variable by dividing it by its standard deviation, and perform LASSO regression again; generate predictions using the optimal value of lambda, and report the parameter values and the rmse on the test set.
+
+```{r}
+
+```
+
+10. Comment on the performance of LASSO regression in comparison to ridge, in terms of both prediction quality and the value of the parameter values from the optimally tuned models; did scaling help improve prediction quality?
+
+YOUR ANSWER HERE
