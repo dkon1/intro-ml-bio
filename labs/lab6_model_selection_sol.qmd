@@ -66,7 +66,7 @@ lm_out <- lm(brozek ~ ., data = fat_train)
 summary(lm_out)
 ```
 
-2. Calculate the r squared of the predictions on the test set and report them. How does it compare to the r-squared from the summary of lm? Do you see evidence of overfitting?
+2.  Calculate the r squared of the predictions on the test set and report them. How does it compare to the r-squared from the summary of lm? Do you see evidence of overfitting?
 
 ```{r}
 compare_pred <- augment(fit_lm, new_data = fat_test) 
@@ -180,7 +180,6 @@ tidy(ridge_final_fit, penalty= best_penalty$penalty)
 6.  Compare on the performance of ridge regression to plain linear regression in terms of tuning the parameter lambda and the impact it has on the prediction quality on the test set.
 
 Ridge regression does a better job than plain linear regression because it avoids overfitting (due to using k-fold cross-validation), so its r-squared on the test set is considerably higher. The best penalty value is small (will vary depending on the random split) but none of parameters are very small. (Their difference in absolute value from the linear model is due to us having scaled the variables in the recipe using the `step_normalize` function.)
-
 
 ## Regression with LASSO
 
