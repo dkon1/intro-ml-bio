@@ -1,0 +1,94 @@
+---
+title: "Dimensionality reduction (lab 7 for BIOS 26122)"
+author: "Dmitry Kondrashov"
+format: 
+  html:
+    self-contained: true
+editor: visual
+---
+
+## Description
+
+The goal of this assignment is to learn to use and understand regularization methods for multivariate linear regression, such as ridge and LASSO.
+
+The use of these models is demonstrated in the week 6 tutorials using the tools from package `tidymodels`; I recommend that you use them to perform the tasks below.
+
+```{r setup}
+#| include: false
+#| echo: false
+library(tidyverse)
+library(tidymodels)
+library(faraway)
+```
+
+The data set `fat` loaded below from the package `faraway` contains variables age, weight, height, and 10 body circumference measurements measured for 252 men. There are four potential response variables `brozek`, `free`, `siri`, and `density`, which are all highly related measures of body fat percentage.
+
+```{r}
+data("fat")
+glimpse(fat)
+```
+
+## Multivariate regression
+
+1.  First, clean the data to keep only `brozek` of the above response variables and remove any missing values. Second, split the data into training and test sets. Third, perform standard linear regression using `lm` on the training set using `brozek` as the response variable and report which of the predictor variables have the most significant relationship with it.
+
+```{r}
+
+
+```
+
+2.  Calculate the r squared of the predictions on the test set and report them. How does it compare to the r-squared from the summary of lm? Do you see evidence of overfitting?
+
+    ```{r}
+
+    ```
+
+## Ridge regression
+
+3.  Perform ridge regression on the training set using a couple of different values of penalty lambda and report the rmse of the predictions on the test set.
+
+```{r}
+
+
+```
+
+4.  Perform ridge regression on the training set with parameter tuning, using k-fold validation. Make a plot of the rmse and r-squared as a function of lambda and report the best value of lambda.
+
+    ```{r}
+
+    ```
+
+5.  Get the final model using the best penalty value, generate predictions on the test set, and report the parameter values and the r-squared on the test set.
+
+```{r}
+
+```
+
+6.  Compare on the performance of ridge regression to plain linear regression in terms of tuning the parameter lambda and the impact it has on the prediction quality on the test set.
+
+YOUR ANSWER HERE
+
+## Regression with LASSO
+
+7.  Perform LASSO regression on the training set using a couple of different values of penalty lambda and report the parameter values and the r-squared on the test set.
+
+```{r}
+
+
+```
+
+8.  Perform LASSO regression on the training set with parameter tuning, using k-fold validation. Make a plot of the rmse and r-squared as a function of lambda and report the best value of lambda.
+
+    ```{r}
+
+    ```
+
+9.  Get the final model using the best penalty value, generate predictions on the test set, and report the parameter values and the r-squared on the test set.
+
+```{r}
+
+```
+
+10. Comment on the performance of LASSO regression in comparison to ridge, in terms of both prediction quality and the value of the parameter values from the optimally tuned models.
+
+YOUR ANSWER HERE
