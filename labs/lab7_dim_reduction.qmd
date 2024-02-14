@@ -1,5 +1,5 @@
 ---
-title: "Dimensionality reduction (lab 7 for BIOS 26122)"
+title: "Dimensionality reduction and clustering (lab 7 for BIOS 26122)"
 author: "Dmitry Kondrashov"
 format: 
   html:
@@ -9,9 +9,15 @@ editor: visual
 
 ## Description
 
-The goal of this assignment is to learn to use and understand regularization methods for multivariate linear regression, such as ridge and LASSO.
+The goal of this assignment is to use methods of unsupervised learning, specifically:
 
-The use of these models is demonstrated in the week 6 tutorials using the tools from package `tidymodels`; I recommend that you use them to perform the tasks below.
+-   PCA for dimensionality reduction
+
+-   PCA for model selection
+
+-   clustering using reduced dimensions
+
+-   compare clustering performance of different methods
 
 ```{r setup}
 #| include: false

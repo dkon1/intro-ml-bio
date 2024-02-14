@@ -1,0 +1,431 @@
+---
+title: "Regularization for regression (lab 6 for BIOS 26122)"
+author: "Dmitry Kondrashov"
+format: 
+  html:
+    self-contained: true
+editor: visual
+---
+
+## Description
+
+The goal of this assignment is to use methods of unsupervised learning, specifically:
+
+-   PCA for dimensionality reduction
+
+-   PCA for model selection
+
+-   clustering using reduced dimensions
+
+-   compare clustering performance of different methods
+
+```{r setup}
+#| include: false
+#| echo: false
+library(tidyverse)
+library(tidymodels)
+library(faraway)
+```
+
+The data set `fat` loaded below from the package `faraway` contains variables age, weight, height, and 10 body circumference measurements measured for 252 men. There are four potential response variables `brozek`, `free`, `siri`, and `density`, which are all highly related measures of body fat percentage.
+
+```{r}
+data("fat")
+glimpse(fat)
+```
+
+## PCA for dimensionality reduction
+
+```{r}
+wisc_data = read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/wdbc.csv")
+
+```
+
+```{r}
+wisc_pred<- wisc_data |> 
+ dplyr::select(-c(ID, Diagnosis)) |> 
+ drop_na()
+
+wisc_class <- wisc_data |> 
+ dplyr::select(Diagnosis) |> 
+ drop_na()
+
+wisc_pca <- wisc_pred  |> 
+  prcomp(scale = TRUE)
+
+tidy(wisc_pca, matrix = 'loadings') |> filter(PC < 6) |> 
+  ggplot(aes(value, column)) +
+  facet_wrap(~ PC) +
+  geom_col() +
+  scale_x_continuous(labels = scales::percent)
+
+tidy(wisc_pca, matrix = "eigenvalues") |> filter(PC < 6) |> 
+  ggplot(aes(PC, percent)) +
+  geom_col()
+
+fviz_pca_ind(wisc_pca,
+             col.ind = factor(wisc_class$Diagnosis),
+             label = 'none',
+             addEllipses=TRUE, 
+             ellipse.level=0.9, 
+             palette = "Dark2")
+```
+
+Perform clustering on this data set without using PCA first
+
+```{r}
+kmeans_spec <- k_means(num_clusters = 2) |>
+  set_mode("partition") |>
+  set_engine("stats") |>
+  set_args(nstart = 20)
+
+
+kmeans_fit <- kmeans_spec |> 
+  fit(~., data = wisc_pred)
+
+wisc_km <- augment(kmeans_fit, new_data = wisc_pred) 
+
+fviz_cluster(list(data = wisc_pred, cluster = wisc_class$Diagnosis),
+ellipse.type = "norm", geom = "point", stand = FALSE, palette = "jco", ggtheme = theme_classic())
+
+#kmeans_fit |>  accuracy(truth = high_risk, estimate = .pred_class)
+
+#kmeans_fit |>  conf_mat(truth = high_risk, estimate = .pred_class)
+
+table(wisc_class$Diagnosis, wisc_km$.pred_cluster)
+```
+
+Let's repeat the same process, but use PCA with the first two components (create a recipe with `step_pca`:
+
+```{r}
+kmeans_rec <- recipe(~., data = wisc_pred) %>%
+  step_normalize(all_numeric()) %>%
+  step_pca(all_numeric(), num_comp = 2) #%>%
+#  prep() %>%
+ # bake(new_data = NULL)
+
+workflow_km <- workflow() |> 
+  add_model(kmeans_spec) |>
+  add_recipe(kmeans_rec)
+
+kmeans_fit <-  workflow_km |> 
+  fit(wisc_pred)
+
+wisc_km <- augment(kmeans_fit, new_data = wisc_pred) 
+
+fviz_cluster(list(data = wisc_pred, cluster = wisc_class$Diagnosis),
+ellipse.type = "norm", geom = "point", stand = FALSE, palette = "jco", ggtheme = theme_classic())
+
+table(wisc_class$Diagnosis, wisc_km$.pred_cluster)
+```
+
+1.  First, clean the data to keep only `brozek` of the above response variables and remove any missing values. Perform PCA on the data set (with scaling) and make a plot of the loadings of the first 5 PCs, and make a Scree plot of the same 5 PCs.
+
+```{r}
+fat_pred<- fat |> 
+ dplyr::select(-c(siri, density, free, brozek)) |> 
+ drop_na()
+
+fat_pca <- fat_pred  |> 
+  prcomp(scale = TRUE)
+
+tidy(fat_pca, matrix = 'loadings') |> filter(PC < 6) |> 
+  ggplot(aes(value, column)) +
+  facet_wrap(~ PC) +
+  geom_col() +
+  scale_x_continuous(labels = scales::percent)
+
+tidy(fat_pca, matrix = "eigenvalues") |> filter(PC < 6) |> 
+  ggplot(aes(PC, percent)) +
+  geom_col()
+```
+
+2.  Use PCA regression as a step in the recipe to calculate
+
+```{r}
+fat_clean <- fat |> 
+ dplyr::select(-c(siri, density, free)) |> 
+ drop_na()
+
+
+# Put 3/4 of the data into the training set 
+fat_split <- initial_split(fat_clean, prop = 0.75)
+
+# Create data frames for the two sets:
+fat_train <- training(fat_split)
+fat_test  <- testing(fat_split)
+
+fat_recipe <- 
+  recipe(brozek ~ ., data = fat_train)
+
+lm_spec <- linear_reg() |> 
+  set_mode("regression") |> 
+  set_engine("lm")
+
+workflow_lm <- workflow() |> 
+  add_model(lm_spec) |> 
+  add_recipe(fat_recipe)
+
+fit_lm <- workflow_lm |> 
+  fit(fat_train)
+
+tidy(fit_lm)
+
+# You can also use lm
+lm_out <- lm(brozek ~ ., data = fat_train)
+summary(lm_out)
+
+compare_pred <- augment(fit_lm, new_data = fat_test) 
+
+compare_pred |> rsq(brozek, .pred)
+```
+
+```{r}
+lm_spec <- 
+  linear_reg() %>% 
+  set_mode("regression") %>% 
+  set_engine("lm")
+
+pca_recipe <- 
+  recipe(formula = brozek ~ ., data = fat_train) %>% 
+  step_novel(all_nominal_predictors()) %>% 
+  step_dummy(all_nominal_predictors()) %>% 
+  step_zv(all_predictors()) %>% 
+  step_normalize(all_predictors()) %>%
+  step_pca(all_predictors(), threshold = 0.99)
+
+pca_workflow <- 
+  workflow() %>% 
+  add_recipe(pca_recipe) %>% 
+  add_model(lm_spec)
+
+
+fit_pca <- pca_workflow |> 
+  fit(fat_train)
+
+compare_pred <- augment(fit_pca, new_data = fat_test) 
+
+compare_pred |> rsq(brozek, .pred)
+
+
+#threshold_grid <- grid_regular(threshold(), levels = 10)
+
+#tune_res <- tune_grid(
+#  pca_workflow,
+#  resamples = Hitters_fold, 
+#  grid = threshold_grid
+#)
+
+#autoplot(tune_res)
+```
+
+The r-squared from lm (calculated on the training set) is 0.75 (will vary for different splits) but the r-squared calculated on the test set is about 0.5, so there is evidence of overfitting.
+
+## Ridge regression
+
+3.  Perform ridge regression on the training set using a couple of different values of penalty lambda and report the parameter values and the r-squared on the test set.
+
+```{r}
+ridge_spec <- linear_reg(mixture = 0, penalty= 0.1) |> 
+  set_mode("regression") |> 
+  set_engine("glmnet")
+
+workflow_ridge <- workflow() |> 
+  add_model(ridge_spec) |> 
+  add_recipe(fat_recipe)
+
+fit_ridge <- workflow_ridge |> 
+  fit(fat_train)
+
+print("The parameters and r-squared of the prediction on the test with lambda = 0.1:")
+
+tidy(fit_ridge)
+
+compare_pred <- augment(fit_ridge, new_data = fat_test) 
+
+compare_pred |> rsq(brozek, .pred)
+
+
+ridge_spec <- linear_reg(mixture = 0, penalty= 1) |> 
+  set_mode("regression") |> 
+  set_engine("glmnet")
+
+workflow_ridge <- workflow() |> 
+  add_model(ridge_spec) |> 
+  add_recipe(fat_recipe)
+
+fit_ridge <- workflow_ridge |> 
+  fit(fat_train)
+
+print("The parameters and r-squared of the prediction on the test with lambda = 1:")
+
+tidy(fit_ridge)
+
+compare_pred <- augment(fit_ridge, new_data = fat_test) 
+
+compare_pred |> rsq(brozek, .pred)
+
+```
+
+4.  Perform ridge regression on the training set with parameter tuning, using k-fold validation. Make a plot of the rmse and r-squared as a function of lambda and report the best value of lambda.
+
+    ```{r}
+    fat_fold <- vfold_cv(fat_train, v = 10)
+
+    ridge_recipe <- 
+      recipe(brozek~ ., data = fat_train) |> 
+      step_novel(all_nominal_predictors()) |>  
+      step_dummy(all_nominal_predictors()) |>  
+      step_zv(all_predictors()) |> 
+      step_normalize(all_predictors())
+
+    ridge_spec <- 
+      linear_reg(penalty= tune(), mixture = 0) |> 
+      set_mode("regression") |> 
+      set_engine("glmnet")
+
+    ridge_workflow <- workflow() |> 
+      add_recipe(ridge_recipe) |> 
+      add_model(ridge_spec)
+
+
+    penalty_grid <- grid_regular(penalty(range = c(-5, 1)), levels = 50)
+
+
+    tune_res <- tune_grid(
+      ridge_workflow,
+      resamples = fat_fold, 
+      grid = penalty_grid
+    )
+
+    autoplot(tune_res)
+
+    collect_metrics(tune_res)
+
+    best_penalty<- select_best(tune_res, metric = "rmse")
+
+    best_penalty
+
+    ```
+
+5.  Get the final model using the best penalty value, generate predictions on the test set, and report the parameter values and the r-squared on the test set.
+
+```{r}
+ridge_final <- finalize_workflow(ridge_workflow, best_penalty)
+
+ridge_final_fit <- fit(ridge_final, data = fat_train)
+
+augment(ridge_final_fit, new_data = fat_test) |>
+  rsq(truth = brozek, estimate = .pred)
+
+tidy(ridge_final_fit, penalty= best_penalty$penalty)
+
+```
+
+6.  Compare on the performance of ridge regression to plain linear regression in terms of tuning the parameter lambda and the impact it has on the prediction quality on the test set.
+
+Ridge regression does a better job than plain linear regression because it avoids overfitting (due to using k-fold cross-validation), so its r-squared on the test set is considerably higher. The best penalty value is small (will vary depending on the random split) but none of parameters are very small. (Their difference in absolute value from the linear model is due to us having scaled the variables in the recipe using the `step_normalize` function.)
+
+## Regression with LASSO
+
+7.  Perform LASSO regression on the training set using a couple of different values of penalty lambda and report the parameter values and the r-squared on the test set.
+
+```{r}
+lasso_spec <- linear_reg(mixture = 1, penalty= 0.1) |> 
+  set_mode("regression") |> 
+  set_engine("glmnet")
+
+workflow_ridge <- workflow() |> 
+  add_model(lasso_spec) |> 
+  add_recipe(fat_recipe)
+
+fit_ridge <- workflow_ridge |> 
+  fit(fat_train)
+
+print("The parameters and r-squared of the LASSO prediction on the test with lambda = 0.1:")
+
+tidy(fit_ridge)
+
+compare_pred <- augment(fit_ridge, new_data = fat_test) 
+
+compare_pred |> rsq(brozek, .pred)
+
+
+lasso_spec <- linear_reg(mixture = 1, penalty= 1) |> 
+  set_mode("regression") |> 
+  set_engine("glmnet")
+
+workflow_ridge <- workflow() |> 
+  add_model(lasso_spec) |> 
+  add_recipe(fat_recipe)
+
+fit_ridge <- workflow_ridge |> 
+  fit(fat_train)
+
+print("The parameters and r-squared of the LASSO prediction on the test set with lambda = 1:")
+
+tidy(fit_ridge)
+
+compare_pred <- augment(fit_ridge, new_data = fat_test) 
+
+compare_pred |> rsq(brozek, .pred)
+
+
+```
+
+8.  Perform LASSO regression on the training set with parameter tuning, using k-fold validation. Make a plot of the rmse and r-squared as a function of lambda and report the best value of lambda.
+
+    ```{r}
+    fat_fold <- vfold_cv(fat_train, v = 10)
+
+    lasso_recipe <- 
+      recipe(brozek~ ., data = fat_train) |> 
+      step_novel(all_nominal_predictors()) |>  
+      step_dummy(all_nominal_predictors()) |>  
+      step_zv(all_predictors()) |> 
+      step_normalize(all_predictors())
+
+    lasso_spec <- 
+      linear_reg(penalty= tune(), mixture = 1) |> 
+      set_mode("regression") |> 
+      set_engine("glmnet")
+
+    lasso_workflow <- workflow() |> 
+      add_recipe(lasso_recipe) |> 
+      add_model(lasso_spec)
+
+
+    penalty_grid <- grid_regular(penalty(range = c(-5, 0)), levels = 50)
+
+
+    tune_res <- tune_grid(
+      lasso_workflow,
+      resamples = fat_fold, 
+      grid = penalty_grid
+    )
+
+    autoplot(tune_res)
+
+    collect_metrics(tune_res)
+
+    best_penalty<- select_best(tune_res, metric = "rmse")
+
+    best_penalty
+    ```
+
+9.  Get the final model using the best penalty value, generate predictions on the test set, and report the parameter values and the r-squared on the test set.
+
+```{r}
+lasso_final <- finalize_workflow(lasso_workflow, best_penalty)
+
+lasso_final_fit <- fit(lasso_final, data = fat_train)
+
+augment(lasso_final_fit , new_data = fat_test) |>
+  rsq(truth = brozek, estimate = .pred)
+
+tidy(lasso_final_fit, penalty= best_penalty$penalty)
+```
+
+10. Comment on the performance of LASSO regression in comparison to ridge, in terms of both prediction quality and the value of the parameter values from the optimally tuned models.
+
+LASSO seems to do consistently better, generating higher r-squared on the test set. IT also gives a simplified model, because several parameter values are set to 0.
