@@ -25,6 +25,12 @@ The goal of this assignment is to use methods of unsupervised learning, specific
 library(tidyverse)
 library(tidymodels)
 library(faraway)
+library(ggmap) # for ggimage
+library(ggfortify) # for autoplot
+library(factoextra)
+library(NbClust)
+library(palmerpenguins)
+library(tidyclust)
 ```
 
 The data set `fat` loaded below from the package `faraway` contains variables age, weight, height, and 10 body circumference measurements measured for 252 men. There are four potential response variables `brozek`, `free`, `siri`, and `density`, which are all highly related measures of body fat percentage.
@@ -69,6 +75,21 @@ fviz_pca_ind(wisc_pca,
              addEllipses=TRUE, 
              ellipse.level=0.9, 
              palette = "Dark2")
+
+#tidy(wisc_pca, matrix = 'samples')
+```
+
+Another way to perform pca using tidymodels:
+
+```{r}
+pca_rec <- recipe(~., data = wisc_pred) %>%
+  step_normalize(all_numeric()) %>%
+  step_pca(all_numeric(), id = "pca") %>%
+  prep()
+
+wisc_pca_trans <- pca_rec %>%
+  bake(new_data = wisc_pred)
+
 ```
 
 Perform clustering on this data set without using PCA first
@@ -85,12 +106,8 @@ kmeans_fit <- kmeans_spec |>
 
 wisc_km <- augment(kmeans_fit, new_data = wisc_pred) 
 
-fviz_cluster(list(data = wisc_pred, cluster = wisc_class$Diagnosis),
+fviz_cluster(list(data = scale(wisc_pred), cluster = wisc_km$.pred_cluster),
 ellipse.type = "norm", geom = "point", stand = FALSE, palette = "jco", ggtheme = theme_classic())
-
-#kmeans_fit |>  accuracy(truth = high_risk, estimate = .pred_class)
-
-#kmeans_fit |>  conf_mat(truth = high_risk, estimate = .pred_class)
 
 table(wisc_class$Diagnosis, wisc_km$.pred_cluster)
 ```
@@ -98,9 +115,17 @@ table(wisc_class$Diagnosis, wisc_km$.pred_cluster)
 Let's repeat the same process, but use PCA with the first two components (create a recipe with `step_pca`:
 
 ```{r}
-kmeans_rec <- recipe(~., data = wisc_pred) %>%
-  step_normalize(all_numeric()) %>%
-  step_pca(all_numeric(), num_comp = 2) #%>%
+
+kmeans_spec <- k_means(num_clusters = 2) |>
+  set_mode("partition") |>
+  set_engine("stats") |>
+  set_args(nstart = 20)
+
+
+kmeans_rec <- recipe(~., data = wisc_pca$x[,1:2]) |> 
+#  step_clean_names(all_predictors()) |> 
+  step_normalize(all_numeric()) #|> 
+#  step_pca(all_numeric(), num_comp = 20) #%>%
 #  prep() %>%
  # bake(new_data = NULL)
 
@@ -109,14 +134,60 @@ workflow_km <- workflow() |>
   add_recipe(kmeans_rec)
 
 kmeans_fit <-  workflow_km |> 
-  fit(wisc_pred)
+  fit(wisc_pca$x[,1:2])
 
-wisc_km <- augment(kmeans_fit, new_data = wisc_pred) 
+wisc_km <- augment(kmeans_fit, new_data = wisc_pca$x[,1:2]) 
 
-fviz_cluster(list(data = wisc_pred, cluster = wisc_class$Diagnosis),
+fviz_cluster(list(data = wisc_pca$x[,1:2], cluster = wisc_class$Diagnosis),
 ellipse.type = "norm", geom = "point", stand = FALSE, palette = "jco", ggtheme = theme_classic())
 
 table(wisc_class$Diagnosis, wisc_km$.pred_cluster)
+```
+
+Do some hyperparameter tuning:
+
+```{r}
+kmeans_spec_tuned <- kmeans_spec %>% 
+  set_args(num_clusters = tune())
+
+kmeans_wf <- workflow() %>%
+  add_model(kmeans_spec_tuned) %>%
+  add_formula(~.)
+
+splits <- bootstraps(wisc_data, times = 10)
+
+num_clusters_grid <- tibble(num_clusters = seq(1, 10))
+
+tune_res <- tune_cluster(
+  object = kmeans_wf,
+  resamples = splits,
+  grid = num_clusters_grid
+)
+
+tune_res %>%
+  autoplot()
+```
+
+```{r}
+kmeans_rec <- recipe( ~. , data = wisc_pred) |> 
+  step_clean_names(all_predictors()) |> 
+  step_normalize(all_numeric()) |> 
+  step_pca(all_numeric(), num_comp = 2) |> 
+ prep()
+
+kmeans_rec |> 
+ bake(new_data = NULL)
+```
+
+```{r}
+USArrests <- as_tibble(USArrests, rownames = "state")
+pca_rec <- recipe(~., data = USArrests) %>%
+  step_normalize(all_numeric()) %>%
+  step_pca(all_numeric(), id = "pca") %>%
+  prep()
+
+pca_rec %>%
+  bake(new_data = NULL)
 ```
 
 1.  First, clean the data to keep only `brozek` of the above response variables and remove any missing values. Perform PCA on the data set (with scaling) and make a plot of the loadings of the first 5 PCs, and make a Scree plot of the same 5 PCs.
