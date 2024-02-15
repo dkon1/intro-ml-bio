@@ -1,5 +1,5 @@
 ---
-title: "Regularization for regression (lab 6 for BIOS 26122)"
+title: "Unsupervised learning: PCA and clustering (lab 7 for BIOS 26122)"
 author: "Dmitry Kondrashov"
 format: 
   html:
@@ -13,43 +13,39 @@ The goal of this assignment is to use methods of unsupervised learning, specific
 
 -   PCA for dimensionality reduction
 
--   PCA for model selection
+-   clustering using k-means and hierarchical methods
 
 -   clustering using reduced dimensions
 
--   compare clustering performance of different methods
+-   validate clustering and compare different methods
 
 ```{r setup}
 #| include: false
 #| echo: false
 library(tidyverse)
 library(tidymodels)
-library(faraway)
 library(ggmap) # for ggimage
 library(ggfortify) # for autoplot
 library(factoextra)
 library(NbClust)
-library(palmerpenguins)
 library(tidyclust)
 ```
 
-The data set `fat` loaded below from the package `faraway` contains variables age, weight, height, and 10 body circumference measurements measured for 252 men. There are four potential response variables `brozek`, `free`, `siri`, and `density`, which are all highly related measures of body fat percentage.
 
-```{r}
-data("fat")
-glimpse(fat)
-```
+## Breast cancer data
 
-## PCA for dimensionality reduction
+The Wisconsin breast cancer data set contains information about different tumor biopsies in the form of 30 features of cell nuclei determined from images. The first two variables are the sample ID and the diagnosis (M = malignant or B = benign). The source and description of the data is here: https://archive-beta.ics.uci.edu/ml/datasets/breast+cancer+wisconsin+diagnostic
 
 ```{r}
 wisc_data = read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/wdbc.csv")
 
 ```
+1. Clean the data set by removing the non-predictor variables (hint: to make things run smoothly you should also fix a few weird variable names!) and removing any missing values, and place the Diagnosis variable into a separate data frame. Perform PCA on the data (after scaling the variables), and make a Scree plot of the eigenvalues. Plot the data points projected onto the first principal components colored by their Diagnosis.
 
 ```{r}
 wisc_pred<- wisc_data |> 
  dplyr::select(-c(ID, Diagnosis)) |> 
+ clean_names() |> 
  drop_na()
 
 wisc_class <- wisc_data |> 
@@ -59,11 +55,6 @@ wisc_class <- wisc_data |>
 wisc_pca <- wisc_pred  |> 
   prcomp(scale = TRUE)
 
-tidy(wisc_pca, matrix = 'loadings') |> filter(PC < 6) |> 
-  ggplot(aes(value, column)) +
-  facet_wrap(~ PC) +
-  geom_col() +
-  scale_x_continuous(labels = scales::percent)
 
 tidy(wisc_pca, matrix = "eigenvalues") |> filter(PC < 6) |> 
   ggplot(aes(PC, percent)) +
@@ -75,24 +66,9 @@ fviz_pca_ind(wisc_pca,
              addEllipses=TRUE, 
              ellipse.level=0.9, 
              palette = "Dark2")
-
-#tidy(wisc_pca, matrix = 'samples')
 ```
 
-Another way to perform pca using tidymodels:
-
-```{r}
-pca_rec <- recipe(~., data = wisc_pred) %>%
-  step_normalize(all_numeric()) %>%
-  step_pca(all_numeric(), id = "pca") %>%
-  prep()
-
-wisc_pca_trans <- pca_rec %>%
-  bake(new_data = wisc_pred)
-
-```
-
-Perform clustering on this data set without using PCA first
+2. Perform k-means clustering with k=2 on this data set using all the scaled variables. Make a plot of all the data points colored by their assigned cluster label. Print out a confusion matrix of  the assigned cluster labels with the Diagnosis value for all the points.
 
 ```{r}
 kmeans_spec <- k_means(num_clusters = 2) |>
@@ -112,7 +88,7 @@ ellipse.type = "norm", geom = "point", stand = FALSE, palette = "jco", ggtheme =
 table(wisc_class$Diagnosis, wisc_km$.pred_cluster)
 ```
 
-Let's repeat the same process, but use PCA with the first two components (create a recipe with `step_pca`:
+3. Perform k-means clustering with k=2 on this data set using only the first few PCs from PCA (you can do this by creating a recipe with `step_pca`). Make a plot of all the data points colored by their assigned cluster label. Print out a confusion matrix of  the assigned cluster labels with the Diagnosis value for all the points.
 
 ```{r}
 
@@ -122,10 +98,9 @@ kmeans_spec <- k_means(num_clusters = 2) |>
   set_args(nstart = 20)
 
 
-kmeans_rec <- recipe(~., data = wisc_pca$x[,1:2]) |> 
-#  step_clean_names(all_predictors()) |> 
-  step_normalize(all_numeric()) #|> 
-#  step_pca(all_numeric(), num_comp = 20) #%>%
+kmeans_rec <- recipe(~., data = wisc_pred) |> 
+  step_normalize(all_numeric()) |> 
+ step_pca(all_numeric(), num_comp = 2) #%>%
 #  prep() %>%
  # bake(new_data = NULL)
 
@@ -134,27 +109,35 @@ workflow_km <- workflow() |>
   add_recipe(kmeans_rec)
 
 kmeans_fit <-  workflow_km |> 
-  fit(wisc_pca$x[,1:2])
+  fit(wisc_pred)
 
-wisc_km <- augment(kmeans_fit, new_data = wisc_pca$x[,1:2]) 
+wisc_km <- augment(kmeans_fit, new_data = wisc_pred) 
 
-fviz_cluster(list(data = wisc_pca$x[,1:2], cluster = wisc_class$Diagnosis),
+fviz_cluster(list(data = scale(wisc_pred), cluster = wisc_class$Diagnosis),
 ellipse.type = "norm", geom = "point", stand = FALSE, palette = "jco", ggtheme = theme_classic())
 
 table(wisc_class$Diagnosis, wisc_km$.pred_cluster)
 ```
-
-Do some hyperparameter tuning:
+4. Choose either the complete set of variables or the reduced set of principal components, and perform hyperparameter tuning to find the optimal value of k in k-means using `tidymodels` tools. Make a plot of within SSE (sum of squared errors within clusters) as a function of k and use the elbow method to determine the optimal value of k.
 
 ```{r}
 kmeans_spec_tuned <- kmeans_spec %>% 
   set_args(num_clusters = tune())
 
+
+pca_recipe <- 
+  recipe(formula =  ~ ., data = wisc_pred) %>% 
+  step_novel(all_nominal_predictors()) %>% 
+  step_dummy(all_nominal_predictors()) %>% 
+  step_zv(all_predictors()) %>% 
+  step_normalize(all_predictors()) %>%
+  step_pca(all_predictors(), threshold = 0.9) 
+
 kmeans_wf <- workflow() %>%
   add_model(kmeans_spec_tuned) %>%
-  add_formula(~.)
+  add_recipe(pca_recipe)
 
-splits <- bootstraps(wisc_data, times = 10)
+splits <- bootstraps(wisc_pred, times = 10)
 
 num_clusters_grid <- tibble(num_clusters = seq(1, 10))
 
@@ -165,338 +148,151 @@ tune_res <- tune_cluster(
 )
 
 tune_res %>%
+  collect_metrics()
+
+tune_res %>%
   autoplot()
 ```
 
-```{r}
-kmeans_rec <- recipe( ~. , data = wisc_pred) |> 
-  step_clean_names(all_predictors()) |> 
-  step_normalize(all_numeric()) |> 
-  step_pca(all_numeric(), num_comp = 2) |> 
- prep()
+5. Compare the performance of clustering with and without reducing dimensionality, in terms of its agreement with the true labels (from Diagnosis). Explain the meaning of the elbow method for hyperparameter tuning and whether the result is surprising.
 
-kmeans_rec |> 
- bake(new_data = NULL)
+YOUR ANSWERS HERE
+
+## Dimensionality reduction of neuroblastoma data
+
+The following data set is gene expression data from tumors of patients with neuroblastoma (a type of cancer), accession number [**GSE62564**](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE62564). It contains 22 phenotypic scores, 6 of which (MYCN, STC1, P4HA1, BHLHE40, HIF1A and ST8SIA1) are gene expressions measured in log2RPM (log 2 reads per million). The other 16 are quantified by R package GSVA (Gene Set Enrichment Analysis).
+
+```{r}
+neuro_blast <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/r2_gse62564_GSVA_Metadata_selected.csv")
 ```
 
-```{r}
-USArrests <- as_tibble(USArrests, rownames = "state")
-pca_rec <- recipe(~., data = USArrests) %>%
-  step_normalize(all_numeric()) %>%
-  step_pca(all_numeric(), id = "pca") %>%
-  prep()
+1. Clean the data to remove any outliers or missing values, and select only the predictor variables for dimensionality reduction, and leave `high risk` in a separate tibble. Perform PCA on the data (after scaling the variables), and make a Scree plot of the eigenvalues. Plot the data points projected onto the first principal components colored by `high risk` value.
 
-pca_rec %>%
-  bake(new_data = NULL)
-```
-
-1.  First, clean the data to keep only `brozek` of the above response variables and remove any missing values. Perform PCA on the data set (with scaling) and make a plot of the loadings of the first 5 PCs, and make a Scree plot of the same 5 PCs.
 
 ```{r}
-fat_pred<- fat |> 
- dplyr::select(-c(siri, density, free, brozek)) |> 
- drop_na()
+neuro_pred <- neuro_blast |>  drop_na() |>
+  dplyr::select(-c(high_risk, `sample id`))
 
-fat_pca <- fat_pred  |> 
+neuro_risk <- neuro_blast |>  dplyr::select(high_risk) |> 
+  drop_na() |>
+  mutate(high_risk = factor(high_risk))
+
+
+neuro_pca <- neuro_pred  |> 
   prcomp(scale = TRUE)
 
-tidy(fat_pca, matrix = 'loadings') |> filter(PC < 6) |> 
-  ggplot(aes(value, column)) +
-  facet_wrap(~ PC) +
-  geom_col() +
-  scale_x_continuous(labels = scales::percent)
 
-tidy(fat_pca, matrix = "eigenvalues") |> filter(PC < 6) |> 
+tidy(neuro_pca, matrix = "eigenvalues") |> filter(PC < 6) |> 
   ggplot(aes(PC, percent)) +
   geom_col()
+
+fviz_pca_ind(neuro_pca,
+             col.ind = factor(neuro_risk$high_risk),
+             label = 'none',
+             addEllipses=TRUE, 
+             ellipse.level=0.9, 
+             palette = "Dark2")
+
+
 ```
 
-2.  Use PCA regression as a step in the recipe to calculate
+2. Perform k-means clustering with k=2 on this data set using a few of the PCs. Make a plot of all the data points colored by their assigned cluster label. Print out a confusion matrix of the assigned cluster labels with the `high risk` value for all the points.
+
 
 ```{r}
-fat_clean <- fat |> 
- dplyr::select(-c(siri, density, free)) |> 
- drop_na()
 
-
-# Put 3/4 of the data into the training set 
-fat_split <- initial_split(fat_clean, prop = 0.75)
-
-# Create data frames for the two sets:
-fat_train <- training(fat_split)
-fat_test  <- testing(fat_split)
-
-fat_recipe <- 
-  recipe(brozek ~ ., data = fat_train)
-
-lm_spec <- linear_reg() |> 
-  set_mode("regression") |> 
-  set_engine("lm")
-
-workflow_lm <- workflow() |> 
-  add_model(lm_spec) |> 
-  add_recipe(fat_recipe)
-
-fit_lm <- workflow_lm |> 
-  fit(fat_train)
-
-tidy(fit_lm)
-
-# You can also use lm
-lm_out <- lm(brozek ~ ., data = fat_train)
-summary(lm_out)
-
-compare_pred <- augment(fit_lm, new_data = fat_test) 
-
-compare_pred |> rsq(brozek, .pred)
-```
-
-```{r}
-lm_spec <- 
-  linear_reg() %>% 
-  set_mode("regression") %>% 
-  set_engine("lm")
-
-pca_recipe <- 
-  recipe(formula = brozek ~ ., data = fat_train) %>% 
+neuro_rec <- neuro_pred |> 
+  recipe(formula =  ~ .) %>% 
   step_novel(all_nominal_predictors()) %>% 
   step_dummy(all_nominal_predictors()) %>% 
   step_zv(all_predictors()) %>% 
   step_normalize(all_predictors()) %>%
-  step_pca(all_predictors(), threshold = 0.99)
+  step_pca(all_predictors(), num_comp = 2) 
 
-pca_workflow <- 
-  workflow() %>% 
-  add_recipe(pca_recipe) %>% 
-  add_model(lm_spec)
+kmeans_wf <- workflow() %>%
+  add_model(kmeans_spec) %>%
+  add_recipe(neuro_rec)
 
+kmeans_fit <- kmeans_wf  |> 
+  fit(neuro_pred)
 
-fit_pca <- pca_workflow |> 
-  fit(fat_train)
+neuro_km <- predict(kmeans_fit, new_data = neuro_pred)
 
-compare_pred <- augment(fit_pca, new_data = fat_test) 
+fviz_cluster(list(data = scale(neuro_pred), cluster = neuro_km$.pred_cluster),
+ellipse.type = "norm", geom = "point", stand = FALSE, palette = "jco", ggtheme = theme_classic())
 
-compare_pred |> rsq(brozek, .pred)
+table(neuro_km$.pred_cluster, neuro_risk$high_risk)
 
-
-#threshold_grid <- grid_regular(threshold(), levels = 10)
-
-#tune_res <- tune_grid(
-#  pca_workflow,
-#  resamples = Hitters_fold, 
-#  grid = threshold_grid
-#)
-
-#autoplot(tune_res)
 ```
 
-The r-squared from lm (calculated on the training set) is 0.75 (will vary for different splits) but the r-squared calculated on the test set is about 0.5, so there is evidence of overfitting.
 
-## Ridge regression
 
-3.  Perform ridge regression on the training set using a couple of different values of penalty lambda and report the parameter values and the r-squared on the test set.
+3. Perform hierarchical clustering on the same data set using the method "single". 
 
 ```{r}
-ridge_spec <- linear_reg(mixture = 0, penalty= 0.1) |> 
-  set_mode("regression") |> 
-  set_engine("glmnet")
+hclust_spec <- hier_clust(linkage_method = "single")
+  
 
-workflow_ridge <- workflow() |> 
-  add_model(ridge_spec) |> 
-  add_recipe(fat_recipe)
+hclust_wf <- workflow() %>%
+  add_model(hclust_spec) %>%
+  add_recipe(neuro_rec)
 
-fit_ridge <- workflow_ridge |> 
-  fit(fat_train)
+hclust_fit <- hclust_wf  |> 
+  fit(neuro_pred)
 
-print("The parameters and r-squared of the prediction on the test with lambda = 0.1:")
+neuro_hc <- predict(hclust_fit, new_data = neuro_pred, num_clusters = 2)
 
-tidy(fit_ridge)
+fviz_cluster(list(data = scale(neuro_pred), cluster = neuro_hc$.pred_cluster),
+ellipse.type = "norm", geom = "point", stand = FALSE, palette = "jco", ggtheme = theme_classic())
 
-compare_pred <- augment(fit_ridge, new_data = fat_test) 
-
-compare_pred |> rsq(brozek, .pred)
-
-
-ridge_spec <- linear_reg(mixture = 0, penalty= 1) |> 
-  set_mode("regression") |> 
-  set_engine("glmnet")
-
-workflow_ridge <- workflow() |> 
-  add_model(ridge_spec) |> 
-  add_recipe(fat_recipe)
-
-fit_ridge <- workflow_ridge |> 
-  fit(fat_train)
-
-print("The parameters and r-squared of the prediction on the test with lambda = 1:")
-
-tidy(fit_ridge)
-
-compare_pred <- augment(fit_ridge, new_data = fat_test) 
-
-compare_pred |> rsq(brozek, .pred)
-
+print("The confusion matrix for hierarchical clustering using single linkage method:")
+table(neuro_hc$.pred_cluster, neuro_risk$high_risk)
 ```
-
-4.  Perform ridge regression on the training set with parameter tuning, using k-fold validation. Make a plot of the rmse and r-squared as a function of lambda and report the best value of lambda.
-
-    ```{r}
-    fat_fold <- vfold_cv(fat_train, v = 10)
-
-    ridge_recipe <- 
-      recipe(brozek~ ., data = fat_train) |> 
-      step_novel(all_nominal_predictors()) |>  
-      step_dummy(all_nominal_predictors()) |>  
-      step_zv(all_predictors()) |> 
-      step_normalize(all_predictors())
-
-    ridge_spec <- 
-      linear_reg(penalty= tune(), mixture = 0) |> 
-      set_mode("regression") |> 
-      set_engine("glmnet")
-
-    ridge_workflow <- workflow() |> 
-      add_recipe(ridge_recipe) |> 
-      add_model(ridge_spec)
-
-
-    penalty_grid <- grid_regular(penalty(range = c(-5, 1)), levels = 50)
-
-
-    tune_res <- tune_grid(
-      ridge_workflow,
-      resamples = fat_fold, 
-      grid = penalty_grid
-    )
-
-    autoplot(tune_res)
-
-    collect_metrics(tune_res)
-
-    best_penalty<- select_best(tune_res, metric = "rmse")
-
-    best_penalty
-
-    ```
-
-5.  Get the final model using the best penalty value, generate predictions on the test set, and report the parameter values and the r-squared on the test set.
+4. Try using other linkage methods (e.g. "complete" and "average") and report the same confusion matrix for both.
 
 ```{r}
-ridge_final <- finalize_workflow(ridge_workflow, best_penalty)
 
-ridge_final_fit <- fit(ridge_final, data = fat_train)
+hclust_spec <- hier_clust(linkage_method = "complete")
+  
 
-augment(ridge_final_fit, new_data = fat_test) |>
-  rsq(truth = brozek, estimate = .pred)
+hclust_wf <- workflow() %>%
+  add_model(hclust_spec) %>%
+  add_recipe(neuro_rec)
 
-tidy(ridge_final_fit, penalty= best_penalty$penalty)
+hclust_fit <- hclust_wf  |> 
+  fit(neuro_pred)
 
+neuro_hc <- predict(hclust_fit, new_data = neuro_pred, num_clusters = 2)
+
+fviz_cluster(list(data = scale(neuro_pred), cluster = neuro_hc$.pred_cluster),
+ellipse.type = "norm", geom = "point", stand = FALSE, palette = "jco", ggtheme = theme_classic())
+
+print("The confusion matrix for hierarchical clustering using average linkage method:")
+table(neuro_hc$.pred_cluster, neuro_risk$high_risk)
 ```
-
-6.  Compare on the performance of ridge regression to plain linear regression in terms of tuning the parameter lambda and the impact it has on the prediction quality on the test set.
-
-Ridge regression does a better job than plain linear regression because it avoids overfitting (due to using k-fold cross-validation), so its r-squared on the test set is considerably higher. The best penalty value is small (will vary depending on the random split) but none of parameters are very small. (Their difference in absolute value from the linear model is due to us having scaled the variables in the recipe using the `step_normalize` function.)
-
-## Regression with LASSO
-
-7.  Perform LASSO regression on the training set using a couple of different values of penalty lambda and report the parameter values and the r-squared on the test set.
-
 ```{r}
-lasso_spec <- linear_reg(mixture = 1, penalty= 0.1) |> 
-  set_mode("regression") |> 
-  set_engine("glmnet")
 
-workflow_ridge <- workflow() |> 
-  add_model(lasso_spec) |> 
-  add_recipe(fat_recipe)
+hclust_spec <- hier_clust(linkage_method = "average")
+  
 
-fit_ridge <- workflow_ridge |> 
-  fit(fat_train)
+hclust_wf <- workflow() %>%
+  add_model(hclust_spec) %>%
+  add_recipe(neuro_rec)
 
-print("The parameters and r-squared of the LASSO prediction on the test with lambda = 0.1:")
+hclust_fit <- hclust_wf  |> 
+  fit(neuro_pred)
 
-tidy(fit_ridge)
+neuro_hc <- predict(hclust_fit, new_data = neuro_pred, num_clusters = 2)
 
-compare_pred <- augment(fit_ridge, new_data = fat_test) 
+fviz_cluster(list(data = scale(neuro_pred), cluster = neuro_hc$.pred_cluster),
+ellipse.type = "norm", geom = "point", stand = FALSE, palette = "jco", ggtheme = theme_classic())
 
-compare_pred |> rsq(brozek, .pred)
-
-
-lasso_spec <- linear_reg(mixture = 1, penalty= 1) |> 
-  set_mode("regression") |> 
-  set_engine("glmnet")
-
-workflow_ridge <- workflow() |> 
-  add_model(lasso_spec) |> 
-  add_recipe(fat_recipe)
-
-fit_ridge <- workflow_ridge |> 
-  fit(fat_train)
-
-print("The parameters and r-squared of the LASSO prediction on the test set with lambda = 1:")
-
-tidy(fit_ridge)
-
-compare_pred <- augment(fit_ridge, new_data = fat_test) 
-
-compare_pred |> rsq(brozek, .pred)
-
-
+print("The confusion matrix for hierarchical clustering using average linkage method:")
+table(neuro_hc$.pred_cluster, neuro_risk$high_risk)
 ```
 
-8.  Perform LASSO regression on the training set with parameter tuning, using k-fold validation. Make a plot of the rmse and r-squared as a function of lambda and report the best value of lambda.
-
-    ```{r}
-    fat_fold <- vfold_cv(fat_train, v = 10)
-
-    lasso_recipe <- 
-      recipe(brozek~ ., data = fat_train) |> 
-      step_novel(all_nominal_predictors()) |>  
-      step_dummy(all_nominal_predictors()) |>  
-      step_zv(all_predictors()) |> 
-      step_normalize(all_predictors())
-
-    lasso_spec <- 
-      linear_reg(penalty= tune(), mixture = 1) |> 
-      set_mode("regression") |> 
-      set_engine("glmnet")
-
-    lasso_workflow <- workflow() |> 
-      add_recipe(lasso_recipe) |> 
-      add_model(lasso_spec)
+5. Report how the clustering quality (as judged by comparison with the true value of risk) depends on the type of clustering algorithm. Discuss how the relative performance of the methods depends on the geometry of the point distribution you observed in the plots.
 
 
-    penalty_grid <- grid_regular(penalty(range = c(-5, 0)), levels = 50)
 
 
-    tune_res <- tune_grid(
-      lasso_workflow,
-      resamples = fat_fold, 
-      grid = penalty_grid
-    )
-
-    autoplot(tune_res)
-
-    collect_metrics(tune_res)
-
-    best_penalty<- select_best(tune_res, metric = "rmse")
-
-    best_penalty
-    ```
-
-9.  Get the final model using the best penalty value, generate predictions on the test set, and report the parameter values and the r-squared on the test set.
-
-```{r}
-lasso_final <- finalize_workflow(lasso_workflow, best_penalty)
-
-lasso_final_fit <- fit(lasso_final, data = fat_train)
-
-augment(lasso_final_fit , new_data = fat_test) |>
-  rsq(truth = brozek, estimate = .pred)
-
-tidy(lasso_final_fit, penalty= best_penalty$penalty)
-```
-
-10. Comment on the performance of LASSO regression in comparison to ridge, in terms of both prediction quality and the value of the parameter values from the optimally tuned models.
-
-LASSO seems to do consistently better, generating higher r-squared on the test set. IT also gives a simplified model, because several parameter values are set to 0.
