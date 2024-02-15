@@ -1,6 +1,6 @@
 ---
-title: "Dimensionality reduction and clustering (lab 7 for BIOS 26122)"
-author: "Dmitry Kondrashov"
+title: "Unsupervised learning: PCA and clustering (lab 7 for BIOS 26122)"
+author: "Your Name"
 format: 
   html:
     self-contained: true
@@ -13,88 +13,99 @@ The goal of this assignment is to use methods of unsupervised learning, specific
 
 -   PCA for dimensionality reduction
 
--   PCA for model selection
+-   clustering using k-means and hierarchical methods
 
 -   clustering using reduced dimensions
 
--   compare clustering performance of different methods
+-   validate clustering and compare different methods
 
 ```{r setup}
 #| include: false
 #| echo: false
 library(tidyverse)
 library(tidymodels)
-library(faraway)
+library(ggmap) # for ggimage
+library(ggfortify) # for autoplot
+library(factoextra)
+library(NbClust)
+library(tidyclust)
 ```
 
-The data set `fat` loaded below from the package `faraway` contains variables age, weight, height, and 10 body circumference measurements measured for 252 men. There are four potential response variables `brozek`, `free`, `siri`, and `density`, which are all highly related measures of body fat percentage.
+
+## Breast cancer data
+
+The Wisconsin breast cancer data set contains information about different tumor biopsies in the form of 30 features of cell nuclei determined from images. The first two variables are the sample ID and the diagnosis (M = malignant or B = benign). The source and description of the data is here: https://archive-beta.ics.uci.edu/ml/datasets/breast+cancer+wisconsin+diagnostic
 
 ```{r}
-data("fat")
-glimpse(fat)
-```
-
-## Multivariate regression
-
-1.  First, clean the data to keep only `brozek` of the above response variables and remove any missing values. Second, split the data into training and test sets. Third, perform standard linear regression using `lm` on the training set using `brozek` as the response variable and report which of the predictor variables have the most significant relationship with it.
-
-```{r}
-
+wisc_data = read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/wdbc.csv")
 
 ```
-
-2.  Calculate the r squared of the predictions on the test set and report them. How does it compare to the r-squared from the summary of lm? Do you see evidence of overfitting?
-
-    ```{r}
-
-    ```
-
-## Ridge regression
-
-3.  Perform ridge regression on the training set using a couple of different values of penalty lambda and report the rmse of the predictions on the test set.
-
-```{r}
-
-
-```
-
-4.  Perform ridge regression on the training set with parameter tuning, using k-fold validation. Make a plot of the rmse and r-squared as a function of lambda and report the best value of lambda.
-
-    ```{r}
-
-    ```
-
-5.  Get the final model using the best penalty value, generate predictions on the test set, and report the parameter values and the r-squared on the test set.
+1. Clean the data set by removing the non-predictor variables (hint: to make things run smoothly you should also fix a few weird variable names!) and removing any missing values, and place the Diagnosis variable into a separate data frame. Perform PCA on the data (after scaling the variables), and make a Scree plot of the eigenvalues. Plot the data points projected onto the first principal components colored by their Diagnosis.
 
 ```{r}
 
 ```
 
-6.  Compare on the performance of ridge regression to plain linear regression in terms of tuning the parameter lambda and the impact it has on the prediction quality on the test set.
+2. Perform k-means clustering with k=2 on this data set using all the scaled variables. Make a plot of all the data points colored by their assigned cluster label. Print out a confusion matrix of  the assigned cluster labels with the Diagnosis value for all the points.
 
-YOUR ANSWER HERE
+```{r}
 
-## Regression with LASSO
+```
 
-7.  Perform LASSO regression on the training set using a couple of different values of penalty lambda and report the parameter values and the r-squared on the test set.
+3. Perform k-means clustering with k=2 on this data set using only the first few PCs from PCA (you can do this by creating a recipe with `step_pca`). Make a plot of all the data points colored by their assigned cluster label. Print out a confusion matrix of  the assigned cluster labels with the Diagnosis value for all the points.
+
+```{r}
+
+```
+4. Choose either the complete set of variables or the reduced set of principal components, and perform hyperparameter tuning to find the optimal value of k in k-means using `tidymodels` tools. Make a plot of within SSE (sum of squared errors within clusters) as a function of k and use the elbow method to determine the optimal value of k.
+
+```{r}
+
+```
+
+5. Compare the performance of clustering with and without reducing dimensionality, in terms of its agreement with the true labels (from Diagnosis). Explain the meaning of the elbow method for hyperparameter tuning and whether the result is surprising.
+
+YOUR ANSWERS HERE
+
+## Dimensionality reduction of neuroblastoma data
+
+The following data set is gene expression data from tumors of patients with neuroblastoma (a type of cancer), accession number [**GSE62564**](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE62564). It contains 22 phenotypic scores, 6 of which (MYCN, STC1, P4HA1, BHLHE40, HIF1A and ST8SIA1) are gene expressions measured in log2RPM (log 2 reads per million). The other 16 are quantified by R package GSVA (Gene Set Enrichment Analysis).
+
+```{r}
+neuro_blast <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/r2_gse62564_GSVA_Metadata_selected.csv")
+```
+
+1. Clean the data to remove any outliers or missing values, and select only the predictor variables for dimensionality reduction, and leave `high risk` in a separate tibble. Perform PCA on the data (after scaling the variables), and make a Scree plot of the eigenvalues. Plot the data points projected onto the first principal components colored by `high risk` value.
+
 
 ```{r}
 
 
 ```
 
-8.  Perform LASSO regression on the training set with parameter tuning, using k-fold validation. Make a plot of the rmse and r-squared as a function of lambda and report the best value of lambda.
+2. Perform k-means clustering with k=2 on this data set using a few of the PCs. Make a plot of all the data points colored by their assigned cluster label. Print out a confusion matrix of the assigned cluster labels with the `high risk` value for all the points.
 
-    ```{r}
-
-    ```
-
-9.  Get the final model using the best penalty value, generate predictions on the test set, and report the parameter values and the r-squared on the test set.
 
 ```{r}
 
 ```
 
-10. Comment on the performance of LASSO regression in comparison to ridge, in terms of both prediction quality and the value of the parameter values from the optimally tuned models.
 
-YOUR ANSWER HERE
+
+3. Perform hierarchical clustering on the same data set using the method "single". 
+
+```{r}
+
+```
+4. Try using other linkage methods (e.g. "complete" and "average") and report the same confusion matrix for both.
+
+```{r}
+
+```
+
+
+5. Report how the clustering quality (as judged by comparison with the true value of risk) depends on the type of clustering algorithm. Discuss how the relative performance of the methods depends on the geometry of the point distribution you observed in the plots.
+
+YOUR ANSWERS HERE
+
+

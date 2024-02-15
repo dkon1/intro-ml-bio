@@ -31,7 +31,6 @@ library(NbClust)
 library(tidyclust)
 ```
 
-
 ## Breast cancer data
 
 The Wisconsin breast cancer data set contains information about different tumor biopsies in the form of 30 features of cell nuclei determined from images. The first two variables are the sample ID and the diagnosis (M = malignant or B = benign). The source and description of the data is here: https://archive-beta.ics.uci.edu/ml/datasets/breast+cancer+wisconsin+diagnostic
@@ -40,7 +39,8 @@ The Wisconsin breast cancer data set contains information about different tumor 
 wisc_data = read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/wdbc.csv")
 
 ```
-1. Clean the data set by removing the non-predictor variables (hint: to make things run smoothly you should also fix a few weird variable names!) and removing any missing values, and place the Diagnosis variable into a separate data frame. Perform PCA on the data (after scaling the variables), and make a Scree plot of the eigenvalues. Plot the data points projected onto the first principal components colored by their Diagnosis.
+
+1.  Clean the data set by removing the non-predictor variables (hint: to make things run smoothly you should also fix a few weird variable names!) and removing any missing values, and place the Diagnosis variable into a separate data frame. Perform PCA on the data (after scaling the variables), and make a Scree plot of the eigenvalues. Plot the data points projected onto the first principal components colored by their Diagnosis.
 
 ```{r}
 wisc_pred<- wisc_data |> 
@@ -68,7 +68,7 @@ fviz_pca_ind(wisc_pca,
              palette = "Dark2")
 ```
 
-2. Perform k-means clustering with k=2 on this data set using all the scaled variables. Make a plot of all the data points colored by their assigned cluster label. Print out a confusion matrix of  the assigned cluster labels with the Diagnosis value for all the points.
+2.  Perform k-means clustering with k=2 on this data set using all the scaled variables. Make a plot of all the data points colored by their assigned cluster label. Print out a confusion matrix of the assigned cluster labels with the Diagnosis value for all the points.
 
 ```{r}
 kmeans_spec <- k_means(num_clusters = 2) |>
@@ -88,7 +88,7 @@ ellipse.type = "norm", geom = "point", stand = FALSE, palette = "jco", ggtheme =
 table(wisc_class$Diagnosis, wisc_km$.pred_cluster)
 ```
 
-3. Perform k-means clustering with k=2 on this data set using only the first few PCs from PCA (you can do this by creating a recipe with `step_pca`). Make a plot of all the data points colored by their assigned cluster label. Print out a confusion matrix of  the assigned cluster labels with the Diagnosis value for all the points.
+3.  Perform k-means clustering with k=2 on this data set using only the first few PCs from PCA (you can do this by creating a recipe with `step_pca`). Make a plot of all the data points colored by their assigned cluster label. Print out a confusion matrix of the assigned cluster labels with the Diagnosis value for all the points.
 
 ```{r}
 
@@ -118,7 +118,8 @@ ellipse.type = "norm", geom = "point", stand = FALSE, palette = "jco", ggtheme =
 
 table(wisc_class$Diagnosis, wisc_km$.pred_cluster)
 ```
-4. Choose either the complete set of variables or the reduced set of principal components, and perform hyperparameter tuning to find the optimal value of k in k-means using `tidymodels` tools. Make a plot of within SSE (sum of squared errors within clusters) as a function of k and use the elbow method to determine the optimal value of k.
+
+4.  Choose either the complete set of variables or the reduced set of principal components, and perform hyperparameter tuning to find the optimal value of k in k-means using `tidymodels` tools. Make a plot of within SSE (sum of squared errors within clusters) as a function of k and use the elbow method to determine the optimal value of k.
 
 ```{r}
 kmeans_spec_tuned <- kmeans_spec %>% 
@@ -154,9 +155,9 @@ tune_res %>%
   autoplot()
 ```
 
-5. Compare the performance of clustering with and without reducing dimensionality, in terms of its agreement with the true labels (from Diagnosis). Explain the meaning of the elbow method for hyperparameter tuning and whether the result is surprising.
+5.  Compare the performance of clustering with and without reducing dimensionality, in terms of its agreement with the true labels (from Diagnosis). Explain the meaning of the elbow method for hyperparameter tuning and whether the result is surprising.
 
-YOUR ANSWERS HERE
+K-means does a better job with reduced dimensions (2 PCs) than with the full data set; the total number of mislabeled points goes down. From the elbow plot, it appears that 2 is the optimal number of clusters; the elbow method essentially assumes that at the optimal number of clusters the within cluster variance decreases the fastest and for larger k we see diminishing returns.
 
 ## Dimensionality reduction of neuroblastoma data
 
@@ -166,8 +167,7 @@ The following data set is gene expression data from tumors of patients with neur
 neuro_blast <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/r2_gse62564_GSVA_Metadata_selected.csv")
 ```
 
-1. Clean the data to remove any outliers or missing values, and select only the predictor variables for dimensionality reduction, and leave `high risk` in a separate tibble. Perform PCA on the data (after scaling the variables), and make a Scree plot of the eigenvalues. Plot the data points projected onto the first principal components colored by `high risk` value.
-
+1.  Clean the data to remove any outliers or missing values, and select only the predictor variables for dimensionality reduction, and leave `high risk` in a separate tibble. Perform PCA on the data (after scaling the variables), and make a Scree plot of the eigenvalues. Plot the data points projected onto the first principal components colored by `high risk` value.
 
 ```{r}
 neuro_pred <- neuro_blast |>  drop_na() |>
@@ -196,8 +196,7 @@ fviz_pca_ind(neuro_pca,
 
 ```
 
-2. Perform k-means clustering with k=2 on this data set using a few of the PCs. Make a plot of all the data points colored by their assigned cluster label. Print out a confusion matrix of the assigned cluster labels with the `high risk` value for all the points.
-
+2.  Perform k-means clustering with k=2 on this data set using a few of the PCs. Make a plot of all the data points colored by their assigned cluster label. Print out a confusion matrix of the assigned cluster labels with the `high risk` value for all the points.
 
 ```{r}
 
@@ -225,9 +224,7 @@ table(neuro_km$.pred_cluster, neuro_risk$high_risk)
 
 ```
 
-
-
-3. Perform hierarchical clustering on the same data set using the method "single". 
+3.  Perform hierarchical clustering on the same data set using the method "single".
 
 ```{r}
 hclust_spec <- hier_clust(linkage_method = "single")
@@ -248,7 +245,8 @@ ellipse.type = "norm", geom = "point", stand = FALSE, palette = "jco", ggtheme =
 print("The confusion matrix for hierarchical clustering using single linkage method:")
 table(neuro_hc$.pred_cluster, neuro_risk$high_risk)
 ```
-4. Try using other linkage methods (e.g. "complete" and "average") and report the same confusion matrix for both.
+
+4.  Try using other linkage methods (e.g. "complete" and "average") and report the same confusion matrix for both.
 
 ```{r}
 
@@ -270,6 +268,7 @@ ellipse.type = "norm", geom = "point", stand = FALSE, palette = "jco", ggtheme =
 print("The confusion matrix for hierarchical clustering using average linkage method:")
 table(neuro_hc$.pred_cluster, neuro_risk$high_risk)
 ```
+
 ```{r}
 
 hclust_spec <- hier_clust(linkage_method = "average")
@@ -291,8 +290,6 @@ print("The confusion matrix for hierarchical clustering using average linkage me
 table(neuro_hc$.pred_cluster, neuro_risk$high_risk)
 ```
 
-5. Report how the clustering quality (as judged by comparison with the true value of risk) depends on the type of clustering algorithm. Discuss how the relative performance of the methods depends on the geometry of the point distribution you observed in the plots.
+5.  Report how the clustering quality (as judged by comparison with the true value of risk) depends on the type of clustering algorithm. Discuss how the relative performance of the methods depends on the geometry of the point distribution you observed in the plots.
 
-
-
-
+The clustering quality is better for the k-means method than any of the hierarchical methods, but all of the do poorly compared to the clustering on the neuroblastoma data. The reason is likely due to the categories not being well separated in the plots, and the fact that the actual clusters are fairly spherical, so k-means is more appropriate than agglomerative methods.
