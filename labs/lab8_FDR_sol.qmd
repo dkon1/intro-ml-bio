@@ -48,7 +48,7 @@ pvals <- replicate(1000, gen_ind_test(probA, probB, samp_size))
 #plot(-log(pvals), type = 'h')
 alpha <- 0.01
 print("Fraction of rejections at alpha = 0.01:")
-print(sum(pvals < alpha))
+print(sum(pvals < alpha)/1000)
 print("The False Positive Rate is:")
 print((sum(pvals < alpha))/1000)
 ```
@@ -229,7 +229,7 @@ pvals <- replicate(1000, gen_ind_test(probA, probB, samp_size))
 #plot(-log(pvals), type = 'h')
 alpha <- 0.01
 print("Fraction of rejections at alpha = 0.01:")
-print(sum(pvals < alpha))
+print(sum(pvals < alpha)/1000)
 print("The False Negative Rate for a small effect is:")
 print(1-(sum(pvals < alpha))/1000)
 
@@ -239,7 +239,7 @@ pvals <- replicate(1000, gen_ind_test(probA, probB, samp_size))
 #plot(-log(pvals), type = 'h')
 alpha <- 0.01
 print("Fraction of rejections at alpha = 0.01:")
-print(sum(pvals < alpha))
+print(sum(pvals < alpha)/1000)
 print("The False Negative Rate for a large effect is:")
 print(1-(sum(pvals < alpha))/1000)
 ```
@@ -569,4 +569,14 @@ print(FP/(TP+FP))
 
 10. Discuss the results you reported in the four questions above. Describe the influence of the following parameters: the effect size, the prior probability of the hypothesis being true, and the choice of p-value adjustment. Comment on your conclusions for what you would choose to do for a data set with a small effect size and a large prior probability for the null.
 
-YOUR ANSWERS HERE
+The results vary substantially for the two different effect sizes (small: 0.1 vs 0.2 and large: 0.1 vs 0.4), as well as the prior (fraction of true null hypotheses).
+
+In the first case, small effect size and prior probability of 0.9, the hypothesis test detects about 1/2 (or more) of the false nulls using unadjusted p-values, and the FDR is low (a few percent), because there are not many false positives. All three adjustment methods are fairly ruthless about removing the positives, so we end up with very few of the low effect sizes detected after correction, though BH method is a bit more forgiving. All three give either a 0 FDR or a NA if all positives are removed.
+
+In the second case, small effect size and prior probability of 0.99, the hypothesis test detects the same fraction of false nulls using unadjusted p-values, but the FDR is much higher (40-50%), because the true positives are more rare. All three adjustment methods are fairly ruthless about removing the positives, so we end up with very few of the low effect sizes detected after correction, though BH method is a bit more forgiving and can leave 10-20% true positive rate. Usually we see a zero FDR for Bonferroni or Holm, and a small but non-zero FDR with BH.
+
+In the third case, large effect size and prior probability of 0.9, the hypothesis test with the unadjusted p-values detects virtually all of the false nulls, while keeping the same false positive rate of about 1%, so the FDR is very low. All three adjustment methods remove all of the (very few) false positive while keeping almost all of the true positives, so the FDR is zero for all three.
+
+In the fourth case, large effect size and prior probability of 0.99, the hypothesis test with the unadjusted p-values detects virtually all of the false nulls, while keeping the same false positive rate of about 1%, but since there are very few true positives, the FDR can be as high as 40-50%. Once again, all three adjustment methods remove all of the (very few) false positive while keeping almost all of the true positives, so the FDR is zero for all three.
+
+For the problem of detection of a low effect size with a low prevalence (high prior of the null hypothesis), I would choose the BH correction method, as it keeps a lot more of the true positives while weeding out virtually all of the false positives.
