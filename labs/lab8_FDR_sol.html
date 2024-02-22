@@ -3133,7 +3133,7 @@ vertical-align: -.125em;
 </div>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">sum</span>(pvals <span class="sc">&lt;</span> alpha))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 10</code></pre>
+<pre><code>[1] 5</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">&quot;The False Positive Rate is:&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -3141,7 +3141,7 @@ vertical-align: -.125em;
 </div>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>((<span class="fu">sum</span>(pvals <span class="sc">&lt;</span> alpha))<span class="sc">/</span><span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.01</code></pre>
+<pre><code>[1] 0.005</code></pre>
 </div>
 </div>
 <ol start="2" type="1">
@@ -3163,7 +3163,7 @@ vertical-align: -.125em;
 <span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;The FWER for&quot;</span>, m,<span class="st">&quot; hypothesis tests is:&quot;</span>,atleast1<span class="sc">/</span><span class="dv">100</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] &quot;The FWER for 10  hypothesis tests is: 0.06&quot;</code></pre>
+<pre><code>[1] &quot;The FWER for 10  hypothesis tests is: 0.07&quot;</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="dv">50</span> <span class="co"># number of hypotheses</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>atleast1 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
@@ -3176,7 +3176,7 @@ vertical-align: -.125em;
 <span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;The FWER for&quot;</span>, m,<span class="st">&quot; hypothesis tests is:&quot;</span>,atleast1<span class="sc">/</span><span class="dv">100</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] &quot;The FWER for 50  hypothesis tests is: 0.2&quot;</code></pre>
+<pre><code>[1] &quot;The FWER for 50  hypothesis tests is: 0.22&quot;</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="dv">100</span> <span class="co"># number of hypotheses</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>atleast1 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
@@ -3189,7 +3189,7 @@ vertical-align: -.125em;
 <span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;The FWER for&quot;</span>, m,<span class="st">&quot; hypothesis tests is:&quot;</span>,atleast1<span class="sc">/</span><span class="dv">100</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] &quot;The FWER for 100  hypothesis tests is: 0.42&quot;</code></pre>
+<pre><code>[1] &quot;The FWER for 100  hypothesis tests is: 0.41&quot;</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="dv">500</span> <span class="co"># number of hypotheses</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>atleast1 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
@@ -3202,7 +3202,7 @@ vertical-align: -.125em;
 <span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;The FWER for&quot;</span>, m,<span class="st">&quot; hypothesis tests is:&quot;</span>,atleast1<span class="sc">/</span><span class="dv">100</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] &quot;The FWER for 500  hypothesis tests is: 0.93&quot;</code></pre>
+<pre><code>[1] &quot;The FWER for 500  hypothesis tests is: 0.94&quot;</code></pre>
 </div>
 </div>
 <ol start="3" type="1">
@@ -3224,7 +3224,7 @@ vertical-align: -.125em;
 <span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;The FWER for&quot;</span>, m,<span class="st">&quot; hypothesis tests is:&quot;</span>,atleast1<span class="sc">/</span><span class="dv">100</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] &quot;The FWER for 10  hypothesis tests is: 0.01&quot;</code></pre>
+<pre><code>[1] &quot;The FWER for 10  hypothesis tests is: 0&quot;</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="dv">50</span> <span class="co"># number of hypotheses</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>atleast1 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
@@ -3250,7 +3250,7 @@ vertical-align: -.125em;
 <span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;The FWER for&quot;</span>, m,<span class="st">&quot; hypothesis tests is:&quot;</span>,atleast1<span class="sc">/</span><span class="dv">100</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] &quot;The FWER for 100  hypothesis tests is: 0&quot;</code></pre>
+<pre><code>[1] &quot;The FWER for 100  hypothesis tests is: 0.02&quot;</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="dv">500</span> <span class="co"># number of hypotheses</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>atleast1 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
@@ -3263,7 +3263,7 @@ vertical-align: -.125em;
 <span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;The FWER for&quot;</span>, m,<span class="st">&quot; hypothesis tests is:&quot;</span>,atleast1<span class="sc">/</span><span class="dv">100</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] &quot;The FWER for 500  hypothesis tests is: 0.01&quot;</code></pre>
+<pre><code>[1] &quot;The FWER for 500  hypothesis tests is: 0&quot;</code></pre>
 </div>
 </div>
 <ol start="4" type="1">
@@ -3311,7 +3311,7 @@ vertical-align: -.125em;
 <span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;The FWER for&quot;</span>, m,<span class="st">&quot; hypothesis tests is:&quot;</span>,atleast1<span class="sc">/</span><span class="dv">100</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] &quot;The FWER for 100  hypothesis tests is: 0.01&quot;</code></pre>
+<pre><code>[1] &quot;The FWER for 100  hypothesis tests is: 0&quot;</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="dv">500</span> <span class="co"># number of hypotheses</span></span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>atleast1 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
@@ -3324,7 +3324,7 @@ vertical-align: -.125em;
 <span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;The FWER for&quot;</span>, m,<span class="st">&quot; hypothesis tests is:&quot;</span>,atleast1<span class="sc">/</span><span class="dv">100</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] &quot;The FWER for 500  hypothesis tests is: 0.01&quot;</code></pre>
+<pre><code>[1] &quot;The FWER for 500  hypothesis tests is: 0&quot;</code></pre>
 </div>
 </div>
 </section>
@@ -3346,7 +3346,7 @@ vertical-align: -.125em;
 </div>
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">sum</span>(pvals <span class="sc">&lt;</span> alpha))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 182</code></pre>
+<pre><code>[1] 205</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">&quot;The False Negative Rate for a small effect is:&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -3354,7 +3354,7 @@ vertical-align: -.125em;
 </div>
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="dv">1</span><span class="sc">-</span>(<span class="fu">sum</span>(pvals <span class="sc">&lt;</span> alpha))<span class="sc">/</span><span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.818</code></pre>
+<pre><code>[1] 0.795</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>probA <span class="ot">&lt;-</span> <span class="fl">0.1</span></span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>probB <span class="ot">&lt;-</span> <span class="fl">0.4</span></span>
@@ -3368,7 +3368,7 @@ vertical-align: -.125em;
 </div>
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">sum</span>(pvals <span class="sc">&lt;</span> alpha))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 991</code></pre>
+<pre><code>[1] 990</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">&quot;The False Negative Rate for a large effect is:&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -3376,7 +3376,7 @@ vertical-align: -.125em;
 </div>
 <div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="dv">1</span><span class="sc">-</span>(<span class="fu">sum</span>(pvals <span class="sc">&lt;</span> alpha))<span class="sc">/</span><span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.009</code></pre>
+<pre><code>[1] 0.01</code></pre>
 </div>
 </div>
 <ol start="6" type="1">
@@ -3419,7 +3419,7 @@ vertical-align: -.125em;
 </div>
 <div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">sum</span>(pvals_false <span class="sc">&lt;</span> alpha)<span class="sc">/</span>num_false)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0</code></pre>
+<pre><code>[1] 0.01</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>TPR <span class="ot">&lt;-</span> <span class="fu">sum</span>(pvals_false <span class="sc">&lt;</span> alpha)<span class="sc">/</span>num_false</span>
 <span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -3427,9 +3427,9 @@ vertical-align: -.125em;
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] &quot;FDR without adjustment at alpha = 0.01:&quot;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">/</span>(TPR<span class="sc">+</span>FPR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">*</span>num_true<span class="sc">/</span>(TPR<span class="sc">*</span>num_true<span class="sc">+</span>FPR<span class="sc">*</span>num_false))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 1</code></pre>
+<pre><code>[1] 0.6206897</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>pvals_adj <span class="ot">&lt;-</span> <span class="fu">p.adjust</span>(<span class="fu">c</span>(pvals_true, pvals_false), <span class="at">method =</span> <span class="st">&#39;bonferroni&#39;</span>)</span>
 <span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -3457,7 +3457,7 @@ vertical-align: -.125em;
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] &quot;FDR with Bonferroni adjustment at alpha = 0.01:&quot;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">/</span>(TPR<span class="sc">+</span>FPR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">*</span>num_true<span class="sc">/</span>(TPR<span class="sc">*</span>num_true<span class="sc">+</span>FPR<span class="sc">*</span>num_false))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] NaN</code></pre>
 </div>
@@ -3487,7 +3487,7 @@ vertical-align: -.125em;
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] &quot;FDR with Holm adjustment at alpha = 0.01:&quot;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">/</span>(TPR<span class="sc">+</span>FPR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">*</span>num_true<span class="sc">/</span>(TPR<span class="sc">*</span>num_true<span class="sc">+</span>FPR<span class="sc">*</span>num_false))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] NaN</code></pre>
 </div>
@@ -3517,7 +3517,7 @@ vertical-align: -.125em;
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] &quot;FDR with BH adjustment at alpha = 0.01:&quot;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">/</span>(TPR<span class="sc">+</span>FPR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">*</span>num_true<span class="sc">/</span>(TPR<span class="sc">*</span>num_true<span class="sc">+</span>FPR<span class="sc">*</span>num_false))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] NaN</code></pre>
 </div>
@@ -3553,7 +3553,7 @@ vertical-align: -.125em;
 </div>
 <div class="sourceCode cell-code" id="cb101"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">sum</span>(pvals_true <span class="sc">&lt;</span> alpha)<span class="sc">/</span>num_false)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.6363636</code></pre>
+<pre><code>[1] 0.7272727</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a>FPR <span class="ot">&lt;-</span> <span class="fu">sum</span>(pvals_true <span class="sc">&lt;</span> alpha)<span class="sc">/</span>num_true</span>
 <span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -3563,7 +3563,7 @@ vertical-align: -.125em;
 </div>
 <div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">sum</span>(pvals_false <span class="sc">&lt;</span> alpha)<span class="sc">/</span>num_false)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.2727273</code></pre>
+<pre><code>[1] 0.7272727</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>TPR <span class="ot">&lt;-</span> <span class="fu">sum</span>(pvals_false <span class="sc">&lt;</span> alpha)<span class="sc">/</span>num_false</span>
 <span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -3571,9 +3571,9 @@ vertical-align: -.125em;
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] &quot;FDR without adjustment at alpha = 0.01:&quot;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">/</span>(TPR<span class="sc">+</span>FPR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">*</span>num_true<span class="sc">/</span>(TPR<span class="sc">*</span>num_true<span class="sc">+</span>FPR<span class="sc">*</span>num_false))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.02527076</code></pre>
+<pre><code>[1] 0.01110974</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb111"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a>pvals_adj <span class="ot">&lt;-</span> <span class="fu">p.adjust</span>(<span class="fu">c</span>(pvals_true, pvals_false), <span class="at">method =</span> <span class="st">&#39;bonferroni&#39;</span>)</span>
 <span id="cb111-2"><a href="#cb111-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -3601,7 +3601,7 @@ vertical-align: -.125em;
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] &quot;FDR with Bonferroni adjustment at alpha = 0.01:&quot;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb121"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">/</span>(TPR<span class="sc">+</span>FPR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb121"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">*</span>num_true<span class="sc">/</span>(TPR<span class="sc">*</span>num_true<span class="sc">+</span>FPR<span class="sc">*</span>num_false))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] NaN</code></pre>
 </div>
@@ -3631,7 +3631,7 @@ vertical-align: -.125em;
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] &quot;FDR with Holm adjustment at alpha = 0.01:&quot;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb133"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb133-1"><a href="#cb133-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">/</span>(TPR<span class="sc">+</span>FPR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb133"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb133-1"><a href="#cb133-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">*</span>num_true<span class="sc">/</span>(TPR<span class="sc">*</span>num_true<span class="sc">+</span>FPR<span class="sc">*</span>num_false))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] NaN</code></pre>
 </div>
@@ -3661,7 +3661,7 @@ vertical-align: -.125em;
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] &quot;FDR with BH adjustment at alpha = 0.01:&quot;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb145"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb145-1"><a href="#cb145-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">/</span>(TPR<span class="sc">+</span>FPR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb145"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb145-1"><a href="#cb145-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">*</span>num_true<span class="sc">/</span>(TPR<span class="sc">*</span>num_true<span class="sc">+</span>FPR<span class="sc">*</span>num_false))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] NaN</code></pre>
 </div>
@@ -3697,7 +3697,7 @@ vertical-align: -.125em;
 </div>
 <div class="sourceCode cell-code" id="cb149"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb149-1"><a href="#cb149-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">sum</span>(pvals_true <span class="sc">&lt;</span> alpha)<span class="sc">/</span>num_false)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.11</code></pre>
+<pre><code>[1] 0.09</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb151"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb151-1"><a href="#cb151-1" aria-hidden="true" tabindex="-1"></a>FPR <span class="ot">&lt;-</span> <span class="fu">sum</span>(pvals_true <span class="sc">&lt;</span> alpha)<span class="sc">/</span>num_true</span>
 <span id="cb151-2"><a href="#cb151-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -3715,9 +3715,9 @@ vertical-align: -.125em;
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] &quot;FDR without adjustment at alpha = 0.01:&quot;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb157"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb157-1"><a href="#cb157-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">/</span>(TPR<span class="sc">+</span>FPR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb157"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb157-1"><a href="#cb157-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">*</span>num_true<span class="sc">/</span>(TPR<span class="sc">*</span>num_true<span class="sc">+</span>FPR<span class="sc">*</span>num_false))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.01207464</code></pre>
+<pre><code>[1] 0.009988901</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb159"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb159-1"><a href="#cb159-1" aria-hidden="true" tabindex="-1"></a>pvals_adj <span class="ot">&lt;-</span> <span class="fu">p.adjust</span>(<span class="fu">c</span>(pvals_true, pvals_false), <span class="at">method =</span> <span class="st">&#39;bonferroni&#39;</span>)</span>
 <span id="cb159-2"><a href="#cb159-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -3745,7 +3745,7 @@ vertical-align: -.125em;
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] &quot;FDR with Bonferroni adjustment at alpha = 0.01:&quot;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb169"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb169-1"><a href="#cb169-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">/</span>(TPR<span class="sc">+</span>FPR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb169"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb169-1"><a href="#cb169-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">*</span>num_true<span class="sc">/</span>(TPR<span class="sc">*</span>num_true<span class="sc">+</span>FPR<span class="sc">*</span>num_false))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
@@ -3775,7 +3775,7 @@ vertical-align: -.125em;
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] &quot;FDR with Holm adjustment at alpha = 0.01:&quot;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb181"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb181-1"><a href="#cb181-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">/</span>(TPR<span class="sc">+</span>FPR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb181"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb181-1"><a href="#cb181-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">*</span>num_true<span class="sc">/</span>(TPR<span class="sc">*</span>num_true<span class="sc">+</span>FPR<span class="sc">*</span>num_false))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
@@ -3787,7 +3787,7 @@ vertical-align: -.125em;
 </div>
 <div class="sourceCode cell-code" id="cb185"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb185-1"><a href="#cb185-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">sum</span>(pvals_adj[<span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span><span class="sc">*</span>prior] <span class="sc">&lt;</span> alpha)<span class="sc">/</span>num_true)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.001111111</code></pre>
+<pre><code>[1] 0</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb187"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb187-1"><a href="#cb187-1" aria-hidden="true" tabindex="-1"></a>FPR <span class="ot">&lt;-</span> <span class="fu">sum</span>(pvals_adj[<span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span><span class="sc">*</span>prior] <span class="sc">&lt;</span> alpha)<span class="sc">/</span>num_true</span>
 <span id="cb187-2"><a href="#cb187-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -3805,9 +3805,9 @@ vertical-align: -.125em;
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] &quot;FDR with BH adjustment at alpha = 0.01:&quot;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb193"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb193-1"><a href="#cb193-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">/</span>(TPR<span class="sc">+</span>FPR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb193"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb193-1"><a href="#cb193-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">*</span>num_true<span class="sc">/</span>(TPR<span class="sc">*</span>num_true<span class="sc">+</span>FPR<span class="sc">*</span>num_false))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.001109878</code></pre>
+<pre><code>[1] 0</code></pre>
 </div>
 </div>
 <ol start="9" type="1">
@@ -3841,7 +3841,7 @@ vertical-align: -.125em;
 </div>
 <div class="sourceCode cell-code" id="cb197"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb197-1"><a href="#cb197-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">sum</span>(pvals_true <span class="sc">&lt;</span> alpha)<span class="sc">/</span>num_false)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9090909</code></pre>
+<pre><code>[1] 0.3636364</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb199"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb199-1"><a href="#cb199-1" aria-hidden="true" tabindex="-1"></a>FPR <span class="ot">&lt;-</span> <span class="fu">sum</span>(pvals_true <span class="sc">&lt;</span> alpha)<span class="sc">/</span>num_true</span>
 <span id="cb199-2"><a href="#cb199-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -3859,9 +3859,9 @@ vertical-align: -.125em;
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] &quot;FDR without adjustment at alpha = 0.01:&quot;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb205"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb205-1"><a href="#cb205-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">/</span>(TPR<span class="sc">+</span>FPR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb205"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb205-1"><a href="#cb205-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">*</span>num_true<span class="sc">/</span>(TPR<span class="sc">*</span>num_true<span class="sc">+</span>FPR<span class="sc">*</span>num_false))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.01</code></pre>
+<pre><code>[1] 0.004040223</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb207"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb207-1"><a href="#cb207-1" aria-hidden="true" tabindex="-1"></a>pvals_adj <span class="ot">&lt;-</span> <span class="fu">p.adjust</span>(<span class="fu">c</span>(pvals_true, pvals_false), <span class="at">method =</span> <span class="st">&#39;bonferroni&#39;</span>)</span>
 <span id="cb207-2"><a href="#cb207-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -3881,7 +3881,7 @@ vertical-align: -.125em;
 </div>
 <div class="sourceCode cell-code" id="cb213"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb213-1"><a href="#cb213-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">sum</span>(pvals_adj[(<span class="dv">1000</span><span class="sc">*</span>prior)<span class="sc">:</span><span class="dv">1000</span>] <span class="sc">&lt;</span> alpha)<span class="sc">/</span>num_false)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9090909</code></pre>
+<pre><code>[1] 0.8181818</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb215"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb215-1"><a href="#cb215-1" aria-hidden="true" tabindex="-1"></a>TPR <span class="ot">&lt;-</span> <span class="fu">sum</span>(pvals_adj[(<span class="dv">1000</span><span class="sc">*</span>prior)<span class="sc">:</span><span class="dv">1000</span>] <span class="sc">&lt;</span> alpha)<span class="sc">/</span>num_false</span>
 <span id="cb215-2"><a href="#cb215-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -3889,7 +3889,7 @@ vertical-align: -.125em;
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] &quot;FDR with Bonferroni adjustment at alpha = 0.01:&quot;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb217"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb217-1"><a href="#cb217-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">/</span>(TPR<span class="sc">+</span>FPR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb217"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb217-1"><a href="#cb217-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">*</span>num_true<span class="sc">/</span>(TPR<span class="sc">*</span>num_true<span class="sc">+</span>FPR<span class="sc">*</span>num_false))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
@@ -3911,7 +3911,7 @@ vertical-align: -.125em;
 </div>
 <div class="sourceCode cell-code" id="cb225"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb225-1"><a href="#cb225-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">sum</span>(pvals_adj[(<span class="dv">1000</span><span class="sc">*</span>prior)<span class="sc">:</span><span class="dv">1000</span>] <span class="sc">&lt;</span> alpha)<span class="sc">/</span>num_false)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9090909</code></pre>
+<pre><code>[1] 0.8181818</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb227"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb227-1"><a href="#cb227-1" aria-hidden="true" tabindex="-1"></a>TPR <span class="ot">&lt;-</span> <span class="fu">sum</span>(pvals_adj[(<span class="dv">1000</span><span class="sc">*</span>prior)<span class="sc">:</span><span class="dv">1000</span>] <span class="sc">&lt;</span> alpha)<span class="sc">/</span>num_false</span>
 <span id="cb227-2"><a href="#cb227-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -3919,7 +3919,7 @@ vertical-align: -.125em;
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] &quot;FDR with Holm adjustment at alpha = 0.01:&quot;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb229"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb229-1"><a href="#cb229-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">/</span>(TPR<span class="sc">+</span>FPR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb229"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb229-1"><a href="#cb229-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">*</span>num_true<span class="sc">/</span>(TPR<span class="sc">*</span>num_true<span class="sc">+</span>FPR<span class="sc">*</span>num_false))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
@@ -3949,7 +3949,7 @@ vertical-align: -.125em;
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] &quot;FDR with BH adjustment at alpha = 0.01:&quot;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb241"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb241-1"><a href="#cb241-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">/</span>(TPR<span class="sc">+</span>FPR))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb241"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb241-1"><a href="#cb241-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(FPR<span class="sc">*</span>num_true<span class="sc">/</span>(TPR<span class="sc">*</span>num_true<span class="sc">+</span>FPR<span class="sc">*</span>num_false))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
