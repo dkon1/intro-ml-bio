@@ -1,0 +1,569 @@
+---
+title: "Lab 8: Multiple hypothesis testing and false discovery rate"
+format: 
+  html:
+    self-contained: true
+editor: visual
+---
+
+```{r}
+#| include: false
+library(tidyverse)
+
+```
+
+## Description
+
+The goal of this assignment is to simulate multiple hypothesis testing, so that we can calculate the testing error rates for different scenarios. You will learn the following:
+
+1.  How to compute Type 1 and Type 2 errors.
+2.  Compute the Family-Wide Error Rate and the False Discovery Rate.
+3.  Use different p-value correction methods.
+4.  Simulate testing a mix of true and false hypotheses.
+5.  Observe the impact of effect size and prior probability on the false discovery rate.
+
+## Part 1: simulations of hypothesis testing
+
+In this part you will simulate a hypothesis testing for independence. The chunk below contains a function that generates a fake data set with two different variables: genotype (either A or B) and health status ('D' or 'H'). The input arguments control the true (or population) probability of disease for genotype A, same for genotype B, and the number of individuals in both sample groups.
+
+```{r}
+gen_ind_test <- function(probA, probB, samp_size) {
+  health_states <- c('D', 'H') # health states 'D' and 'H'
+  dis_genA <- sample(health_states, samp_size, replace = TRUE, prob = c(probA, 1-probA)) # generate a vector of health states for genotype A
+  dis_genB <- sample(health_states, samp_size, replace = TRUE, prob = c(probB, 1-probB)) # generate a vector of health states for genotype B
+  data_vec <- c(table(dis_genA), table(dis_genB)) # calculate number of H and D for each genotype
+  data_mat <- matrix(data_vec, nrow=2, ncol=2) # put those together into a data matrix
+  chisq_result <- chisq.test(data_mat) # run chi-squared test
+  return(chisq_result$p.value) # output the p-value
+} 
+```
+
+1.  Simulate 1000 hypothesis tests with *identical* probabilities of disease (e.g. 0.2) and a sample size of 100. Report the number of null hypothesis rejections at significance level alpha = 0.01 and the number of errors. What type of errors do you observe? Report the error rate.
+
+```{r}
+probA <- 0.2
+probB <- 0.2
+num <- 100
+pvals <- replicate(1000, gen_ind_test(probA, probB, num))
+#plot(-log(pvals), type = 'h')
+alpha <- 0.01
+print("Fraction of rejections at alpha = 0.01:")
+print(sum(pvals < alpha))
+print("The False Positive Rate is:")
+print((sum(pvals < alpha))/1000)
+```
+
+2.  Calculate the FWER (family-wise error rate) for a simulation of 10 repeated hypothesis tests with equal probabilities of disease and sample size 100 (as in question 1) by using a for loop or making a function and then using replicate to repeat the simulation 100 times, and report the fraction of times that *at least one of the hypotheses was rejected at significance level 1*. Repeat the calculation for 50, 100, and 500 hypothesis tests and report the FWER as a function the number of hypotheses tested.
+
+```{r}
+probA <- 0.2
+probB <- 0.2
+samp_size <- 100 # sample size
+alpha <- 0.01
+m <- 10 # number of hypotheses
+atleast1 <- 0
+for (i in 1:100) {
+  pvals <- replicate(m, gen_ind_test(probA, probB, samp_size))
+
+  if (sum(pvals < alpha) >0) {
+      atleast1 <- atleast1 + 1    
+  }
+}
+print(paste("The FWER for", m," hypothesis tests is:",atleast1/100))
+
+m <- 50 # number of hypotheses
+atleast1 <- 0
+for (i in 1:100) {
+  pvals <- replicate(m, gen_ind_test(probA, probB, samp_size))
+
+  if (sum(pvals < alpha) >0) {
+      atleast1 <- atleast1 + 1    
+  }
+}
+print(paste("The FWER for", m," hypothesis tests is:",atleast1/100))
+
+
+m <- 100 # number of hypotheses
+atleast1 <- 0
+for (i in 1:100) {
+  pvals <- replicate(m, gen_ind_test(probA, probB, samp_size))
+
+  if (sum(pvals < alpha) >0) {
+      atleast1 <- atleast1 + 1    
+  }
+}
+print(paste("The FWER for", m," hypothesis tests is:",atleast1/100))
+
+
+m <- 500 # number of hypotheses
+atleast1 <- 0
+for (i in 1:100) {
+  pvals <- replicate(m, gen_ind_test(probA, probB, samp_size))
+
+  if (sum(pvals < alpha) >0) {
+      atleast1 <- atleast1 + 1    
+  }
+}
+print(paste("The FWER for", m," hypothesis tests is:",atleast1/100))
+
+```
+
+3.  Use the Bonferroni correction for the p-values and repeat the calculation in question 2: report the FWER for repeated testing of 10, 50, 100, and 500 true null hypotheses.
+
+```{r}
+probA <- 0.2
+probB <- 0.2
+samp_size <- 100 # sample size
+alpha <- 0.01
+m <- 10 # number of hypotheses
+atleast1 <- 0
+for (i in 1:100) {
+  pvals <- replicate(m, gen_ind_test(probA, probB, samp_size))
+  pvals <- p.adjust(pvals, method = "bonferroni")
+  if (sum(pvals < alpha) >0) {
+      atleast1 <- atleast1 + 1    
+  }
+}
+print(paste("The FWER for", m," hypothesis tests is:",atleast1/100))
+
+m <- 50 # number of hypotheses
+atleast1 <- 0
+for (i in 1:100) {
+  pvals <- replicate(m, gen_ind_test(probA, probB, samp_size))
+  pvals <- p.adjust(pvals, method = "bonferroni")
+  if (sum(pvals < alpha) >0) {
+      atleast1 <- atleast1 + 1    
+  }
+}
+print(paste("The FWER for", m," hypothesis tests is:",atleast1/100))
+
+
+m <- 100 # number of hypotheses
+atleast1 <- 0
+for (i in 1:100) {
+  pvals <- replicate(m, gen_ind_test(probA, probB, samp_size))
+  pvals <- p.adjust(pvals, method = "bonferroni")
+  if (sum(pvals < alpha) >0) {
+      atleast1 <- atleast1 + 1    
+  }
+}
+print(paste("The FWER for", m," hypothesis tests is:",atleast1/100))
+
+
+m <- 500 # number of hypotheses
+atleast1 <- 0
+for (i in 1:100) {
+  pvals <- replicate(m, gen_ind_test(probA, probB, samp_size))
+  pvals <- p.adjust(pvals, method = "bonferroni")
+  if (sum(pvals < alpha) >0) {
+      atleast1 <- atleast1 + 1    
+  }
+}
+print(paste("The FWER for", m," hypothesis tests is:",atleast1/100))
+
+```
+
+4.  Use the Holm correction for the p-values and repeat the calculation in question 3: report the FWER for repeated testing of 10, 50, 100, and 500 true null hypotheses.
+
+```{r}
+probA <- 0.2
+probB <- 0.2
+samp_size <- 100 # sample size
+alpha <- 0.01
+m <- 10 # number of hypotheses
+atleast1 <- 0
+for (i in 1:100) {
+  pvals <- replicate(m, gen_ind_test(probA, probB, samp_size))
+  pvals <- p.adjust(pvals, method = "holm")
+  if (sum(pvals < alpha) >0) {
+      atleast1 <- atleast1 + 1    
+  }
+}
+print(paste("The FWER for", m," hypothesis tests is:",atleast1/100))
+
+m <- 50 # number of hypotheses
+atleast1 <- 0
+for (i in 1:100) {
+  pvals <- replicate(m, gen_ind_test(probA, probB, samp_size))
+  pvals <- p.adjust(pvals, method = "holm")
+  if (sum(pvals < alpha) >0) {
+      atleast1 <- atleast1 + 1    
+  }
+}
+print(paste("The FWER for", m," hypothesis tests is:",atleast1/100))
+
+
+m <- 100 # number of hypotheses
+atleast1 <- 0
+for (i in 1:100) {
+  pvals <- replicate(m, gen_ind_test(probA, probB, samp_size))
+  pvals <- p.adjust(pvals, method = "holm")
+  if (sum(pvals < alpha) >0) {
+      atleast1 <- atleast1 + 1    
+  }
+}
+print(paste("The FWER for", m," hypothesis tests is:",atleast1/100))
+
+
+m <- 500 # number of hypotheses
+atleast1 <- 0
+for (i in 1:100) {
+  pvals <- replicate(m, gen_ind_test(probA, probB, samp_size))
+  pvals <- p.adjust(pvals, method = "holm")
+  if (sum(pvals < alpha) >0) {
+      atleast1 <- atleast1 + 1    
+  }
+}
+print(paste("The FWER for", m," hypothesis tests is:",atleast1/100))
+```
+
+## Part 2: False Discovery Rate
+
+5.  Simulate 1000 hypothesis tests with probabilities of disease of 0.1 (for genotype A) and 0.2 (for genotype B) and a sample size of 100 - we'll call this a *small effect size*. Report the number of null hypothesis rejections at significance level alpha = 0.01 and the number of errors. What type of errors do you observe? Report the error rate. Increase the probability of disease of genotype B to 0.4 - we'll call this a *large effect size* - and again report the error rate.
+
+```{r}
+probA <- 0.1
+probB <- 0.2
+num <- 100
+pvals <- replicate(1000, gen_ind_test(probA, probB, num))
+#plot(-log(pvals), type = 'h')
+alpha <- 0.01
+print("Fraction of rejections at alpha = 0.01:")
+print(sum(pvals < alpha))
+print("The False Negative Rate for a small effect is:")
+print(1-(sum(pvals < alpha))/1000)
+
+probA <- 0.1
+probB <- 0.4
+num <- 100
+pvals <- replicate(1000, gen_ind_test(probA, probB, num))
+#plot(-log(pvals), type = 'h')
+alpha <- 0.01
+print("Fraction of rejections at alpha = 0.01:")
+print(sum(pvals < alpha))
+print("The False Negative Rate for a large effect is:")
+print(1-(sum(pvals < alpha))/1000)
+```
+
+6.  Let us simulate a scenario where some fraction of the hypotheses are true (equal probabilities of disease) and some are false (different probabilities). Let us call the fraction of true hypotheses our prior. Set the prior probability to be 90%, and simulate 1000 hypotheses: 90% true and 50% false, with a small effect (probabilities of 0.1 and 0.2).
+
+```{r}
+probA <- 0.2
+probB <- 0.2
+num <- 500
+prior <- 0.9
+num_true <- prior*1000
+pvals_true <- replicate(num_true, gen_ind_test(probA, probB, num))
+alpha <- 0.01
+
+probA <- 0.2
+probB <- 0.21
+num_false <- ceiling((1-prior)*1000) # if I don't use celing it has a weird rounding effect
+pvals_false <- replicate(num_false, gen_ind_test(probA, probB, num))
+
+```
+
+a)  Report the fraction of rejected null hypotheses using alpha = 0.01 *without any p-value adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
+
+b)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Bonferroni adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
+
+c)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Holm adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
+
+d)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Benjamini-Hochberg adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
+
+```{r}
+print("Fraction of rejections of true null without adjustment at alpha = 0.01:")
+print(sum(pvals_true < alpha)/num_false)
+FPR <- sum(pvals_true < alpha)/num_true
+
+print("Fraction of rejections of false null without adjustment at alpha = 0.01:")
+print(sum(pvals_false < alpha)/num_false)
+TPR <- sum(pvals_false < alpha)/num_false
+
+print("FDR without adjustment at alpha = 0.01:")
+print(FPR/(TPR+FPR))
+
+pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'bonferroni')
+
+print("Fraction of rejections of true null with Bonferroni adjustment at alpha = 0.01:")
+print(sum(pvals_adj[1:1000*prior] < alpha)/num_true)
+FPR <- sum(pvals_adj[1:1000*prior] < alpha)/num_true
+
+print("Fraction of rejections of false null with Bonferroni adjustment at alpha = 0.01:")
+print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
+TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
+
+print("FDR with Bonferroni adjustment at alpha = 0.01:")
+print(FPR/(TPR+FPR))
+
+
+pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'holm')
+
+print("Fraction of rejections of true null with Holm adjustment at alpha = 0.01:")
+print(sum(pvals_adj[1:1000*prior] < alpha)/num_true)
+FPR <- sum(pvals_adj[1:1000*prior] < alpha)/num_true
+
+print("Fraction of rejections of false null with Holm adjustment at alpha = 0.01:")
+print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
+TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
+
+print("FDR with Holm adjustment at alpha = 0.01:")
+print(FPR/(TPR+FPR))
+
+pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'BH')
+
+print("Fraction of rejections of true null with BH adjustment at alpha = 0.01:")
+print(sum(pvals_adj[1:1000*prior] < alpha)/num_true)
+FPR <- sum(pvals_adj[1:1000*prior] < alpha)/num_true
+
+print("Fraction of rejections of false null with BH adjustment at alpha = 0.01:")
+print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
+TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
+
+print("FDR with BH adjustment at alpha = 0.01:")
+print(FPR/(TPR+FPR))
+```
+
+7.  Let us simulate a scenario where some fraction of the hypotheses are true (equal probabilities of disease) and some are false (different probabilities). Let us call the fraction of true hypotheses our prior. Set the prior probability to be 99%, and simulate 1000 hypotheses: 99% true and 1% false, with a small effect (probabilities of 0.21 and 0.2).
+
+```{=html}
+<!-- -->
+```
+a)  Report the fraction of rejected null hypotheses using alpha = 0.01 *without any p-value adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
+
+b)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Bonferroni adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
+
+c)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Holm adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
+
+d)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Benjamini-Hochberg adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
+
+```{r}
+probA <- 0.2
+probB <- 0.2
+num <- 500
+prior <- 0.99
+num_true <- prior*1000
+pvals_true <- replicate(num_true, gen_ind_test(probA, probB, num))
+alpha <- 0.01
+
+probA <- 0.2
+probB <- 0.25
+num_false <- ceiling((1-prior)*1000) # if I don't use celing it has a weird rounding effect
+pvals_false <- replicate(num_false, gen_ind_test(probA, probB, num))
+
+
+print("Fraction of rejections of true null without adjustment at alpha = 0.01:")
+print(sum(pvals_true < alpha)/num_false)
+FPR <- sum(pvals_true < alpha)/num_true
+
+print("Fraction of rejections of false null without adjustment at alpha = 0.01:")
+print(sum(pvals_false < alpha)/num_false)
+TPR <- sum(pvals_false < alpha)/num_false
+
+print("FDR without adjustment at alpha = 0.01:")
+print(FPR/(TPR+FPR))
+
+pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'bonferroni')
+
+print("Fraction of rejections of true null with Bonferroni adjustment at alpha = 0.01:")
+print(sum(pvals_adj[1:1000*prior] < alpha)/num_true)
+FPR <- sum(pvals_adj[1:1000*prior] < alpha)/num_true
+
+print("Fraction of rejections of false null with Bonferroni adjustment at alpha = 0.01:")
+print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
+TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
+
+print("FDR with Bonferroni adjustment at alpha = 0.01:")
+print(FPR/(TPR+FPR))
+
+
+pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'holm')
+
+print("Fraction of rejections of true null with Holm adjustment at alpha = 0.01:")
+print(sum(pvals_adj[1:1000*prior] < alpha)/num_true)
+FPR <- sum(pvals_adj[1:1000*prior] < alpha)/num_true
+
+print("Fraction of rejections of false null with Holm adjustment at alpha = 0.01:")
+print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
+TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
+
+print("FDR with Holm adjustment at alpha = 0.01:")
+print(FPR/(TPR+FPR))
+
+pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'BH')
+
+print("Fraction of rejections of true null with BH adjustment at alpha = 0.01:")
+print(sum(pvals_adj[1:1000*prior] < alpha)/num_true)
+FPR <- sum(pvals_adj[1:1000*prior] < alpha)/num_true
+
+print("Fraction of rejections of false null with BH adjustment at alpha = 0.01:")
+print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
+TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
+
+print("FDR with BH adjustment at alpha = 0.01:")
+print(FPR/(TPR+FPR))
+```
+
+8.  Let us simulate a scenario where some fraction of the hypotheses are true (equal probabilities of disease) and some are false (different probabilities). Let us call the fraction of true hypotheses our prior. Set the prior probability to be 90%, and simulate 1000 hypotheses: 90% true and 50% false, with a large effect (probabilities of 0.1 and 0.4).
+
+```{=html}
+<!-- -->
+```
+a)  Report the fraction of rejected null hypotheses using alpha = 0.01 *without any p-value adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
+
+b)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Bonferroni adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
+
+c)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Holm adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
+
+d)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Benjamini-Hochberg adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
+
+```{r}
+probA <- 0.2
+probB <- 0.2
+num <- 500
+prior <- 0.9
+num_true <- prior*1000
+pvals_true <- replicate(num_true, gen_ind_test(probA, probB, num))
+alpha <- 0.01
+
+probA <- 0.2
+probB <- 0.4
+num_false <- ceiling((1-prior)*1000) # if I don't use celing it has a weird rounding effect
+pvals_false <- replicate(num_false, gen_ind_test(probA, probB, num))
+
+
+print("Fraction of rejections of true null without adjustment at alpha = 0.01:")
+print(sum(pvals_true < alpha)/num_false)
+FPR <- sum(pvals_true < alpha)/num_true
+
+print("Fraction of rejections of false null without adjustment at alpha = 0.01:")
+print(sum(pvals_false < alpha)/num_false)
+TPR <- sum(pvals_false < alpha)/num_false
+
+print("FDR without adjustment at alpha = 0.01:")
+print(FPR/(TPR+FPR))
+
+pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'bonferroni')
+
+print("Fraction of rejections of true null with Bonferroni adjustment at alpha = 0.01:")
+print(sum(pvals_adj[1:1000*prior] < alpha)/num_true)
+FPR <- sum(pvals_adj[1:1000*prior] < alpha)/num_true
+
+print("Fraction of rejections of false null with Bonferroni adjustment at alpha = 0.01:")
+print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
+TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
+
+print("FDR with Bonferroni adjustment at alpha = 0.01:")
+print(FPR/(TPR+FPR))
+
+
+pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'holm')
+
+print("Fraction of rejections of true null with Holm adjustment at alpha = 0.01:")
+print(sum(pvals_adj[1:1000*prior] < alpha)/num_true)
+FPR <- sum(pvals_adj[1:1000*prior] < alpha)/num_true
+
+print("Fraction of rejections of false null with Holm adjustment at alpha = 0.01:")
+print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
+TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
+
+print("FDR with Holm adjustment at alpha = 0.01:")
+print(FPR/(TPR+FPR))
+
+pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'BH')
+
+print("Fraction of rejections of true null with BH adjustment at alpha = 0.01:")
+print(sum(pvals_adj[1:1000*prior] < alpha)/num_true)
+FPR <- sum(pvals_adj[1:1000*prior] < alpha)/num_true
+
+print("Fraction of rejections of false null with BH adjustment at alpha = 0.01:")
+print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
+TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
+
+print("FDR with BH adjustment at alpha = 0.01:")
+print(FPR/(TPR+FPR))
+```
+
+9.  Let us simulate a scenario where some fraction of the hypotheses are true (equal probabilities of disease) and some are false (different probabilities). Let us call the fraction of true hypotheses our prior. Set the prior probability to be 99%, and simulate 1000 hypotheses: 99% true and 1% false, with a large effect (probabilities of 0.1 and 0.4).
+
+```{=html}
+<!-- -->
+```
+a)  Report the fraction of rejected null hypotheses using alpha = 0.01 *without any p-value adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
+
+b)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Bonferroni adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
+
+c)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Holm adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
+
+d)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Benjamini-Hochberg adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
+
+```{r}
+probA <- 0.2
+probB <- 0.2
+num <- 500
+prior <- 0.99
+num_true <- prior*1000
+pvals_true <- replicate(num_true, gen_ind_test(probA, probB, num))
+alpha <- 0.01
+
+probA <- 0.2
+probB <- 0.4
+num_false <- ceiling((1-prior)*1000) # if I don't use celing it has a weird rounding effect
+pvals_false <- replicate(num_false, gen_ind_test(probA, probB, num))
+
+
+print("Fraction of rejections of true null without adjustment at alpha = 0.01:")
+print(sum(pvals_true < alpha)/num_false)
+FPR <- sum(pvals_true < alpha)/num_true
+
+print("Fraction of rejections of false null without adjustment at alpha = 0.01:")
+print(sum(pvals_false < alpha)/num_false)
+TPR <- sum(pvals_false < alpha)/num_false
+
+print("FDR without adjustment at alpha = 0.01:")
+print(FPR/(TPR+FPR))
+
+pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'bonferroni')
+
+print("Fraction of rejections of true null with Bonferroni adjustment at alpha = 0.01:")
+print(sum(pvals_adj[1:1000*prior] < alpha)/num_true)
+FPR <- sum(pvals_adj[1:1000*prior] < alpha)/num_true
+
+print("Fraction of rejections of false null with Bonferroni adjustment at alpha = 0.01:")
+print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
+TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
+
+print("FDR with Bonferroni adjustment at alpha = 0.01:")
+print(FPR/(TPR+FPR))
+
+
+pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'holm')
+
+print("Fraction of rejections of true null with Holm adjustment at alpha = 0.01:")
+print(sum(pvals_adj[1:1000*prior] < alpha)/num_true)
+FPR <- sum(pvals_adj[1:1000*prior] < alpha)/num_true
+
+print("Fraction of rejections of false null with Holm adjustment at alpha = 0.01:")
+print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
+TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
+
+print("FDR with Holm adjustment at alpha = 0.01:")
+print(FPR/(TPR+FPR))
+
+pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'BH')
+
+print("Fraction of rejections of true null with BH adjustment at alpha = 0.01:")
+print(sum(pvals_adj[1:1000*prior] < alpha)/num_true)
+FPR <- sum(pvals_adj[1:1000*prior] < alpha)/num_true
+
+print("Fraction of rejections of false null with BH adjustment at alpha = 0.01:")
+print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
+TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
+
+print("FDR with BH adjustment at alpha = 0.01:")
+print(FPR/(TPR+FPR))
+```
+
+10. Discuss the results you reported in the four questions above. Describe the influence of the following parameters: the effect size, the prior probability of the hypothesis being true, and the choice of p-value adjustment. Comment on your conclusions for what you would choose to do for a data set with a small effect size and a large prior probability for the null.
+
+YOUR ANSWERS HERE
