@@ -281,7 +281,7 @@ print(sum(pvals_false < alpha)/num_false)
 TPR <- sum(pvals_false < alpha)/num_false
 
 print("FDR without adjustment at alpha = 0.01:")
-print(FPR*num_true/(TPR*num_true+FPR*num_false))
+print(FPR*num_true/(TPR*num_false+FPR*num_true))
 
 pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'bonferroni')
 
@@ -294,7 +294,7 @@ print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
 TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
 
 print("FDR with Bonferroni adjustment at alpha = 0.01:")
-print(FPR*num_true/(TPR*num_true+FPR*num_false))
+print(FPR*num_true/(TPR*num_false+FPR*num_true))
 
 
 pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'holm')
@@ -308,7 +308,7 @@ print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
 TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
 
 print("FDR with Holm adjustment at alpha = 0.01:")
-print(FPR*num_true/(TPR*num_true+FPR*num_false))
+print(FPR*num_true/(TPR*num_false+FPR*num_true))
 
 pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'BH')
 
@@ -321,7 +321,7 @@ print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
 TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
 
 print("FDR with BH adjustment at alpha = 0.01:")
-print(FPR*num_true/(TPR*num_true+FPR*num_false))
+print(FPR*num_true/(TPR*num_false+FPR*num_true))
 ```
 
 7.  Let us simulate a scenario where some fraction of the hypotheses are true (equal probabilities of disease) and some are false (different probabilities). Let us call the fraction of true hypotheses our prior. Set the prior probability to be 99%, and simulate 1000 hypotheses: 99% true and 1% false, with a small effect (probabilities of 0.21 and 0.2).
@@ -361,7 +361,7 @@ print(sum(pvals_false < alpha)/num_false)
 TPR <- sum(pvals_false < alpha)/num_false
 
 print("FDR without adjustment at alpha = 0.01:")
-print(FPR*num_true/(TPR*num_true+FPR*num_false))
+print(FPR*num_true/(TPR*num_false+FPR*num_true))
 
 pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'bonferroni')
 
@@ -374,7 +374,7 @@ print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
 TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
 
 print("FDR with Bonferroni adjustment at alpha = 0.01:")
-print(FPR*num_true/(TPR*num_true+FPR*num_false))
+print(FPR*num_true/(TPR*num_false+FPR*num_true))
 
 
 pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'holm')
@@ -388,7 +388,7 @@ print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
 TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
 
 print("FDR with Holm adjustment at alpha = 0.01:")
-print(FPR*num_true/(TPR*num_true+FPR*num_false))
+print(FPR*num_true/(TPR*num_false+FPR*num_true))
 
 pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'BH')
 
@@ -401,7 +401,7 @@ print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
 TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
 
 print("FDR with BH adjustment at alpha = 0.01:")
-print(FPR*num_true/(TPR*num_true+FPR*num_false))
+print(FPR*num_true/(TPR*num_false+FPR*num_true))
 ```
 
 8.  Let us simulate a scenario where some fraction of the hypotheses are true (equal probabilities of disease) and some are false (different probabilities). Let us call the fraction of true hypotheses our prior. Set the prior probability to be 90%, and simulate 1000 hypotheses: 90% true and 50% false, with a large effect (probabilities of 0.1 and 0.4).
@@ -441,7 +441,7 @@ print(sum(pvals_false < alpha)/num_false)
 TPR <- sum(pvals_false < alpha)/num_false
 
 print("FDR without adjustment at alpha = 0.01:")
-print(FPR*num_true/(TPR*num_true+FPR*num_false))
+print(FPR*num_true/(TPR*num_false+FPR*num_true))
 
 pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'bonferroni')
 
@@ -454,7 +454,7 @@ print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
 TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
 
 print("FDR with Bonferroni adjustment at alpha = 0.01:")
-print(FPR*num_true/(TPR*num_true+FPR*num_false))
+print(FPR*num_true/(TPR*num_false+FPR*num_true))
 
 
 pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'holm')
@@ -468,7 +468,7 @@ print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
 TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
 
 print("FDR with Holm adjustment at alpha = 0.01:")
-print(FPR*num_true/(TPR*num_true+FPR*num_false))
+print(FPR*num_true/(TPR*num_false+FPR*num_true))
 
 pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'BH')
 
@@ -481,7 +481,7 @@ print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
 TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
 
 print("FDR with BH adjustment at alpha = 0.01:")
-print(FPR*num_true/(TPR*num_true+FPR*num_false))
+print(FPR*num_true/(TPR*num_false+FPR*num_true))
 ```
 
 9.  Let us simulate a scenario where some fraction of the hypotheses are true (equal probabilities of disease) and some are false (different probabilities). Let us call the fraction of true hypotheses our prior. Set the prior probability to be 99%, and simulate 1000 hypotheses: 99% true and 1% false, with a large effect (probabilities of 0.1 and 0.4).
@@ -521,7 +521,7 @@ print(sum(pvals_false < alpha)/num_false)
 TPR <- sum(pvals_false < alpha)/num_false
 
 print("FDR without adjustment at alpha = 0.01:")
-print(FPR*num_true/(TPR*num_true+FPR*num_false))
+print(FPR*num_true/(TPR*num_false+FPR*num_true))
 
 pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'bonferroni')
 
@@ -534,7 +534,7 @@ print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
 TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
 
 print("FDR with Bonferroni adjustment at alpha = 0.01:")
-print(FPR*num_true/(TPR*num_true+FPR*num_false))
+print(FPR*num_true/(TPR*num_false+FPR*num_true))
 
 
 pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'holm')
@@ -548,7 +548,7 @@ print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
 TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
 
 print("FDR with Holm adjustment at alpha = 0.01:")
-print(FPR*num_true/(TPR*num_true+FPR*num_false))
+print(FPR*num_true/(TPR*num_false+FPR*num_true))
 
 pvals_adj <- p.adjust(c(pvals_true, pvals_false), method = 'BH')
 
@@ -561,7 +561,7 @@ print(sum(pvals_adj[(1000*prior):1000] < alpha)/num_false)
 TPR <- sum(pvals_adj[(1000*prior):1000] < alpha)/num_false
 
 print("FDR with BH adjustment at alpha = 0.01:")
-print(FPR*num_true/(TPR*num_true+FPR*num_false))
+print(FPR*num_true/(TPR*num_false+FPR*num_true))
 ```
 
 10. Discuss the results you reported in the four questions above. Describe the influence of the following parameters: the effect size, the prior probability of the hypothesis being true, and the choice of p-value adjustment. Comment on your conclusions for what you would choose to do for a data set with a small effect size and a large prior probability for the null.
