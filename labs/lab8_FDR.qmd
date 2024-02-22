@@ -37,13 +37,13 @@ gen_ind_test <- function(probA, probB, samp_size) {
 } 
 ```
 
-1.  Simulate 1000 hypothesis tests with *identical* probabilities of disease (e.g. 0.2) and a sample size of 100. Report the number of null hypothesis rejections at significance level alpha = 0.01 and the number of errors. What type of errors do you observe? Report the error rate.
+1.  Simulate 1000 hypothesis tests with *identical* probabilities of disease (e.g. 0.2) and a sample size of 200. Report the number of null hypothesis rejections at significance level alpha = 0.01 and the number of errors. What type of errors do you observe? Report the error rate.
 
 ```{r}
 
 ```
 
-2.  Calculate the FWER (family-wise error rate) for a simulation of 10 repeated hypothesis tests with equal probabilities of disease and sample size 100 (as in question 1) by using a for loop or making a function and then using replicate to repeat the simulation 100 times, and report the fraction of times that *at least one of the hypotheses was rejected at significance level 1*. Repeat the calculation for 50, 100, and 500 hypothesis tests and report the FWER as a function the number of hypotheses tested.
+2.  Calculate the FWER (family-wise error rate) for a simulation of 10 repeated hypothesis tests with equal probabilities of disease and sample size 200 (as in question 1) by using a for loop (or making a function and then using replicate) to repeat the simulation 100 times, and report the fraction of times that *at least one of the hypotheses was rejected at significance level 1*. Repeat the calculation for 50, 100, and 500 hypothesis tests and report the FWER as a function the number of hypotheses tested.
 
 ```{r}
 
@@ -63,7 +63,7 @@ gen_ind_test <- function(probA, probB, samp_size) {
 
 ## Part 2: False Discovery Rate
 
-5.  Simulate 1000 hypothesis tests with probabilities of disease of 0.1 (for genotype A) and 0.2 (for genotype B) and a sample size of 100 - we'll call this a *small effect size*. Report the number of null hypothesis rejections at significance level alpha = 0.01 and the number of errors. What type of errors do you observe? Report the error rate. Increase the probability of disease of genotype B to 0.4 - we'll call this a *large effect size* - and again report the error rate.
+5.  Simulate 1000 hypothesis tests with probabilities of disease of 0.1 (for genotype A) and 0.2 (for genotype B) and a sample size of 200 - we'll call this a *small effect size*. Report the number of null hypothesis rejections at significance level alpha = 0.01 and the number of errors. What type of errors do you observe? Report the error rate. Increase the probability of disease of genotype B to 0.4 - we'll call this a *large effect size* - and again report the error rate.
 
 ```{r}
 
