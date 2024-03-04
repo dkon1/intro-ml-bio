@@ -327,9 +327,6 @@ print(FP/(TP+FP))
 
 7.  Let us simulate a scenario where some fraction of the hypotheses are true (equal probabilities of disease) and some are false (different probabilities). Let us call the fraction of true hypotheses our prior. Set the prior probability to be 99%, and simulate 1000 hypotheses: 99% true and 1% false, with a small effect (probabilities of 0.1 and 0.2).
 
-```{=html}
-<!-- -->
-```
 a)  Report the fraction of rejected null hypotheses using alpha = 0.01 *without any p-value adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
 
 b)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Bonferroni adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
@@ -408,9 +405,8 @@ print(FP/(TP+FP))
 
 8.  Let us simulate a scenario where some fraction of the hypotheses are true (equal probabilities of disease) and some are false (different probabilities). Let us call the fraction of true hypotheses our prior. Set the prior probability to be 90%, and simulate 1000 hypotheses: 90% true and 10% false, with a large effect (probabilities of 0.1 and 0.4).
 
-```{=html}
 <!-- -->
-```
+
 a)  Report the fraction of rejected null hypotheses using alpha = 0.01 *without any p-value adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
 
 b)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Bonferroni adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
@@ -489,9 +485,8 @@ print(FP/(TP+FP))
 
 9.  Let us simulate a scenario where some fraction of the hypotheses are true (equal probabilities of disease) and some are false (different probabilities). Let us call the fraction of true hypotheses our prior. Set the prior probability to be 99%, and simulate 1000 hypotheses: 99% true and 1% false, with a large effect (probabilities of 0.1 and 0.4).
 
-```{=html}
 <!-- -->
-```
+
 a)  Report the fraction of rejected null hypotheses using alpha = 0.01 *without any p-value adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
 
 b)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Bonferroni adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
