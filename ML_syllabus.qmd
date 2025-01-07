@@ -8,20 +8,18 @@ format:
 editor: visual
 ---
 
-## Instructors:
+## Instructor:
 
 Dmitry Kondrashov [dkon\@uchicago.edu](mailto:dkon@uchicago.edu){.email}
 
-### TAs:
+### TA: 
 
-Robbie Sucholeiki [rsucholeiki\@uchicago.edu](mailto:rsucholeiki@uchicago.edu){.email}
-
-Jared Montney [jaredmontney\@uchicago.edu](mailto:jaredmontney@uchicago.edu){.email}
+Esther Goldberg [estherg\@uchicago.edu](mailto:estherg@uchicago.edu)
 
 ## Course logistics
 
 -   Course meetings: Tue/Thu 9:30 - 10:50 am; BSLC 008
--   Lab sections: Fri 1:30-3:30 pm; BSLC 018
+-   Lab sections: Wed 3:30-5:30; Fri 1:30-3:30 pm BSLC 018
 -   Office hours: Wed 9:30 - 11 am; Fri 9:30 - 11 am; BSLC 301A
 
 ## Course Description
@@ -30,20 +28,26 @@ Machine learning techniques are essential in many fields of biology that rely on
 
 ## Reading resources
 
--   [Textbook: Introduction to Statistical Learning by James, Witten, Tibshirani, and Hastie](https://www.statlearning.com/)
+-   Main textbook: [Introduction to Statistical Learning](https://www.statlearning.com/) by James, Witten, Tibshirani, and Hastie
 
--   [R for Data Science, 2e](https://r4ds.hadley.nz/) by Wickham, Çetinkaya-Rundel, and Grolemund.
+-   More advanced text: [Understanding Machine Learning](https://www.cs.huji.ac.il/w~shais/UnderstandingMachineLearning/) by Shalev-Shwartz and Shai Ben-David
 
--   [Introduction to Modern Statistics](https://openintro-ims.netlify.app/) Çetinkaya-Rundel and Hardin.
+-   [R for Data Science, 2e](https://r4ds.hadley.nz/) by Wickham, Çetinkaya-Rundel, and Grolemund
+
+-   [Introduction to Modern Statistics](https://openintro-ims.netlify.app/) Çetinkaya-Rundel and Hardin
+
+-   
 
 ## Learning goals
 
 In this course, you will...
 
--   Understand concepts for applying machine learning methods, such as cross-validation and bias-variance tradeoff
+-   Understand concepts for applying machine learning methods, such as bias-variance tradeoff
 -   Know when to use regression and when to use classification for supervised learning
--   Wrestle with unsupervised learning and dimensionality reduction
--   Use resampling and bootstrapping for validation and multiple hypothesis testing
+-   Use resampling and the bootstrap for estimation and empirical hypothesis testing
+-   Perform hyperparameter tuning using tidymodels functions
+-   Wrestle with dimensionality reduction
+-   Utilize p-value adjustments for minimizing the False Discovery Rate
 -   Apply these methods to a variety of biological data sets
 -   Critically evaluate methods section of a paper that uses these methods
 
@@ -60,24 +64,25 @@ You are welcome to email the instructors with personal requests, but please ask 
 ## Weekly Schedule
 
 | Week   | Day      | Topic                                                                | Date      |
-|--------|----------|----------------------------------------------------------------------|-----------|
-| Week 1 | Thursday | Learning from data                                                   | 4-Jan-24  |
-| Week 2 | Tuesday  | Bias-variance tradeoff (chapter 2 ISLR)                              | 9-Jan-24  |
-| Week 2 | Thursday | K nearest neighbors (chapter 2 ISLR)                                 | 11-Jan-24 |
-| Week 3 | Tuesday  | Linear regression (chapter 3 of ISLR)                                | 16-Jan-24 |
-| Week 3 | Thursday | Linear regression (chapter 3 of ISLR)                                | 18-Jan-24 |
-| Week 4 | Tuesday  | Classification: Naïve Bayes (chapter 4 of ISLR)                      | 23-Jan-24 |
-| Week 4 | Thursday | Classification: logistic regression (chapter 4 of ISLR)              | 25-Jan-24 |
-| Week 5 | Tuesday  | Cross-validation (chapter 5 of ISLR)                                 | 30-Jan-24 |
-| Week 5 | Thursday | Bootstrapping (chapter 5 of ISLR)                                    | 1-Feb-24  |
-| Week 6 | Tuesday  | Linear model selection (chapter 6 of ISLR)                           | 6-Feb-24  |
-| Week 6 | Thursday | Regularization and regression in high dimensions (chapter 6 of ISLR) | 8-Feb-24  |
-| Week 7 | Tuesday  | Decision trees (chapter 8 of ISLR)                                   | 13-Feb-24 |
-| Week 7 | Thursday | Random forests (chapter 8 of ISLR)                                   | 15-Feb-24 |
-| Week 8 | Tuesday  | PCA and dimensionality reduction (chapter 12 of ISLR)                | 20-Feb-24 |
-| Week 8 | Thursday | Clustering methods (chapter 12 of ISLR)                              | 22-Feb-24 |
-| Week 9 | Tuesday  | Multiple hypothesis testing (chapter 13 of ISLR)                     | 27-Feb-24 |
-| Week 9 | Thursday | False discovery rate and resampling (chapter 13 of ISLR)             | 29-Feb-24 |
+|-------------|-----------------|---------------------------------------------------|--------------------------|
+| Week 1 | Tuesday  | Learning and the bias-variance tradeoff (chapter 2 ISLR)             | 7-Jan-25  |
+| Week 1 | Thursday | K nearest neighbors (chapter 2 ISLR)                                 | 9-Jan-25  |
+| Week 2 | Tuesday  | Linear regression (chapter 3 of ISLR)                                | 14-Jan-25 |
+| Week 2 | Thursday | Linear regression (chapter 3 of ISLR)                                | 16-Jan-25 |
+| Week 3 | Tuesday  | Classification: Naïve Bayes (chapter 4 of ISLR)                      | 21-Jan-25 |
+| Week 3 | Thursday | Classification: logistic regression (chapter 4 of ISLR)              | 23-Jan-25 |
+| Week 4 | Tuesday  | Cross-validation (chapter 5 of ISLR)                                 | 28-Jan-25 |
+| Week 4 | Thursday | Bootstrap (chapter 5 of ISLR)                                        | 30-Jan-25 |
+| Week 5 | Tuesday  | Linear model selection (chapter 6 of ISLR)                           | 4-Feb-25  |
+| Week 5 | Thursday | Regularization and regression in high dimensions (chapter 6 of ISLR) | 6-Feb-25  |
+| Week 6 | Tuesday  | Decision trees (chapter 8 of ISLR)                                   | 11-Feb-25 |
+| Week 6 | Thursday | Random forests (chapter 8 of ISLR)                                   | 13-Feb-25 |
+| Week 7 | Tuesday  | Multiple hypothesis testing (chapter 13 of ISLR)                     | 18-Feb-25 |
+| Week 7 | Thursday | False discovery rate and resampling (chapter 13 of ISLR)             | 20-Feb-25 |
+| Week 8 | Tuesday  | PCA and dimensionality reduction (chapter 12 of ISLR)                | 25-Feb-25 |
+| Week 8 | Thursday | Clustering methods (chapter 12 of ISLR)                              | 27-Feb-25 |
+| Week 9 | Tuesday  | TBA                                                                  | 4-Mar-25  |
+| Week 9 | Thursday | TBA                                                                  | 6-Mar-25  |
 
 ## Assessments
 
@@ -88,8 +93,8 @@ The final course grade will be calculated as follows:
 | R labs               | 8 assignments         | 40 %                   |
 | Weekly quizzes       | take on Canvas        | 20 %                   |
 | Project proposal     | short proposal        | 5 %                    |
-| Project presentation | in-class presentation | 20 %                   |
-| Final report         | submit on Canvas      | 10 %                   |
+| Project presentation | in-class presentation | 15 %                   |
+| Final report         | submit on Canvas      | 15 %                   |
 | Surveys              | complete on Canvas    | 5 %                    |
 
 ## Course policies
@@ -110,7 +115,7 @@ Please abide by the following guidelines as you work on assignments in this cour
 
 -   You are welcome to work together with others, but what you turn in must have been typed or written by you, and not copied from another. Evidence that a student has copied another one's work will result in a grade of 0 for the assignment, and may trigger disciplinary action.
 
--   Reusing code: You may make use of online resources (e.g. StackOverflow, ChatGPT, or other LLMs) for coding examples on assignments. If you directly use code from an outside source, you must explicitly cite where you obtained the code.
+-   Reusing code: You may make use of online resources (e.g. StackOverflow, ChatGPT, or other LLMs) for coding examples on assignments, with two caveats: first, if you directly use code from an outside source, you must explicitly cite where you obtained the code
 
 ### late work & extensions
 

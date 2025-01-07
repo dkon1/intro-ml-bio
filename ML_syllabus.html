@@ -2567,20 +2567,19 @@ vertical-align: -.125em;
 
 </header>
 
-<section id="instructors" class="level2">
-<h2 class="anchored" data-anchor-id="instructors">Instructors:</h2>
+<section id="instructor" class="level2">
+<h2 class="anchored" data-anchor-id="instructor">Instructor:</h2>
 <p>Dmitry Kondrashov <a href="mailto:dkon@uchicago.edu" class="email">dkon@uchicago.edu</a></p>
-<section id="tas" class="level3">
-<h3 class="anchored" data-anchor-id="tas">TAs:</h3>
-<p>Robbie Sucholeiki <a href="mailto:rsucholeiki@uchicago.edu" class="email">rsucholeiki@uchicago.edu</a></p>
-<p>Jared Montney <a href="mailto:jaredmontney@uchicago.edu" class="email">jaredmontney@uchicago.edu</a></p>
+<section id="ta" class="level3">
+<h3 class="anchored" data-anchor-id="ta">TA:</h3>
+<p>Esther Goldberg <a href="mailto:estherg@uchicago.edu">estherg@uchicago.edu</a></p>
 </section>
 </section>
 <section id="course-logistics" class="level2">
 <h2 class="anchored" data-anchor-id="course-logistics">Course logistics</h2>
 <ul>
 <li>Course meetings: Tue/Thu 9:30 - 10:50 am; BSLC 008</li>
-<li>Lab sections: Fri 1:30-3:30 pm; BSLC 018</li>
+<li>Lab sections: Wed 3:30-5:30; Fri 1:30-3:30 pm BSLC 018</li>
 <li>Office hours: Wed 9:30 - 11 am; Fri 9:30 - 11 am; BSLC 301A</li>
 </ul>
 </section>
@@ -2591,19 +2590,23 @@ vertical-align: -.125em;
 <section id="reading-resources" class="level2">
 <h2 class="anchored" data-anchor-id="reading-resources">Reading resources</h2>
 <ul>
-<li><p><a href="https://www.statlearning.com/">Textbook: Introduction to Statistical Learning by James, Witten, Tibshirani, and Hastie</a></p></li>
-<li><p><a href="https://r4ds.hadley.nz/">R for Data Science, 2e</a> by Wickham, Çetinkaya-Rundel, and Grolemund.</p></li>
-<li><p><a href="https://openintro-ims.netlify.app/">Introduction to Modern Statistics</a> Çetinkaya-Rundel and Hardin.</p></li>
+<li><p>Main textbook: <a href="https://www.statlearning.com/">Introduction to Statistical Learning</a> by James, Witten, Tibshirani, and Hastie</p></li>
+<li><p>More advanced text: <a href="https://www.cs.huji.ac.il/w~shais/UnderstandingMachineLearning/">Understanding Machine Learning</a> by Shalev-Shwartz and Shai Ben-David</p></li>
+<li><p><a href="https://r4ds.hadley.nz/">R for Data Science, 2e</a> by Wickham, Çetinkaya-Rundel, and Grolemund</p></li>
+<li><p><a href="https://openintro-ims.netlify.app/">Introduction to Modern Statistics</a> Çetinkaya-Rundel and Hardin</p></li>
+<li></li>
 </ul>
 </section>
 <section id="learning-goals" class="level2">
 <h2 class="anchored" data-anchor-id="learning-goals">Learning goals</h2>
 <p>In this course, you will…</p>
 <ul>
-<li>Understand concepts for applying machine learning methods, such as cross-validation and bias-variance tradeoff</li>
+<li>Understand concepts for applying machine learning methods, such as bias-variance tradeoff</li>
 <li>Know when to use regression and when to use classification for supervised learning</li>
-<li>Wrestle with unsupervised learning and dimensionality reduction</li>
-<li>Use resampling and bootstrapping for validation and multiple hypothesis testing</li>
+<li>Use resampling and the bootstrap for estimation and empirical hypothesis testing</li>
+<li>Perform hyperparameter tuning using tidymodels functions</li>
+<li>Wrestle with dimensionality reduction</li>
+<li>Utilize p-value adjustments for minimizing the False Discovery Rate</li>
 <li>Apply these methods to a variety of biological data sets</li>
 <li>Critically evaluate methods section of a paper that uses these methods</li>
 </ul>
@@ -2619,10 +2622,10 @@ vertical-align: -.125em;
 <h2 class="anchored" data-anchor-id="weekly-schedule">Weekly Schedule</h2>
 <table class="table">
 <colgroup>
-<col style="width: 18%">
-<col style="width: 18%">
-<col style="width: 45%">
-<col style="width: 18%">
+<col style="width: 12%">
+<col style="width: 15%">
+<col style="width: 47%">
+<col style="width: 24%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -2635,105 +2638,111 @@ vertical-align: -.125em;
 <tbody>
 <tr class="odd">
 <td>Week 1</td>
-<td>Thursday</td>
-<td>Learning from data</td>
-<td>4-Jan-24</td>
+<td>Tuesday</td>
+<td>Learning and the bias-variance tradeoff (chapter 2 ISLR)</td>
+<td>7-Jan-25</td>
 </tr>
 <tr class="even">
-<td>Week 2</td>
-<td>Tuesday</td>
-<td>Bias-variance tradeoff (chapter 2 ISLR)</td>
-<td>9-Jan-24</td>
-</tr>
-<tr class="odd">
-<td>Week 2</td>
+<td>Week 1</td>
 <td>Thursday</td>
 <td>K nearest neighbors (chapter 2 ISLR)</td>
-<td>11-Jan-24</td>
+<td>9-Jan-25</td>
 </tr>
-<tr class="even">
-<td>Week 3</td>
+<tr class="odd">
+<td>Week 2</td>
 <td>Tuesday</td>
 <td>Linear regression (chapter 3 of ISLR)</td>
-<td>16-Jan-24</td>
+<td>14-Jan-25</td>
+</tr>
+<tr class="even">
+<td>Week 2</td>
+<td>Thursday</td>
+<td>Linear regression (chapter 3 of ISLR)</td>
+<td>16-Jan-25</td>
 </tr>
 <tr class="odd">
 <td>Week 3</td>
-<td>Thursday</td>
-<td>Linear regression (chapter 3 of ISLR)</td>
-<td>18-Jan-24</td>
-</tr>
-<tr class="even">
-<td>Week 4</td>
 <td>Tuesday</td>
 <td>Classification: Naïve Bayes (chapter 4 of ISLR)</td>
-<td>23-Jan-24</td>
+<td>21-Jan-25</td>
+</tr>
+<tr class="even">
+<td>Week 3</td>
+<td>Thursday</td>
+<td>Classification: logistic regression (chapter 4 of ISLR)</td>
+<td>23-Jan-25</td>
 </tr>
 <tr class="odd">
 <td>Week 4</td>
-<td>Thursday</td>
-<td>Classification: logistic regression (chapter 4 of ISLR)</td>
-<td>25-Jan-24</td>
-</tr>
-<tr class="even">
-<td>Week 5</td>
 <td>Tuesday</td>
 <td>Cross-validation (chapter 5 of ISLR)</td>
-<td>30-Jan-24</td>
+<td>28-Jan-25</td>
+</tr>
+<tr class="even">
+<td>Week 4</td>
+<td>Thursday</td>
+<td>Bootstrap (chapter 5 of ISLR)</td>
+<td>30-Jan-25</td>
 </tr>
 <tr class="odd">
 <td>Week 5</td>
-<td>Thursday</td>
-<td>Bootstrapping (chapter 5 of ISLR)</td>
-<td>1-Feb-24</td>
-</tr>
-<tr class="even">
-<td>Week 6</td>
 <td>Tuesday</td>
 <td>Linear model selection (chapter 6 of ISLR)</td>
-<td>6-Feb-24</td>
+<td>4-Feb-25</td>
+</tr>
+<tr class="even">
+<td>Week 5</td>
+<td>Thursday</td>
+<td>Regularization and regression in high dimensions (chapter 6 of ISLR)</td>
+<td>6-Feb-25</td>
 </tr>
 <tr class="odd">
 <td>Week 6</td>
-<td>Thursday</td>
-<td>Regularization and regression in high dimensions (chapter 6 of ISLR)</td>
-<td>8-Feb-24</td>
-</tr>
-<tr class="even">
-<td>Week 7</td>
 <td>Tuesday</td>
 <td>Decision trees (chapter 8 of ISLR)</td>
-<td>13-Feb-24</td>
+<td>11-Feb-25</td>
+</tr>
+<tr class="even">
+<td>Week 6</td>
+<td>Thursday</td>
+<td>Random forests (chapter 8 of ISLR)</td>
+<td>13-Feb-25</td>
 </tr>
 <tr class="odd">
 <td>Week 7</td>
-<td>Thursday</td>
-<td>Random forests (chapter 8 of ISLR)</td>
-<td>15-Feb-24</td>
+<td>Tuesday</td>
+<td>Multiple hypothesis testing (chapter 13 of ISLR)</td>
+<td>18-Feb-25</td>
 </tr>
 <tr class="even">
+<td>Week 7</td>
+<td>Thursday</td>
+<td>False discovery rate and resampling (chapter 13 of ISLR)</td>
+<td>20-Feb-25</td>
+</tr>
+<tr class="odd">
 <td>Week 8</td>
 <td>Tuesday</td>
 <td>PCA and dimensionality reduction (chapter 12 of ISLR)</td>
-<td>20-Feb-24</td>
+<td>25-Feb-25</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Week 8</td>
 <td>Thursday</td>
 <td>Clustering methods (chapter 12 of ISLR)</td>
-<td>22-Feb-24</td>
-</tr>
-<tr class="even">
-<td>Week 9</td>
-<td>Tuesday</td>
-<td>Multiple hypothesis testing (chapter 13 of ISLR)</td>
-<td>27-Feb-24</td>
+<td>27-Feb-25</td>
 </tr>
 <tr class="odd">
 <td>Week 9</td>
+<td>Tuesday</td>
+<td>TBA</td>
+<td>4-Mar-25</td>
+</tr>
+<tr class="even">
+<td>Week 9</td>
 <td>Thursday</td>
-<td>False discovery rate and resampling (chapter 13 of ISLR)</td>
-<td>29-Feb-24</td>
+<td>TBA</td>
+<td>6-Mar-25</td>
 </tr>
 </tbody>
 </table>
