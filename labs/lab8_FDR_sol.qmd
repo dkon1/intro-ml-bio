@@ -43,9 +43,9 @@ gen_ind_test <- function(probA, probB, samp_size) {
 ```{r}
 probA <- 0.2
 probB <- 0.2
-samp_size <- 500
+samp_size <- 200
 pvals <- replicate(1000, gen_ind_test(probA, probB, samp_size))
-plot(-log(pvals), type = 'h')
+#plot(-log(pvals), type = 'h')
 alpha <- 0.01
 print("Fraction of rejections at alpha = 0.01:")
 print(sum(pvals < alpha)/1000)
@@ -53,7 +53,7 @@ print("The False Positive Rate is:")
 print((sum(pvals < alpha))/1000)
 ```
 
-2.  Calculate the FWER (family-wise error rate) for a simulation of 10 repeated hypothesis tests with equal probabilities of disease and sample size 200 (as in question 1) by using a for loop or making a function and then using replicate to repeat the simulation 100 times, and report the fraction of times that *at least one of the hypotheses was rejected at significance level 0.01*. Repeat the calculation for 50, 100, and 500 hypothesis tests and report the FWER as a function the number of hypotheses tested.
+2.  Calculate the FWER (family-wise error rate) for a simulation of 10 repeated hypothesis tests with equal probabilities of disease and sample size 200 (as in question 1) by using a for loop or making a function and then using replicate to repeat the simulation 100 times, and report the fraction of times that *at least one of the hypotheses was rejected at significance level 1*. Repeat the calculation for 50, 100, and 500 hypothesis tests and report the FWER as a function the number of hypotheses tested.
 
 ```{r}
 probA <- 0.2
@@ -271,7 +271,7 @@ c)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using th
 d)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Benjamini-Hochberg adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
 
 ```{r}
-alpha <- 0.1
+alpha <- 0.01
 
 print("Fraction of rejections of true null without adjustment at alpha = 0.01:")
 print(sum(pvals_true < alpha)/num_true)
@@ -327,6 +327,9 @@ print(FP/(TP+FP))
 
 7.  Let us simulate a scenario where some fraction of the hypotheses are true (equal probabilities of disease) and some are false (different probabilities). Let us call the fraction of true hypotheses our prior. Set the prior probability to be 99%, and simulate 1000 hypotheses: 99% true and 1% false, with a small effect (probabilities of 0.1 and 0.2).
 
+```{=html}
+<!-- -->
+```
 a)  Report the fraction of rejected null hypotheses using alpha = 0.01 *without any p-value adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
 
 b)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Bonferroni adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
@@ -350,7 +353,7 @@ num_false <- ceiling((1-prior)*1000) # if I don't use celing it has a weird roun
 pvals_false <- replicate(num_false, gen_ind_test(probA, probB, samp_size))
 
 
-alpha <- 0.1
+alpha <- 0.01
 print("Fraction of rejections of true null without adjustment at alpha = 0.01:")
 print(sum(pvals_true < alpha)/num_true)
 FP <- sum(pvals_true < alpha)

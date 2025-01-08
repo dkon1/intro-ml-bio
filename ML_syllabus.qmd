@@ -1,6 +1,6 @@
 ---
 title: "Introduction to Machine Learning for Biology (BIOS 26122)"
-subtitle: "winter 2024"
+subtitle: "winter 2025"
 author: "Dmitry Kondrashov"
 format: 
   html:
@@ -12,7 +12,7 @@ editor: visual
 
 Dmitry Kondrashov [dkon\@uchicago.edu](mailto:dkon@uchicago.edu){.email}
 
-### TA: 
+### TA:
 
 Esther Goldberg [estherg\@uchicago.edu](mailto:estherg@uchicago.edu)
 
@@ -34,9 +34,7 @@ Machine learning techniques are essential in many fields of biology that rely on
 
 -   [R for Data Science, 2e](https://r4ds.hadley.nz/) by Wickham, Çetinkaya-Rundel, and Grolemund
 
--   [Introduction to Modern Statistics](https://openintro-ims.netlify.app/) Çetinkaya-Rundel and Hardin
-
--   
+-   [Introduction to Modern Statistics](https://openintro-ims.netlify.app/) by Çetinkaya-Rundel and Hardin
 
 ## Learning goals
 
@@ -63,39 +61,40 @@ You are welcome to email the instructors with personal requests, but please ask 
 
 ## Weekly Schedule
 
-| Week   | Day      | Topic                                                                | Date      |
-|-------------|-----------------|---------------------------------------------------|--------------------------|
-| Week 1 | Tuesday  | Learning and the bias-variance tradeoff (chapter 2 ISLR)             | 7-Jan-25  |
-| Week 1 | Thursday | K nearest neighbors (chapter 2 ISLR)                                 | 9-Jan-25  |
-| Week 2 | Tuesday  | Linear regression (chapter 3 of ISLR)                                | 14-Jan-25 |
-| Week 2 | Thursday | Linear regression (chapter 3 of ISLR)                                | 16-Jan-25 |
-| Week 3 | Tuesday  | Classification: Naïve Bayes (chapter 4 of ISLR)                      | 21-Jan-25 |
-| Week 3 | Thursday | Classification: logistic regression (chapter 4 of ISLR)              | 23-Jan-25 |
-| Week 4 | Tuesday  | Cross-validation (chapter 5 of ISLR)                                 | 28-Jan-25 |
-| Week 4 | Thursday | Bootstrap (chapter 5 of ISLR)                                        | 30-Jan-25 |
-| Week 5 | Tuesday  | Linear model selection (chapter 6 of ISLR)                           | 4-Feb-25  |
-| Week 5 | Thursday | Regularization and regression in high dimensions (chapter 6 of ISLR) | 6-Feb-25  |
-| Week 6 | Tuesday  | Decision trees (chapter 8 of ISLR)                                   | 11-Feb-25 |
-| Week 6 | Thursday | Random forests (chapter 8 of ISLR)                                   | 13-Feb-25 |
-| Week 7 | Tuesday  | Multiple hypothesis testing (chapter 13 of ISLR)                     | 18-Feb-25 |
-| Week 7 | Thursday | False discovery rate and resampling (chapter 13 of ISLR)             | 20-Feb-25 |
-| Week 8 | Tuesday  | PCA and dimensionality reduction (chapter 12 of ISLR)                | 25-Feb-25 |
-| Week 8 | Thursday | Clustering methods (chapter 12 of ISLR)                              | 27-Feb-25 |
-| Week 9 | Tuesday  | TBA                                                                  | 4-Mar-25  |
-| Week 9 | Thursday | TBA                                                                  | 6-Mar-25  |
+| Week | Day | Topic | Date |
+|----|----|----|----|
+| Week 1 | Tuesday | Learning and the bias-variance tradeoff (chapter 2 ISLR) | 7-Jan-25 |
+| Week 1 | Thursday | K nearest neighbors (chapter 2 ISLR) | 9-Jan-25 |
+| Week 2 | Tuesday | Linear regression (chapter 3 of ISLR) | 14-Jan-25 |
+| Week 2 | Thursday | Linear regression (chapter 3 of ISLR) | 16-Jan-25 |
+| Week 3 | Tuesday | Classification: Naïve Bayes (chapter 4 of ISLR) | 21-Jan-25 |
+| Week 3 | Thursday | Classification: logistic regression (chapter 4 of ISLR) | 23-Jan-25 |
+| Week 4 | Tuesday | Cross-validation (chapter 5 of ISLR) | 28-Jan-25 |
+| Week 4 | Thursday | Bootstrap (chapter 5 of ISLR) | 30-Jan-25 |
+| Week 5 | Tuesday | Linear model selection (chapter 6 of ISLR) | 4-Feb-25 |
+| Week 5 | Thursday | Regularization and regression in high dimensions (chapter 6 of ISLR) | 6-Feb-25 |
+| Week 6 | Tuesday | Decision trees (chapter 8 of ISLR) | 11-Feb-25 |
+| Week 6 | Thursday | Random forests (chapter 8 of ISLR) | 13-Feb-25 |
+| Week 7 | Tuesday | Multiple hypothesis testing (chapter 13 of ISLR) | 18-Feb-25 |
+| Week 7 | Thursday | False discovery rate and resampling (chapter 13 of ISLR) | 20-Feb-25 |
+| Week 8 | Tuesday | PCA and dimensionality reduction (chapter 12 of ISLR) | 25-Feb-25 |
+| Week 8 | Thursday | Clustering methods (chapter 12 of ISLR) | 27-Feb-25 |
+| Week 9 | Tuesday | TBA | 4-Mar-25 |
+| Week 9 | Thursday | TBA | 6-Mar-25 |
 
 ## Assessments
 
 The final course grade will be calculated as follows:
 
-| Category             | Work                  | Final grade percentage |
-|----------------------|-----------------------|------------------------|
-| R labs               | 8 assignments         | 40 %                   |
-| Weekly quizzes       | take on Canvas        | 20 %                   |
-| Project proposal     | short proposal        | 5 %                    |
-| Project presentation | in-class presentation | 15 %                   |
-| Final report         | submit on Canvas      | 15 %                   |
-| Surveys              | complete on Canvas    | 5 %                    |
+| Category               | Work                  | Final grade percentage |
+|------------------------|-----------------------|------------------------|
+| R labs                 | 8 assignments         | 40 %                   |
+| Weekly quizzes         | take on Canvas        | 20 %                   |
+| Project proposal       | short proposal        | 5 %                    |
+| Feedback/collaboration | final project         | 5%                     |
+| Project presentation   | in-class presentation | 10 %                   |
+| Final report           | submit on Canvas      | 15 %                   |
+| Surveys                | complete on Canvas    | 5 %                    |
 
 ## Course policies
 
@@ -115,7 +114,7 @@ Please abide by the following guidelines as you work on assignments in this cour
 
 -   You are welcome to work together with others, but what you turn in must have been typed or written by you, and not copied from another. Evidence that a student has copied another one's work will result in a grade of 0 for the assignment, and may trigger disciplinary action.
 
--   Reusing code: You may make use of online resources (e.g. StackOverflow, ChatGPT, or other LLMs) for coding examples on assignments, with two caveats: first, if you directly use code from an outside source, you must explicitly cite where you obtained the code
+-   Reusing code: You may make use of online resources (e.g. StackOverflow, ChatGPT, or other LLMs) for coding examples on assignments, with two caveats: first, you must explicitly cite where you obtained the code you use; second, you must understand what each line does before submitting it.
 
 ### late work & extensions
 

@@ -8,7 +8,7 @@
 
 <meta name="author" content="Dmitry Kondrashov">
 
-<title>Introduction to Machine Learning for Biology (BIOS 26122)</title>
+<title>Introduction to data (lab 1 for BIOS 26122)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +19,40 @@ ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
 width: 0.8em;
 margin: 0 0.8em 0.2em -1em;  vertical-align: middle;
+}
+
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+}
+pre.numberSource { margin-left: 3em; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -3042,8 +3076,7 @@ vertical-align: -.125em;
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Introduction to Machine Learning for Biology (BIOS 26122)</h1>
-<p class="subtitle lead">winter 2025</p>
+<h1 class="title">Introduction to data (lab 1 for BIOS 26122)</h1>
 </div>
 
 
@@ -3066,261 +3099,105 @@ vertical-align: -.125em;
 </header>
 
 
-<section id="instructor" class="level2">
-<h2 class="anchored" data-anchor-id="instructor">Instructor:</h2>
-<p>Dmitry Kondrashov <a href="mailto:dkon@uchicago.edu" class="email">dkon@uchicago.edu</a></p>
-<section id="ta" class="level3">
-<h3 class="anchored" data-anchor-id="ta">TA:</h3>
-<p>Esther Goldberg <a href="mailto:estherg@uchicago.edu">estherg@uchicago.edu</a></p>
+<section id="description" class="level2">
+<h2 class="anchored" data-anchor-id="description">Description</h2>
+<p>The goal of this assignment is to introduce basic data description and visualization using base R and tidyverse packages. Specifically, you should be able to:</p>
+<ol type="1">
+<li>Read in a data set as a data frame (or tibble) and report the number and types of variables, as well as the number of observations.</li>
+<li>Visualize a variable using a method appropriate for its type; observe the general shape of the distribution.</li>
+<li>Report descriptive statistics (e.g. counts, means, standard deviations) for numeric variables and generate cross tables for categorical variables.</li>
+<li>Perform an assessment of missing values and outliers and do basic data cleaning.</li>
+</ol>
+<p>These are the first steps that one needs to do to begin working with a data set. Below you will see several real data sets to practice on.</p>
 </section>
+<section id="heart-rates" class="level2">
+<h2 class="anchored" data-anchor-id="heart-rates">Heart rates</h2>
+<p>The following data set contains heart rates measured and reported by students in my class Introduction to Quantitative Modeling for Biology. There are four different heart rates measured (two at rest and two after exercise) and the year it was measured.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>heart_rates <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/HR_data_combined.csv&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 1068 Columns: 5
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+dbl (5): Rest1, Ex1, Rest2, Ex2, Year
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+</div>
+<ol type="1">
+<li><p>Examine the data frame (tibble) and report the number and types of variables and the number of observations</p></li>
+<li><p>Make a histogram of one of the numeric variables of your choice; describe its shape (e.g. normal, uniform, bimodal) and comment on any interesting features.</p></li>
+</ol>
+<ol start="3" type="1">
+<li>Compute the counts, means, and standard deviations of one of the numeric variables of your choice, separated by <code>Year</code> category.</li>
+</ol>
+<ol start="4" type="1">
+<li>Visualize one of the numeric variables as a box plot or violin plot, separated by different years.</li>
+</ol>
+<ol start="5" type="1">
+<li>Report if there are any missing values and if any points may be considered outliers.</li>
+</ol>
+<section id="viral-mutation-rates" class="level3">
+<h3 class="anchored" data-anchor-id="viral-mutation-rates">Viral mutation rates</h3>
+<p>The following data set comes from <a href="https://github.com/lauringlab/JVI_Gem_2018" class="uri">https://github.com/lauringlab/JVI_Gem_2018</a> and contains measurements of different viral species. The three numeric variables are evolutionary rate K, mutation rate mu, and genome size G. The categorical variables are fairly self-explanatory.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>viral_mut_rates <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/lauringlab/JVI_Gem_2018/master/Figure_1_mu_and_K_data.csv&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 111 Columns: 11
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+chr (7): group, family, virus, K reference (Sanjuan 2012), Full K reference,...
+dbl (3): G, K, mu
+lgl (1): Included in 2018 publication
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+</div>
+<ol type="1">
+<li><p>Examine the data frame (tibble) and report the number and types of variables and the number of observations</p></li>
+<li><p>Make a histogram of one of the numeric variables of your choice; describe its shape (e.g. normal, uniform, bimodal) and comment on any interesting features.</p></li>
+</ol>
+<ol start="3" type="1">
+<li>Compute the counts, means, and standard deviations of one of the numeric variables of your choice, separated by <code>group</code> category.</li>
+</ol>
+<ol start="4" type="1">
+<li>Visualize one of the numeric variables as a box plot or violin plot, separated by group.</li>
+</ol>
+<ol start="5" type="1">
+<li>Report if there are any missing values and if any points may be considered outliers.</li>
+</ol>
 </section>
-<section id="course-logistics" class="level2">
-<h2 class="anchored" data-anchor-id="course-logistics">Course logistics</h2>
-<ul>
-<li>Course meetings: Tue/Thu 9:30 - 10:50 am; BSLC 008</li>
-<li>Lab sections: Wed 3:30-5:30; Fri 1:30-3:30 pm BSLC 018</li>
-<li>Office hours: Wed 9:30 - 11 am; Fri 9:30 - 11 am; BSLC 301A</li>
-</ul>
-</section>
-<section id="course-description" class="level2">
-<h2 class="anchored" data-anchor-id="course-description">Course Description</h2>
-<p>Machine learning techniques are essential in many fields of biology that rely on large amounts of data. This course is intended to introduce key concepts in this field and illustrate their applications to biological questions. Students will learn about methods for supervised and unsupervised learning; regression and classification algorithms, and dimensionality reduction approaches. With every method we will emphasize model selection and validation on real data sets. Computational labs are an integral part of the course for students to work on applying these methods using R in the Quarto document system.</p>
-</section>
-<section id="reading-resources" class="level2">
-<h2 class="anchored" data-anchor-id="reading-resources">Reading resources</h2>
-<ul>
-<li><p>Main textbook: <a href="https://www.statlearning.com/">Introduction to Statistical Learning</a> by James, Witten, Tibshirani, and Hastie</p></li>
-<li><p>More advanced text: <a href="https://www.cs.huji.ac.il/w~shais/UnderstandingMachineLearning/">Understanding Machine Learning</a> by Shalev-Shwartz and Shai Ben-David</p></li>
-<li><p><a href="https://r4ds.hadley.nz/">R for Data Science, 2e</a> by Wickham, Çetinkaya-Rundel, and Grolemund</p></li>
-<li><p><a href="https://openintro-ims.netlify.app/">Introduction to Modern Statistics</a> by Çetinkaya-Rundel and Hardin</p></li>
-</ul>
-</section>
-<section id="learning-goals" class="level2">
-<h2 class="anchored" data-anchor-id="learning-goals">Learning goals</h2>
-<p>In this course, you will…</p>
-<ul>
-<li>Understand concepts for applying machine learning methods, such as bias-variance tradeoff</li>
-<li>Know when to use regression and when to use classification for supervised learning</li>
-<li>Use resampling and the bootstrap for estimation and empirical hypothesis testing</li>
-<li>Perform hyperparameter tuning using tidymodels functions</li>
-<li>Wrestle with dimensionality reduction</li>
-<li>Utilize p-value adjustments for minimizing the False Discovery Rate</li>
-<li>Apply these methods to a variety of biological data sets</li>
-<li>Critically evaluate methods section of a paper that uses these methods</li>
-</ul>
-</section>
-<section id="how-to-get-help" class="level2">
-<h2 class="anchored" data-anchor-id="how-to-get-help">How to get help</h2>
-<p>Students are expected and encouraged to use the in-person interactions in the classroom to ask questions and discuss the information introduced in the course. Please attend and participate in the in-class coding activities to get immediate help!</p>
-<p>The instructor will hold office hours as indicated above; please use them to ask questions about the course, for planning the final project, or for general communication.</p>
-<p>We will use the Ed Discussion platform as the primary means of answering questions outside of the classroom. It is available on the left-hand side menu of the Canvas course. You can post questions, either using your name or anonymously, and they may be answered by other students or myself in a time frame of no more than a few hours.</p>
-<p>You are welcome to email the instructors with personal requests, but please ask any course material questions through Ed Discussion so others may benefit.</p>
-</section>
-<section id="weekly-schedule" class="level2">
-<h2 class="anchored" data-anchor-id="weekly-schedule">Weekly Schedule</h2>
-<table class="table">
-<colgroup>
-<col style="width: 19%">
-<col style="width: 19%">
-<col style="width: 41%">
-<col style="width: 19%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Week</th>
-<th>Day</th>
-<th>Topic</th>
-<th>Date</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Week 1</td>
-<td>Tuesday</td>
-<td>Learning and the bias-variance tradeoff (chapter 2 ISLR)</td>
-<td>7-Jan-25</td>
-</tr>
-<tr class="even">
-<td>Week 1</td>
-<td>Thursday</td>
-<td>K nearest neighbors (chapter 2 ISLR)</td>
-<td>9-Jan-25</td>
-</tr>
-<tr class="odd">
-<td>Week 2</td>
-<td>Tuesday</td>
-<td>Linear regression (chapter 3 of ISLR)</td>
-<td>14-Jan-25</td>
-</tr>
-<tr class="even">
-<td>Week 2</td>
-<td>Thursday</td>
-<td>Linear regression (chapter 3 of ISLR)</td>
-<td>16-Jan-25</td>
-</tr>
-<tr class="odd">
-<td>Week 3</td>
-<td>Tuesday</td>
-<td>Classification: Naïve Bayes (chapter 4 of ISLR)</td>
-<td>21-Jan-25</td>
-</tr>
-<tr class="even">
-<td>Week 3</td>
-<td>Thursday</td>
-<td>Classification: logistic regression (chapter 4 of ISLR)</td>
-<td>23-Jan-25</td>
-</tr>
-<tr class="odd">
-<td>Week 4</td>
-<td>Tuesday</td>
-<td>Cross-validation (chapter 5 of ISLR)</td>
-<td>28-Jan-25</td>
-</tr>
-<tr class="even">
-<td>Week 4</td>
-<td>Thursday</td>
-<td>Bootstrap (chapter 5 of ISLR)</td>
-<td>30-Jan-25</td>
-</tr>
-<tr class="odd">
-<td>Week 5</td>
-<td>Tuesday</td>
-<td>Linear model selection (chapter 6 of ISLR)</td>
-<td>4-Feb-25</td>
-</tr>
-<tr class="even">
-<td>Week 5</td>
-<td>Thursday</td>
-<td>Regularization and regression in high dimensions (chapter 6 of ISLR)</td>
-<td>6-Feb-25</td>
-</tr>
-<tr class="odd">
-<td>Week 6</td>
-<td>Tuesday</td>
-<td>Decision trees (chapter 8 of ISLR)</td>
-<td>11-Feb-25</td>
-</tr>
-<tr class="even">
-<td>Week 6</td>
-<td>Thursday</td>
-<td>Random forests (chapter 8 of ISLR)</td>
-<td>13-Feb-25</td>
-</tr>
-<tr class="odd">
-<td>Week 7</td>
-<td>Tuesday</td>
-<td>Multiple hypothesis testing (chapter 13 of ISLR)</td>
-<td>18-Feb-25</td>
-</tr>
-<tr class="even">
-<td>Week 7</td>
-<td>Thursday</td>
-<td>False discovery rate and resampling (chapter 13 of ISLR)</td>
-<td>20-Feb-25</td>
-</tr>
-<tr class="odd">
-<td>Week 8</td>
-<td>Tuesday</td>
-<td>PCA and dimensionality reduction (chapter 12 of ISLR)</td>
-<td>25-Feb-25</td>
-</tr>
-<tr class="even">
-<td>Week 8</td>
-<td>Thursday</td>
-<td>Clustering methods (chapter 12 of ISLR)</td>
-<td>27-Feb-25</td>
-</tr>
-<tr class="odd">
-<td>Week 9</td>
-<td>Tuesday</td>
-<td>TBA</td>
-<td>4-Mar-25</td>
-</tr>
-<tr class="even">
-<td>Week 9</td>
-<td>Thursday</td>
-<td>TBA</td>
-<td>6-Mar-25</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="assessments" class="level2">
-<h2 class="anchored" data-anchor-id="assessments">Assessments</h2>
-<p>The final course grade will be calculated as follows:</p>
-<table class="table">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 32%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Category</th>
-<th>Work</th>
-<th>Final grade percentage</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>R labs</td>
-<td>8 assignments</td>
-<td>40 %</td>
-</tr>
-<tr class="even">
-<td>Weekly quizzes</td>
-<td>take on Canvas</td>
-<td>20 %</td>
-</tr>
-<tr class="odd">
-<td>Project proposal</td>
-<td>short proposal</td>
-<td>5 %</td>
-</tr>
-<tr class="even">
-<td>Feedback/collaboration</td>
-<td>final project</td>
-<td>5%</td>
-</tr>
-<tr class="odd">
-<td>Project presentation</td>
-<td>in-class presentation</td>
-<td>10 %</td>
-</tr>
-<tr class="even">
-<td>Final report</td>
-<td>submit on Canvas</td>
-<td>15 %</td>
-</tr>
-<tr class="odd">
-<td>Surveys</td>
-<td>complete on Canvas</td>
-<td>5 %</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="course-policies" class="level2">
-<h2 class="anchored" data-anchor-id="course-policies">Course policies</h2>
-<section id="general-expectations" class="level3">
-<h3 class="anchored" data-anchor-id="general-expectations">general expectations</h3>
-<p>The ethos of the course is collaborative rather than competitive. I will provide flexibility with timing if needed, and I am happy to offer one on one support. I ask that you facilitate this process by communicating promptly in case there is a need for help - the more communication, the better!</p>
-<p>If there is any portion of the course that is not accessible to you due to challenges with technology or the course format, please let me know so we can make appropriate accommodations.</p>
-<p>I will not take attendance or penalize you for missing classes, but I ask that you show up and participate in discussion and coding work. Being helpful and respectful of your fellow learners is, of course, expected.</p>
-</section>
-<section id="collaboration-and-academic-integrity" class="level3">
-<h3 class="anchored" data-anchor-id="collaboration-and-academic-integrity">collaboration and academic integrity</h3>
-<p>Students are expected to work in accordance with the University Policy of Academic Integrity, which can be found <a href="https://college.uchicago.edu/student-services/academic-integrity-student-conduct">here</a>.</p>
-<p>Please abide by the following guidelines as you work on assignments in this course:</p>
-<ul>
-<li><p>You are welcome to work together with others, but what you turn in must have been typed or written by you, and not copied from another. Evidence that a student has copied another one’s work will result in a grade of 0 for the assignment, and may trigger disciplinary action.</p></li>
-<li><p>Reusing code: You may make use of online resources (e.g. StackOverflow, ChatGPT, or other LLMs) for coding examples on assignments, with two caveats: first, you must explicitly cite where you obtained the code you use; second, you must understand what each line does before submitting it.</p></li>
-</ul>
-</section>
-<section id="late-work-extensions" class="level3">
-<h3 class="anchored" data-anchor-id="late-work-extensions">late work &amp; extensions</h3>
-<p>The due dates for R assignments are there to help you keep up with the course material and to ensure the we can provide feedback within a timely manner. If circumstances come up to prevent your submitting an assignment by the deadline, please notify the instructor as soon as you know and we will work with you to find accommodations. Untimely requests or lack of communication may make it impossible to provide accommodations.</p>
-<p>Each R assignment will have an initial deadline and a resubmission deadline. If the work is submitted by the initial deadline, even if incomplete, you will receive feedback and a chance to revise the work by the resubmission deadline. If you don’t submit an initial version, you may still submit the work by the final deadline, but you will not get a chance to resubmit.</p>
+<section id="neuroblastoma-data" class="level3">
+<h3 class="anchored" data-anchor-id="neuroblastoma-data">Neuroblastoma data</h3>
+<p>The following data set is gene expression data from tumors of patients with neuroblastoma (a type of cancer), accession number <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE62564"><strong>GSE62564</strong></a><strong>.</strong> It contains 22 phenotypic scores, 6 of which (MYCN, STC1, P4HA1, BHLHE40, HIF1A and ST8SIA1) are gene expressions measured in log2RPM (log 2 reads per million). The other 16 are quantified by R package GSVA (Gene Set Enrichment Analysis).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>neuro_blast <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/r2_gse62564_GSVA_Metadata_selected.csv&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 498 Columns: 24
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+chr  (2): sample id, high_risk
+dbl (22): MYCN, STC1, P4HA1, BHLHE40, HIF1A, ELVIDGE_HIF1A_TARGETS_UP, Quies...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+</div>
+<ol type="1">
+<li><p>Examine the data frame (tibble) and report the number and types of variables and the number of observations</p></li>
+<li><p>Compare the distributions of two or more of the numeric variables of your choice using boxplots or other visualizations; describe how the distributions differ.</p></li>
+</ol>
+<ol start="3" type="1">
+<li>Compute the counts, means, and standard deviations of one of the numeric variables of your choice, separated by <code>high_risk</code> category.</li>
+</ol>
+<ol start="4" type="1">
+<li>Visualize one of the numeric variables as a box plot or violin plot, separated by high_risk category.</li>
+</ol>
+<ol start="5" type="1">
+<li>Report if there are any missing values and if any points may be considered outliers.</li>
+</ol>
 </section>
 </section>
 
