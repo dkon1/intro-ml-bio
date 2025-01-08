@@ -1,0 +1,171 @@
+---
+title: "Introduction to data (lab 1 for BIOS 26122)"
+author: "Your Name"
+format: 
+  html:
+    self-contained: true
+editor: visual
+---
+
+## Part 1
+
+The goal of this part of the lab is to introduce basic data description and visualization using base R and tidyverse packages. Specifically, you should be able to:
+
+1.  Read in a data set as a data frame (or tibble) and report the number and types of variables, as well as the number of observations.
+2.  Visualize a variable using a method appropriate for its type; observe the general shape of the distribution.
+3.  Report descriptive statistics (e.g. counts, means, standard deviations) for numeric variables and generate cross tables for categorical variables.
+4.  Perform an assessment of missing values and outliers and do basic data cleaning.
+
+These are the first steps that one needs to do to begin working with a data set. Below you will see several real data sets to practice on.
+
+```{r setup}
+#| include: false
+#| echo: false
+library(tidyverse)
+library(class)
+library(FNN)
+```
+
+## Heart rates
+
+The following data set contains heart rates measured and reported by students in my class Introduction to Quantitative Modeling for Biology. There are four different heart rates measured (two at rest and two after exercise) and the year it was measured.
+
+```{r}
+heart_rates <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/HR_data_combined.csv")
+```
+
+1.  Examine the data frame (tibble) and report the number and types of variables and the number of observations
+
+    YOUR ANSWER HERE
+
+2.  Make a histogram of one of the numeric variables of your choice; describe its shape (e.g. normal, uniform, bimodal) and comment on any interesting features.
+
+```{r}
+
+```
+
+3.  Compute the counts, means, and standard deviations of one of the numeric variables of your choice, separated by \``` Year` `` category.
+
+```{r}
+
+```
+
+4.  Visualize one of the numeric variables as a box plot or violin plot, separated by `Year` category.
+
+```{r}
+
+```
+
+5.  Report if there are any missing values and if any points may be considered outliers.
+
+```{r}
+
+```
+
+### Neuroblastoma data
+
+The following data set is gene expression data from tumors of patients with neuroblastoma (a type of cancer), accession number [**GSE62564**](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE62564)**.** It contains 22 phenotypic scores, 6 of which (MYCN, STC1, P4HA1, BHLHE40, HIF1A and ST8SIA1) are gene expressions measured in log2RPM (log 2 reads per million). The other 16 are quantified by R package GSVA (Gene Set Enrichment Analysis).
+
+```{r}
+neuro_blast <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/r2_gse62564_GSVA_Metadata_selected.csv")
+```
+
+1.  Examine the data frame (tibble) and report the number and types of variables and the number of observations
+
+    YOUR ANSWER HERE
+
+2.  Compare the distributions of two or more of the numeric variables of your choice using boxplots or other visualizations; describe how the distributions differ.
+
+```{r}
+
+```
+
+3.  Compute the counts, means, and standard deviations of one of the numeric variables of your choice, separated by `high_risk` category.
+
+```{r}
+
+```
+
+4.  Visualize one of the numeric variables as a box plot or violin plot, separated by `high_risk` category.
+
+```{r}
+
+```
+
+5.  Report if there are any missing values and if any points may be considered outliers.
+
+```{r}
+
+```
+
+## Part 2
+
+The goal of this part of the assignment is to demonstrate fundamental concepts of machine learning, such as error in training and test sets, bias-variance tradeoff, using KNN regression and classification. Here is what you will do:
+
+1.  Clean a given data set by removing missing values and outliers and selecting the variables you want to work with.
+
+2.  Apply knn method either for classification or regression on a training set and validate on a test set.
+
+3.  Report the error of the classification or regression on both training and test sets.
+
+4.  Repeat the process for different number of nearest neighbors (hyperparameter k) and compare the results.
+
+## Regression using heart rates data
+
+1.  Select a response and an explanatory variable and clean the data to remove any outliers or missing values in these variables. Split the data set into training and test sets.
+
+    ```{r}
+
+    ```
+
+2.  Make a prediction for the test set using knn regression with k=1, and plot the predicted values over the actual data for the test set. Report the variance of the residuals for the test set.
+
+```{r}
+
+```
+
+3.  Use knn regression with k=5 and the training set the same as the test set, and plot the predicted values over the actual data for the training set. Report the variance of the residuals for the test set.
+
+```{r}
+
+```
+
+4.  Repeat knn regression on the test and training sets for a range of k, both smaller and larger than 5 (you can use a loop or write a function and use `replicate`.) For each k, calculate the variance of the residuals on the test set and on the training set, and assign each to a vector. Make a plot of the variance of the errors for the test set and for the training set as a function of k as two lines of different colors and add a legend.
+
+```{r}
+
+```
+
+5.  What seems to be the optimal number of nearest neighbors? Explain how you see bias-variance tradeoff playing out in this example.
+
+    YOUR ANSWER
+
+### Classification with Neuroblastoma data
+
+1.  Clean the data to remove any outliers or missing values in these variables, and select all the numeric variables. Split the data set into training and test sets.
+
+    ```{r}
+
+    ```
+
+2.  Use the `knn` function from package `class` to predict the risk status (`high_risk` response variable) for the test set using k=1.
+
+```{r}
+
+```
+
+3.  Compute the accuracy of knn classification of `high_risk` by printing the table of true vs predicted classes (confusion matrix) for the test set as well as the accuracy (fraction of agreement between true and predicted classes out of all predictions).
+
+```{r}
+
+```
+
+4.  Repeat the classification for a range of values of k, both smaller and larger than 5; calculate the accuracy both for the test set and the training set and assign them as vectors. Plot the resulting accuracy scores as functions of k with different colors, and add a legend.
+
+```{r}
+
+```
+
+5.  What seems to be the optimal number of nearest neighbors? Explain how you see bias-variance tradeoff playing out in this example.
+
+YOUR ANSWER
