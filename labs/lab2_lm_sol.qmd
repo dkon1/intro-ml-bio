@@ -1,0 +1,355 @@
+---
+title: "Linear regression (lab 2 for BIOS 26122)"
+author: "Dmitry Kondrashov"
+format: 
+  html:
+    self-contained: true
+editor: visual
+---
+
+## Description
+
+The goal of this assignment is to use linear regression for both single and multiple variables. You will do the following:
+
+1.  Calculate single variable linear regression and assess its quality
+
+2.  Compare errors for training and test set
+
+3.  Use polynomial regression and assess its quality
+
+4.  Check for overfitting and select appropriate model
+
+```{r setup}
+#| include: false
+#| echo: false
+library(tidyverse)
+
+```
+
+## Heart rates
+
+The following data set contains heart rates measured and reported by students in my class Introduction to Quantitative Modeling for Biology. There are four different heart rates measured (two at rest and two after exercise) and the year it was measured.
+
+```{r}
+heart_rates <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/HR_data_combined.csv")
+```
+
+1.  Select a response and an explanatory variable (from the 4 heart rate variables) and clean the data to remove any missing values in these variables. Split the data set into training and test sets of equal size.
+
+    ```{r}
+    heart_data <- heart_rates |> 
+      dplyr::select(Rest2, Ex2) |> 
+      drop_na() 
+
+
+    train_index <- sample(nrow(heart_data), size = floor(0.5 * nrow(heart_data)))
+
+    heart_train <- heart_data |>  
+      slice(train_index) |> 
+      arrange(Rest2)
+
+    heart_test <- heart_data |>  
+      slice(-train_index) |> 
+      arrange(Rest2)
+
+    ```
+
+### Linear regression
+
+2.  Use linear regression on the training set and print out the summary. Make a scatterplot and overlay the linear regression model as a line on the same plot. Print out the mean square residuals on the training set.
+
+```{r}
+lm_out <- lm(Ex2 ~ Rest2, data = heart_train)
+
+summary(lm_out)
+# base R:
+#plot(Ex2 ~ Rest2, data = heart_train, cex = .8, col = "blue", main = paste("Linear regression over heart data"))
+#abline(lm_out)
+
+
+
+# ggplot:
+ heart_train |> ggplot() + 
+  aes(x = Rest2, y = Ex2) + geom_point(color = 'blue') +
+  geom_smooth(method = 'lm', color = 'darkorange') + ggtitle(paste("Linear regression over heart data"))
+ 
+
+
+ print(paste("The mean squared redisuals on the training set are", mean(lm_out$residuals^2) ))
+```
+
+3.  Calculate the predicted values of the response variable on the *test set* using the coefficients obtained from `lm` and calculate the residuals by subtracting the predicted values from the true response values on the test set. Print out the mean squared residuals.
+
+```{r}
+y_pred <- lm_out$coefficients[1] + lm_out$coefficients[2]*heart_test$Rest2 
+test_resid <- y_pred - heart_test$Ex2 
+print(paste("The mean squared redisuals on the test set are", mean(test_resid^2) ))
+```
+
+4.  Make a separate plot of the residuals on the training set, and assess whether it satisfies the assumptions of regression (like a shapeless blob).
+
+```{r}
+#produce residual vs. fitted plot
+#plot(fitted(lm_out), resid(lm_out))
+
+#add a horizontal line at 0 
+#abline(0,0)
+ ggplot(lm_out, aes(x = .fitted, y = .resid)) +
+  geom_point() +
+  geom_hline(yintercept = 0) +
+  ggtitle(paste("Residuals of regression on heart data"))
+```
+
+Yes it looks like a shapeless blob, assumptions seem satisfied.
+
+### Quadratic regression
+
+5.  Perform quadratic regression on the training set using `lm` and make a scatterplot of the training set with the regression line. Print out the mean squared residuals on the training set.
+
+```{r}
+quad_out <- lm(Ex2 ~ poly(Rest2, degree = 2, raw = TRUE), data = heart_train)
+
+
+    # base R:
+    #plot(Ex2 ~ Rest2, data = heart_train, cex = .8, col = "blue", main = paste("Quadratic regression on heart rate data"))
+
+
+
+    #lines(heart_train$Rest2, y_pred, lwd = 3, col = 'darkorange')
+
+    #produce residual vs. fitted plot
+    #plot(fitted(quad_out), resid(quad_out), main = paste("Residuals of quadratic regression on heart data"))
+    #add a horizontal line at 0 
+    #abline(0,0)
+
+    # ggplot:
+    heart_train |> ggplot() + 
+      aes(x = Rest2, y = Ex2) + geom_point(color = 'blue') +
+      geom_smooth( method = 'lm', formula = 'y ~ poly(x, 2, raw=TRUE)', color = 'darkorange') + ggtitle(paste("Quadratic regression"))
+     
+ print(paste("The mean squared redisuals on the training set are", mean(quad_out$residuals^2) ))
+```
+
+6.  Print out the summary of quadratic regression and explain which parameters are significantly different from zero. Explain whether the fit is improved compared to the linear model.
+
+```{r}
+summary(quad_out)
+```
+
+The r-squared is essentially unchanged at 30%. The parameters, which we strongly significant are not in the quadratic fit, indicating that adding the quadratic term does not improve the regression.
+
+7.  Make a plot of the residuals and comment on whether you see any obvious outliers or deviations from the assumptions of regression.
+
+```{r}
+ggplot(quad_out, aes(x = .fitted, y = .resid)) +
+      geom_point() +
+      geom_hline(yintercept = 0) +
+      ggtitle(paste("Residuals of quadratic regression on heart data"))
+```
+
+The resisuals still look good, with only minor outliers.
+
+8.  Calculate the predicted values of the response variable on the *test set* using the coefficients obtained from the quadratic regression and calculate the residuals by subtracting the predicted values from the true response values on the test set. Print out the mean squared residuals.
+
+```{r}
+y_pred <- quad_out$coefficients[1] + quad_out$coefficients[2]*heart_test$Rest2 + quad_out$coefficients[3]*heart_test$Rest2^2
+
+quad_res <- y_pred - heart_test$Ex2
+    print(paste("The mean squared redisuals on the test set are", mean(quad_res^2) ))
+```
+
+## Ecological data
+
+The following data set contains observations of the populations of one species of fish (cutthroat trout) and two species of salamander in Mack Creek, Andrews Forest, Willamette National Forest, Oregon. The data set contains 16 variables and over thirty-two thousand observations. The variables include time and date, location, and measurements, such as size and weight. The metadata (descriptions of data) are provided [here](https://portal.edirepository.org/nis/metadataviewer?packageid=knb-lter-and.4027.14) (click on "Data entities" tab for explanations of each variable.)
+
+```{r}
+mack_data <- read_csv("https://raw.githubusercontent.com/dkon1/quant_life_quarto/main/data/mack_data.csv")
+```
+
+1.  Select the numeric variables `length_1_mm` (explanatory) and `weight_g` (response) and filter the data to remove outliers and to keep observations from only one species, either: 'Cutthroat trout' or 'Coastal giant salamander'. Split the remaining data into training and test sets of equal size.
+
+```{r}
+mack_data <- mack_data |> 
+  dplyr::select(species, length_1_mm, weight_g) |> 
+  drop_na() |>  filter (species == 'Cutthroat trout')
+
+  train_index <- sample(nrow(mack_data ), size = floor(0.5 * nrow(mack_data )))
+
+mack_train <- mack_data  |>  
+  slice(train_index) |> 
+  arrange(length_1_mm)
+
+mack_test <- mack_data  |>  
+  slice(-train_index) |> 
+  arrange(length_1_mm)
+```
+
+### Linear regression
+
+2.  Use linear regression on the training set using `lm`. Make a scatterplot and overlay the linear regression model as a line on the same plot. Print out the mean squared residuals on the training set.
+
+```{r}
+lm_out <- lm(weight_g ~ length_1_mm , data = mack_train)
+
+
+
+# base R:
+#plot(weight_g ~ length_1_mm, data = mack_train, cex = .8, col = "blue", main = paste("Linear regression on mack data"))
+#abline(lm_out)
+
+
+# ggplot:
+ mack_train |> ggplot() + 
+  aes(x = length_1_mm, y = weight_g) + geom_point(color = 'blue') +
+  geom_smooth( method = 'lm', color = 'darkorange') + ggtitle(paste("Linear regression on mack data"))
+ 
+ print(paste("The mean squared redisuals on the training set are", mean(lm_out$residuals^2) ))
+```
+
+3.  Print out the summary of linear regression, comment on the goodness of fit, and explain which parameters are significantly different from zero, according to the hypothesis test.
+
+```{r}
+summary(lm_out)
+```
+
+The goodness of fit, measured by R-squared, is high (about 83%). Both the intercept and slope are highly statistically significant.
+
+4.  Make a plot of the residuals of the fit and comment on whether it satisfies the assumptions of linear regression.
+
+```{r}
+#produce residual vs. fitted plot
+#plot(fitted(lm_out), resid(lm_out), main = "Residuals of linear regression on mack data")
+
+#add a horizontal line at 0 
+#abline(0,0)
+
+ggplot(lm_out, aes(x = .fitted, y = .resid)) +
+  geom_point() +
+  geom_hline(yintercept = 0) +
+  ggtitle(paste("Residuals of linear regression on mack data"))
+```
+
+No, the residuals do not look like a shapeless blob! This indicated an essential nonlinearity in the data, and thus linear model is not appropriate, despite a high r-squared of over 80%. All parameters are "significant" as indicated by their low p-values.
+
+5.  Compute the predicted values of weight on the test set, calculate the residuals of the linear regression and report the mean squared residuals on it.
+
+```{r}
+y_pred <- lm_out$coefficients[1] + lm_out$coefficients[2]*mack_test$length_1_mm 
+test_resid <- y_pred - mack_test$weight_g
+
+print(paste("The mean squared redisuals on the training set are", mean(test_resid^2) ))
+```
+
+### Quadratic regression
+
+6.  Perform quadratic regression on the training set using `lm` and print out the summary. Make a scatterplot and the plot of quadratic regression model. Print out the mean squared residuals on the training set.
+
+```{r}
+quad_out <- lm(weight_g ~ poly(length_1_mm, degree = 2, raw = TRUE), data = mack_train)
+
+ print(paste("The mean squared redisuals on the training set are", mean(quad_out$residuals^2) ))
+# base R:
+#plot(weight_g ~ length_1_mm, data = mack_train, cex = .8, col = "blue", main = paste("Quadratic regression on mack data"))
+
+
+#lines(mack_train$length_1_mm, y_pred, lwd = 3, col = 'darkorange')
+
+
+# ggplot:
+mack_train |> ggplot() + 
+  aes(x = length_1_mm, y = weight_g) + geom_point(color = 'blue') +
+  geom_smooth( method = 'lm', formula = 'y ~ poly(x, 2, raw=TRUE)', color = 'darkorange') + ggtitle(paste("Quadratic regression on mack data"))
+
+ 
+```
+
+7.  Print out the summary of quadratic regression, comment on the goodness of fit,and compare it to the linear regression. Explain which parameters are significantly different from zero, according to the hypothesis test and again compare the fit to the linear one.
+
+```{r}
+summary(quad_out)
+```
+
+The goodness of fit, as measured by R-squared (94%), is much higher that linear regression (83%). All parameters are highly significant.
+
+8.  Make a separate plot of the quadratic residuals on the training set, and assess whether it looks good (like a shapeless blob).
+
+```{r}
+#produce residual vs. fitted plot
+#plot(fitted(quad_out), resid(quad_out), main = "Residuals of quadratic regression on mack data")
+
+#add a horizontal line at 0 
+#abline(0,0)
+
+ggplot(quad_out, aes(x = .fitted, y = .resid)) +
+  geom_point() +
+  geom_hline(yintercept = 0) +
+  ggtitle(paste("Residuals of quadratic regression on mack data"))
+
+```
+
+The residuals now look shapeless without a curvy trend.
+
+9.  Compute the residuals of the quadratic regression on the test set and report the mean squared residuals on it.
+
+```{r}
+y_pred <- quad_out$coefficients[1] + quad_out$coefficients[2]*mack_test$length_1_mm + quad_out$coefficients[3]*mack_test$length_1_mm^2
+
+test_resid <- y_pred - mack_test$weight_g
+
+ print(paste("The mean squared redisuals on the test set are", mean(test_resid^2) ))
+```
+
+### Cubic regression
+
+10. Perform a cubic polynomial fit on the training set, print out the summary, and print the mean squared residuals on the training set.
+
+```{r}
+cub_out <- lm(weight_g ~ poly(length_1_mm, degree = 3, raw = T), data = mack_train)
+summary(cub_out)
+
+# base R:
+ #   plot(weight_g ~ length_1_mm, data = mack_train, cex = .8, col = "blue", main = paste("Cubic regression on mack data"))
+
+
+ #   lines(mack_train$length_1_mm,fitted(cub_out), lwd = 3, col = 'darkorange')
+
+
+# ggplot:
+mack_train |> ggplot() + 
+  aes(x = length_1_mm, y = weight_g) + 
+  geom_point(color = 'blue') +
+  geom_smooth(method = 'lm', formula = 'y ~ poly(x, degree = 3, raw = TRUE)', color = 'darkorange') + ggtitle(paste("Cubic regression on mack data"))
+
+ 
+
+print(paste("Mean squared residuals for cubic model on the training set", mean(cub_out$residuals^2))) 
+```
+
+11. Make a separate plot of the cubic residuals on the training set, and assess whether it looks good (like a shapeless blob).
+
+```{r}
+#produce residual vs. fitted plot
+# plot(fitted(cub_out), resid(cub_out), main = "Residuals of cubic regression on mack data")
+#add a horizontal line at 0 
+#  abline(0,0)
+cub_out |>  ggplot() + 
+  aes(x = .fitted, y = .resid) +
+  geom_point() +
+  geom_hline(yintercept = 0) +
+  ggtitle(paste("Residuals of cubic regression on mack data"))
+```
+
+YOUR ANSWERS
+
+12. Compute and print out the variance of the residuals for test sets, and compare them. How did adding the cubic parameter impact the error for the training and test sets?
+
+```{r}
+y_pred <- cub_out$coefficients[1] + cub_out$coefficients[2]*mack_test$length_1_mm + cub_out$coefficients[3]*mack_test$length_1_mm^2 + cub_out$coefficients[4]*mack_test$length_1_mm^3
+
+
+test_resid <- y_pred - mack_test$weight_g
+
+print(paste("The mean squared redisuals on the test set are", mean(test_resid^2) ))
+```
+
+Adding a cubic term improves the error for the training set by a small amount, but it goes up for the test set, indicating overfitting.

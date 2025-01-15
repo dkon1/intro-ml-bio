@@ -1,0 +1,197 @@
+---
+title: "Linear regression (lab 2 for BIOS 26122)"
+author: "Dmitry Kondrashov"
+format: 
+  html:
+    self-contained: true
+editor: visual
+---
+
+## Description
+
+The goal of this assignment is to use linear regression for both single and multiple variables. You will do the following:
+
+1.  Calculate single variable linear regression and assess its quality
+
+2.  Compare errors for training and test set
+
+3.  Use polynomial regression and assess its quality
+
+4.  Check for overfitting and select appropriate model
+
+```{r setup}
+#| include: false
+#| echo: false
+library(tidyverse)
+
+```
+
+## Heart rates
+
+The following data set contains heart rates measured and reported by students in my class Introduction to Quantitative Modeling for Biology. There are four different heart rates measured (two at rest and two after exercise) and the year it was measured.
+
+```{r}
+heart_rates <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/HR_data_combined.csv")
+```
+
+1.  Select a response and an explanatory variable (from the 4 heart rate variables) and clean the data to remove any missing values in these variables. Split the data set into training and test sets of equal size.
+
+    ```{r}
+
+
+    ```
+
+### Linear regression
+
+2.  Use linear regression on the training set and print out the summary. Make a scatterplot and overlay the linear regression model as a line on the same plot. Print out the mean square residuals on the training set.
+
+```{r}
+
+```
+
+3.  Calculate the predicted values of the response variable on the *test set* using the coefficients obtained from `lm` and calculate the residuals by subtracting the predicted values from the true response values on the test set. Print out the mean squared residuals.
+
+```{r}
+
+```
+
+4.  Make a separate plot of the residuals on the training set, and assess whether it satisfies the assumptions of regression (like a shapeless blob).
+
+```{r}
+
+```
+
+YOUR ANSWERS HERE
+
+### Quadratic regression
+
+5.  Perform quadratic regression on the training set using `lm` and make a scatterplot of the training set with the regression line. Print out the mean squared residuals on the training set.
+
+```{r}
+
+```
+
+6.  Print out the summary of quadratic regression and explain which parameters are significantly different from zero. Explain whether the fit is improved compared to the linear model.
+
+```{r}
+
+```
+
+YOUR ANSWER
+
+7.  Make a plot of the residuals and comment on whether you see any obvious outliers or deviations from the assumptions of regression.
+
+```{r}
+ 
+```
+
+YOUR ANSWERS
+
+8.  Calculate the predicted values of the response variable on the *test set* using the coefficients obtained from the quadratic regression and calculate the residuals by subtracting the predicted values from the true response values on the test set. Print out the mean squared residuals.
+
+```{r}
+
+```
+
+## Ecological data
+
+The following data set contains observations of the populations of one species of fish (cutthroat trout) and two species of salamander in Mack Creek, Andrews Forest, Willamette National Forest, Oregon. The data set contains 16 variables and over thirty-two thousand observations. The variables include time and date, location, and measurements, such as size and weight. The metadata (descriptions of data) are provided [here](https://portal.edirepository.org/nis/metadataviewer?packageid=knb-lter-and.4027.14) (click on "Data entities" tab for explanations of each variable.)
+
+```{r}
+mack_data <- read_csv("https://raw.githubusercontent.com/dkon1/quant_life_quarto/main/data/mack_data.csv")
+```
+
+1.  Select the numeric variables `length_1_mm` (explanatory) and `weight_g` (response) and filter the data to remove outliers and to keep observations from only one species, either: 'Cutthroat trout' or 'Coastal giant salamander'. Split the remaining data into training and test sets of equal size.
+
+```{r}
+
+
+```
+
+### Linear regression
+
+2.  Use linear regression on the training set using `lm`. Make a scatterplot and overlay the linear regression model as a line on the same plot. Print out the mean squared residuals on the training set.
+
+```{r}
+
+```
+
+YOUR ANSWERS
+
+3.  Print out the summary of linear regression, comment on the goodness of fit, and explain which parameters are significantly different from zero, according to the hypothesis test.
+
+```{r}
+
+```
+
+YOUR ANSWERS
+
+4.  Make a plot of the residuals of the fit and comment on whether it satisfies the assumptions of linear regression.
+
+```{r}
+
+
+```
+
+YOUR ANSWERS
+
+5.  Compute the predicted values of weight on the test set, calculate the residuals of the linear regression and report the mean squared residuals on it.
+
+```{r}
+
+```
+
+### Quadratic regression
+
+6.  Perform quadratic regression on the training set using `lm` and print out the summary. Print out the mean squared residuals on the training set.
+
+```{r}
+
+```
+
+7.  Print out the summary of quadratic regression, comment on the goodness of fit,and compare it to the linear regression. Explain which parameters are significantly different from zero, according to the hypothesis test and again compare the fit to the linear one.
+
+```{r}
+
+```
+
+YOUR ANSWERS
+
+8.  Make a separate plot of the quadratic residuals on the training set, and assess whether it looks good (like a shapeless blob).
+
+```{r}
+
+```
+
+YOUR ANSWERS
+
+9.  Compute the residuals of the quadratic regression on the test set and report the mean squared residuals on it.
+
+```{r}
+
+```
+
+### Cubic regression
+
+10. Perform a cubic polynomial fit on the training set, print out the summary, and print the mean squared residuals on the training set.
+
+```{r}
+
+     
+```
+
+11. Make a separate plot of the cubic residuals on the training set, and assess whether it looks good (like a shapeless blob).
+
+```{r}
+
+```
+
+YOUR ANSWERS
+
+12. Compute and print out the variance of the residuals for test sets, and compare them. How did adding the cubic parameter impact the error for the training and test sets?
+
+```{r}
+
+```
+
+YOUR ANSWERS
