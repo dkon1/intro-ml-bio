@@ -173,29 +173,29 @@ The following data set contains different measurements of proteins in E. coli, a
 9.  `Class`, or the localization site is one of the following categories: cp (cytoplasm); im (inner membrane without signal sequence); pp (perisplasm); imU (inner membrane, uncleavable signal sequence); om (outer membrane); omL (outer membrane lipoprotein); imL (inner membrane lipoprotein); imS (inner membrane, cleavable signal sequence)
 
 ```{r}
-ecoli_data <- read_csv("ecoli.csv")
+ecoli_data <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/refs/heads/main/labs/data/ecoli.csv")
 ```
 
-1.   Split the data set into training and test sets of equal size. Set up a `tidymodels` recipe to predict the variable `class` (make sure it's converted to a factor) using all the other variables.
+1.  Split the data set into training and test sets of equal size. Set up a `tidymodels` recipe to predict the variable `class` (make sure it's converted to a factor) using all the other variables.
 
-    ```{r}
-    ecoli_clean <- ecoli_data  |> 
-      mutate(class= as.factor(class))  
-
-
-    # Put 0.5 of the data into the training set 
-    ecoli_split <- initial_split(ecoli_clean, prop = 0.5)
-
-    # Create data frames for the two sets:
-    ecoli_train <- training(ecoli_split)
-    ecoli_test  <- testing(ecoli_split)
+```{r}
+ecoli_clean <- ecoli_data  |> 
+  mutate(class= as.factor(class))  
 
 
-    ecoli_recipe <- 
-      recipe(class ~ ., data = ecoli_train) |> 
-      update_role(Sequence, new_role = "ID") 
+# Put 0.5 of the data into the training set 
+ecoli_split <- initial_split(ecoli_clean, prop = 0.5)
 
-    ```
+# Create data frames for the two sets:
+ecoli_train <- training(ecoli_split)
+ecoli_test  <- testing(ecoli_split)
+
+
+ecoli_recipe <- 
+  recipe(class ~ ., data = ecoli_train) |> 
+  update_role(Sequence, new_role = "ID") 
+
+```
 
 2.  Train a *Naive Bayes model* to predict the variable class: specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.
 

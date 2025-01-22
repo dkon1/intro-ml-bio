@@ -40,122 +40,32 @@ neuro_blast <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/ma
 1.  Clean the data to remove any outliers or missing values. Split the data set into training and test sets of equal size. Set up a tidymodels recipe to predict the variable `high_risk` (make sure to convert it to a factor!) using all other variables, except for `sample_id`
 
     ```{r}
-    neuro_clean <- neuro_blast |>  drop_na() |>
-      mutate(high_risk = factor(high_risk))
 
-    # Put 1/2 of the data into the training set 
-    neuro_split <- initial_split(neuro_clean, prop = 1/2)
-
-    # Create data frames for the two sets:
-    neuro_train <- training(neuro_split)
-    neuro_test  <- testing(neuro_split)
-
-
-    neuro_recipe <- 
-      recipe(high_risk ~ ., data = neuro_train) |>  
-      update_role(`sample id`, new_role = "ID")
     ```
 
 2.  Train a *generalized linear model* (using the function \`logistic_reg\` and engine "glm") to predict the variable `high_risk`; specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.
 
 ```{r}
-glm_spec <- 
-    logistic_reg() |>  
-    set_engine("glm")
 
-workflow_glm <- workflow() |> 
-  add_model(glm_spec) |> 
-  add_recipe(neuro_recipe)
-
-fit_neuro <- workflow_glm |> 
-  fit(neuro_train)
-
-#fit_neuro %>% 
- # extract_fit_parsnip() 
-
-compare_pred <- augment(fit_neuro, new_data = neuro_test) 
-
-compare_pred |>  accuracy(truth = high_risk, estimate = .pred_class)
-
-compare_pred |>  conf_mat(truth = high_risk, estimate = .pred_class)
 ```
 
 3.  Train a *Naive Bayes model* (using the function `naive_Bayes` and engine "naivebayes") to predict the variable `high_risk`: specify the model, create a workflow, fit it to the training set, and report its accuracy on the test set.
 
     ```{r}
-    nb_spec <- naive_Bayes() |>  
-      set_mode("classification") |>  
-      set_engine("naivebayes") |>  
-      set_args(usekernel = FALSE) 
 
 
-    workflow_nb <- workflow() |> 
-      add_model(nb_spec) |> 
-      add_recipe(neuro_recipe)
-
-    fit_neuro <- workflow_nb |> 
-      fit(neuro_train)
-
-    #fit_neuro %>% 
-     # extract_fit_parsnip() 
-
-    compare_pred <- augment(fit_neuro, new_data = neuro_test) 
-
-    compare_pred |>  accuracy(truth = high_risk, estimate = .pred_class)
-
-    compare_pred |>  conf_mat(truth = high_risk, estimate = .pred_class)
     ```
 
 4.  Train a *linear discriminant model* (using the function `discrim_linear` with engine "MASS") to predict the variable `high_risk`: specify the model, create a workflow, fit it to the training set, and report its accuracy on the test set.
 
     ```{r}
-    ld_spec <- discrim_linear() |> 
-      set_mode("classification") |>  
-      set_engine("MASS") |>  
-      set_args(penalty = NULL, regularization_method = NULL) 
 
-
-    workflow_ld <- workflow() |> 
-      add_model(ld_spec) |> 
-      add_recipe(neuro_recipe)
-
-    fit_neuro <- workflow_ld |> 
-      fit(neuro_train)
-
-    #fit_neuro %>% 
-     # extract_fit_parsnip() 
-
-    compare_pred <- augment(fit_neuro, new_data = neuro_test) 
-
-    compare_pred |>  accuracy(truth = high_risk, estimate = .pred_class)
-
-    compare_pred |>  conf_mat(truth = high_risk, estimate = .pred_class)
     ```
 
 5.  Train a *quadratic discriminant model* (using function `discrim_quad` with engine "MASS") to predict the variable `high_risk`: specify the model, create a workflow, fit it to the training set, and report its accuracy on the test set.
 
 ```{r}
- qd_spec <- discrim_quad()  |> 
-  set_mode("classification") |>  
-  set_engine("MASS") |>  
-  set_args(penalty = NULL, regularization_method = NULL) 
-
-
-workflow_qd <- workflow() |> 
-  add_model(qd_spec) |> 
-  add_recipe(neuro_recipe)
-
-fit_neuro <- workflow_qd |> 
-  fit(neuro_train)
-
-#fit_neuro %>% 
- # extract_fit_parsnip() 
-
-compare_pred <- augment(fit_neuro, new_data = neuro_test) 
-
-compare_pred |>  accuracy(truth = high_risk, estimate = .pred_class)
-
-compare_pred |>  conf_mat(truth = high_risk, estimate = .pred_class)
+ 
 ```
 
 ### E coli protein data
@@ -173,146 +83,36 @@ The following data set contains different measurements of proteins in E. coli, a
 9.  `Class`, or the localization site is one of the following categories: cp (cytoplasm); im (inner membrane without signal sequence); pp (perisplasm); imU (inner membrane, uncleavable signal sequence); om (outer membrane); omL (outer membrane lipoprotein); imL (inner membrane lipoprotein); imS (inner membrane, cleavable signal sequence)
 
 ```{r}
-ecoli_data <- read_csv("ecoli.csv")
+ecoli_data <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/refs/heads/main/labs/data/ecoli.csv")
 ```
 
-1.   Split the data set into training and test sets of equal size. Set up a `tidymodels` recipe to predict the variable `class` (make sure it's converted to a factor) using all the other variables.
+1.  Split the data set into training and test sets of equal size. Set up a `tidymodels` recipe to predict the variable `class` (make sure it's converted to a factor) using all the other variables.
 
-    ```{r}
-    ecoli_clean <- ecoli_data  |> 
-      mutate(class= as.factor(class))  
+```{r}
 
 
-    # Put 0.5 of the data into the training set 
-    ecoli_split <- initial_split(ecoli_clean, prop = 0.5)
-
-    # Create data frames for the two sets:
-    ecoli_train <- training(ecoli_split)
-    ecoli_test  <- testing(ecoli_split)
-
-
-    ecoli_recipe <- 
-      recipe(class ~ ., data = ecoli_train) |> 
-      update_role(Sequence, new_role = "ID") 
-
-    ```
+```
 
 2.  Train a *Naive Bayes model* to predict the variable class: specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.
 
-    ```{r}
-    nb_spec <- naive_Bayes() |> 
-      set_mode("classification") |>  
-      set_engine("naivebayes") |> 
-      set_args(usekernel = FALSE) 
+```{r}
 
+```
 
-    workflow_nb <- workflow() |> 
-      add_model(nb_spec) |> 
-      add_recipe(ecoli_recipe)
-
-    fit_ecoli <- workflow_nb |> 
-      fit(ecoli_train)
-
-
-    compare_pred <- augment(fit_ecoli, new_data = ecoli_test) 
-
-    compare_pred |>  accuracy(truth = class, estimate = .pred_class)
-
-    compare_pred |>  conf_mat(truth = class, estimate = .pred_class)
-
-    ```
-
-3.  You should observe a problem with running the NB classifier (if you don't, re-run the split in part 1 until you see a problem). The problem is caused by the fact that some of the categories in `class` have very few observations so sometimes none of them end up in either the training or test sets. Copy your data cleaning pipeline from question 1 to the window below and modify it to keep only the categories with sufficient number of observations, and then re-run the Naive Bayes training and testing pipeline and print out the accuracy score and the confusion matrix.
+3.  You should observe a problem with running the NB classifier (if you don't, re-run the data cleaning chunk in part 1 until you see a problem). The problem is caused by the fact that some of the categories in `class` have very few observations so sometimes none of them end up in either the training or test sets. Copy your data cleaning pipeline from question 1 to the window below and modify it to keep only the categories with sufficient number of observations, and then re-run the Naive Bayes training and testing pipeline and print out the accuracy score and the confusion matrix.
 
     ```{r}
-    ecoli_clean  <- ecoli_data  |> 
-      filter(class %in% c("cp","im","pp","om","imU")) |> 
-      mutate(class= as.factor(class))  
 
-
-    # Put 0.5 of the data into the training set 
-    ecoli_split <- initial_split(ecoli_clean, prop = 0.5)
-
-    # Create data frames for the two sets:
-    ecoli_train <- training(ecoli_split)
-    ecoli_test  <- testing(ecoli_split)
-
-
-    ecoli_recipe <- 
-      recipe(class ~ ., data = ecoli_train) |> 
-      update_role(Sequence, new_role = "ID") 
-
-
-    workflow_nb <- workflow() |> 
-      add_model(nb_spec) |> 
-      add_recipe(ecoli_recipe)
-
-    fit_ecoli <- workflow_nb |> 
-      fit(ecoli_train)
-
-
-    compare_pred <- augment(fit_ecoli, new_data = ecoli_test) 
-
-    compare_pred |>  accuracy(truth = class, estimate = .pred_class)
-
-    compare_pred |>  conf_mat(truth = class, estimate = .pred_class)
     ```
 
 4.  Use a *linear discriminant model* to predict the variable `class`: specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.
 
     ```{r}
-    ld_spec <- discrim_linear(
-      mode = "classification",
-      penalty = NULL,
-      regularization_method = NULL,
-      engine = "MASS"
-    )
 
-    workflow_ld <- workflow() |> 
-      add_model(ld_spec) |> 
-      add_recipe(ecoli_recipe)
-
-    fit_ecoli <- workflow_ld |> 
-      fit(ecoli_train)
-
-
-    compare_pred <- augment(fit_ecoli, new_data = ecoli_test) 
-
-    compare_pred |>  accuracy(truth = class, estimate = .pred_class)
-
-    compare_pred |>  conf_mat(truth = class, estimate = .pred_class)
     ```
 
-5.  You should notice a new problem with running the LDA classifier (if you don't, re-run the split in part 3 until you see a problem). This time the problem is caused by some variables which are not varying across categories of the response variable, thus making discriminant calculation invalid. Copy your data cleaning pipeline from question 3 to the window below and modify it to select only the variables that have nonzero variance across class, and then re-run the LDA training and testing pipeline and print out the accuracy score and the confusion matrix.
+5.  You should notice a new problem with running the LDA classifier (if you don't, re-run the data cleaning chunk in part 3 until you see a problem). This time the problem is caused by some variables which are not varying across categories of the response variable, thus making discriminant calculation invalid. Copy your data cleaning pipeline from question 3 to the window below and modify it to select only the variables that have nonzero variance across class, and then re-run the LDA training and testing pipeline and print out the accuracy score and the confusion matrix.
 
 ```{r}
-ecoli_clean <- ecoli_data  |> 
-  dplyr::select(-lip, -chg) |> 
-  filter(class %in% c("cp","im","pp","om","imU")) |> 
-  mutate(class= as.factor(class))  
 
-# Put 0.5 of the data into the training set 
-ecoli_split <- initial_split(ecoli_clean, prop = 0.5)
-
-# Create data frames for the two sets:
-ecoli_train <- training(ecoli_split)
-ecoli_test  <- testing(ecoli_split)
-
-
-ecoli_recipe <- 
-  recipe(class ~ ., data = ecoli_train) |> 
-  update_role(Sequence, new_role = "ID") 
-
-workflow_ld <- workflow() |> 
-  add_model(ld_spec) |> 
-  add_recipe(ecoli_recipe)
-
-fit_ecoli <- workflow_ld |> 
-  fit(ecoli_train)
-
-compare_pred <- augment(fit_ecoli, new_data = ecoli_test) 
-
-compare_pred |>  accuracy(truth = class, estimate = .pred_class)
-
-compare_pred |>  conf_mat(truth = class, estimate = .pred_class)
 ```

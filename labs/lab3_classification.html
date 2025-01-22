@@ -8,7 +8,7 @@
 
 <meta name="author" content="Your Name">
 
-<title>Classification methods (lab 4 for BIOS 26122)</title>
+<title>Classification methods (lab 3 for BIOS 26122)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -2608,7 +2608,7 @@ vertical-align: -.125em;
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Classification methods (lab 4 for BIOS 26122)</h1>
+<h1 class="title">Classification methods (lab 3 for BIOS 26122)</h1>
 </div>
 
 
@@ -2641,7 +2641,7 @@ vertical-align: -.125em;
 <p>The use of these models is demonstrated in the week 4 tutorials using the tools from package <code>tidymodels</code>; I recommend that you use them to perform the tasks below.</p>
 <section id="neuroblastoma-data" class="level3">
 <h3 class="anchored" data-anchor-id="neuroblastoma-data">Neuroblastoma data</h3>
-<p>The following data set is gene expression data from tumors of patients with neuroblastoma (a type of cancer), accession number <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE62564"><strong>GSE62564</strong></a><strong>.</strong> It contains 22 phenotypic scores, 6 of which (MYCN, STC1, P4HA1, BHLHE40, HIF1A and ST8SIA1) are gene expressions measured in log2RPM (log 2 reads per million). The other 16 are quantified by R package GSVA (Gene Set Enrichment Analysis).</p>
+<p>The following data set is gene expression data from tumors of patients with neuroblastoma (a type of cancer), accession number <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE62564"><strong>GSE62564</strong></a>. It contains 22 phenotypic scores, 6 of which (MYCN, STC1, P4HA1, BHLHE40, HIF1A and ST8SIA1) are gene expressions measured in log2RPM (log 2 reads per million). The other 16 are quantified by R package GSVA (Gene Set Enrichment Analysis).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>neuro_blast <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/r2_gse62564_GSVA_Metadata_selected.csv&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
@@ -2658,339 +2658,80 @@ dbl (22): MYCN, STC1, P4HA1, BHLHE40, HIF1A, ELVIDGE_HIF1A_TARGETS_UP, Quies...
 <ol type="1">
 <li><p>Clean the data to remove any outliers or missing values. Split the data set into training and test sets of equal size. Set up a tidymodels recipe to predict the variable <code>high_risk</code> (make sure to convert it to a factor!) using all other variables, except for <code>sample_id</code></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>neuro_clean <span class="ot">&lt;-</span> neuro_blast <span class="sc">|&gt;</span>  <span class="fu">drop_na</span>() <span class="sc">|&gt;</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">high_risk =</span> <span class="fu">factor</span>(high_risk))</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Put 1/2 of the data into the training set </span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>neuro_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(neuro_clean, <span class="at">prop =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Create data frames for the two sets:</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>neuro_train <span class="ot">&lt;-</span> <span class="fu">training</span>(neuro_split)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>neuro_test  <span class="ot">&lt;-</span> <span class="fu">testing</span>(neuro_split)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>neuro_recipe <span class="ot">&lt;-</span> </span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(high_risk <span class="sc">~</span> ., <span class="at">data =</span> neuro_train) <span class="sc">|&gt;</span>  </span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update_role</span>(<span class="st">`</span><span class="at">sample id</span><span class="st">`</span>, <span class="at">new_role =</span> <span class="st">&quot;ID&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
 </div></li>
-<li><p>Train a <em>generalized linear model</em> (using engine “glm”) to predict the <code>high_risk</code>; specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.</p></li>
+<li><p>Train a <em>generalized linear model</em> (using the function `logistic_reg` and engine “glm”) to predict the variable <code>high_risk</code>; specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.</p></li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>glm_spec <span class="ot">&lt;-</span> </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">logistic_reg</span>() <span class="sc">|&gt;</span>  </span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_engine</span>(<span class="st">&quot;glm&quot;</span>)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>workflow_glm <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(glm_spec) <span class="sc">|&gt;</span> </span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(neuro_recipe)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>fit_neuro <span class="ot">&lt;-</span> workflow_glm <span class="sc">|&gt;</span> </span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(neuro_train)</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">#fit_neuro %&gt;% </span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a> <span class="co"># extract_fit_parsnip() </span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="ot">&lt;-</span> <span class="fu">augment</span>(fit_neuro, <span class="at">new_data =</span> neuro_test) </span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="sc">|&gt;</span>  <span class="fu">accuracy</span>(<span class="at">truth =</span> high_risk, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 3
-  .metric  .estimator .estimate
-  &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
-1 accuracy binary         0.888</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="sc">|&gt;</span>  <span class="fu">conf_mat</span>(<span class="at">truth =</span> high_risk, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>          Truth
-Prediction  no yes
-       no  148  11
-       yes  17  73</code></pre>
-</div>
+
 </div>
 <ol start="3" type="1">
-<li><p>Train a <em>Naive Bayes model</em> (using engine “naivebayes”) to predict the variable <code>high_risk</code>: specify the model, create a workflow, fit it to the training set, and report its accuracy on the test set.</p>
+<li><p>Train a <em>Naive Bayes model</em> (using the function <code>naive_Bayes</code> and engine “naivebayes”) to predict the variable <code>high_risk</code>: specify the model, create a workflow, fit it to the training set, and report its accuracy on the test set.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>nb_spec <span class="ot">&lt;-</span> <span class="fu">naive_Bayes</span>() <span class="sc">|&gt;</span>  </span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>) <span class="sc">|&gt;</span>  </span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;naivebayes&quot;</span>) <span class="sc">|&gt;</span>  </span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_args</span>(<span class="at">usekernel =</span> <span class="cn">FALSE</span>) </span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>workflow_nb <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(nb_spec) <span class="sc">|&gt;</span> </span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(neuro_recipe)</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>fit_neuro <span class="ot">&lt;-</span> workflow_nb <span class="sc">|&gt;</span> </span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(neuro_train)</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#fit_neuro %&gt;% </span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a> <span class="co"># extract_fit_parsnip() </span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="ot">&lt;-</span> <span class="fu">augment</span>(fit_neuro, <span class="at">new_data =</span> neuro_test) </span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="sc">|&gt;</span>  <span class="fu">accuracy</span>(<span class="at">truth =</span> high_risk, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 3
-  .metric  .estimator .estimate
-  &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
-1 accuracy binary         0.839</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="sc">|&gt;</span>  <span class="fu">conf_mat</span>(<span class="at">truth =</span> high_risk, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>          Truth
-Prediction  no yes
-       no  140  15
-       yes  25  69</code></pre>
-</div>
+
 </div></li>
-<li><p>Train a <em>linear discriminant model</em> (using function <code>discrim_linear</code> with engine “MASS”) to predict the variable <code>high_risk</code>: specify the model, create a workflow, fit it to the training set, and report its accuracy on the test set.</p>
+<li><p>Train a <em>linear discriminant model</em> (using the function <code>discrim_linear</code> with engine “MASS”) to predict the variable <code>high_risk</code>: specify the model, create a workflow, fit it to the training set, and report its accuracy on the test set.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>ld_spec <span class="ot">&lt;-</span> <span class="fu">discrim_linear</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>) <span class="sc">|&gt;</span>  </span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;MASS&quot;</span>) <span class="sc">|&gt;</span>  </span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_args</span>(<span class="at">penalty =</span> <span class="cn">NULL</span>, <span class="at">regularization_method =</span> <span class="cn">NULL</span>) </span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>workflow_ld <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(ld_spec) <span class="sc">|&gt;</span> </span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(neuro_recipe)</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>fit_neuro <span class="ot">&lt;-</span> workflow_ld <span class="sc">|&gt;</span> </span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(neuro_train)</span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="co">#fit_neuro %&gt;% </span></span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a> <span class="co"># extract_fit_parsnip() </span></span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="ot">&lt;-</span> <span class="fu">augment</span>(fit_neuro, <span class="at">new_data =</span> neuro_test) </span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="sc">|&gt;</span>  <span class="fu">accuracy</span>(<span class="at">truth =</span> high_risk, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 3
-  .metric  .estimator .estimate
-  &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
-1 accuracy binary         0.876</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="sc">|&gt;</span>  <span class="fu">conf_mat</span>(<span class="at">truth =</span> high_risk, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>          Truth
-Prediction  no yes
-       no  148  14
-       yes  17  70</code></pre>
-</div>
+
 </div></li>
 <li><p>Train a <em>quadratic discriminant model</em> (using function <code>discrim_quad</code> with engine “MASS”) to predict the variable <code>high_risk</code>: specify the model, create a workflow, fit it to the training set, and report its accuracy on the test set.</p></li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a> qd_spec <span class="ot">&lt;-</span> <span class="fu">discrim_quad</span>()  <span class="sc">|&gt;</span> </span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>) <span class="sc">|&gt;</span>  </span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;MASS&quot;</span>) <span class="sc">|&gt;</span>  </span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_args</span>(<span class="at">penalty =</span> <span class="cn">NULL</span>, <span class="at">regularization_method =</span> <span class="cn">NULL</span>) </span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>workflow_qd <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(qd_spec) <span class="sc">|&gt;</span> </span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(neuro_recipe)</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>fit_neuro <span class="ot">&lt;-</span> workflow_qd <span class="sc">|&gt;</span> </span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(neuro_train)</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="co">#fit_neuro %&gt;% </span></span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a> <span class="co"># extract_fit_parsnip() </span></span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="ot">&lt;-</span> <span class="fu">augment</span>(fit_neuro, <span class="at">new_data =</span> neuro_test) </span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="sc">|&gt;</span>  <span class="fu">accuracy</span>(<span class="at">truth =</span> high_risk, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 3
-  .metric  .estimator .estimate
-  &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
-1 accuracy binary         0.859</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="sc">|&gt;</span>  <span class="fu">conf_mat</span>(<span class="at">truth =</span> high_risk, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>          Truth
-Prediction  no yes
-       no  155  25
-       yes  10  59</code></pre>
-</div>
+
 </div>
 </section>
-<section id="ecological-data" class="level3">
-<h3 class="anchored" data-anchor-id="ecological-data">Ecological data</h3>
-<p>The following data set contains observations of the populations of one species of fish (cutthroat trout) and two species of salamander in Mack Creek, Andrews Forest, Willamette National Forest, Oregon. The data set contains 16 variables and over thirty-two thousand observations. The variables include time and date, location, and measurements, such as size and weight. The metadata (descriptions of data) are provided <a href="https://portal.edirepository.org/nis/metadataviewer?packageid=knb-lter-and.4027.14">here</a> (click on “Data entities” tab for explanations of each variable.)</p>
+<section id="e-coli-protein-data" class="level3">
+<h3 class="anchored" data-anchor-id="e-coli-protein-data">E coli protein data</h3>
+<p>The following data set contains different measurements of proteins in E. coli, along with their locations in the cell. Variable names:</p>
+<ol type="1">
+<li><code>Sequence</code>: Accession number for the SWISS-PROT database</li>
+<li><code>mcg</code>: McGeoch’s method for signal sequence recognition.</li>
+<li><code>gvh</code>: von Heijne’s method for signal sequence recognition.</li>
+<li><code>lip</code>: von Heijne’s Signal Peptidase II consensus sequence score.</li>
+<li><code>chg</code>: Presence of charge on N-terminus of predicted lipoproteins.</li>
+<li><code>aac</code>: score of discriminant analysis of the amino acid content of outer membrane and periplasmic proteins.</li>
+<li><code>alm1</code>: score of the ALOM membrane spanning region prediction program.</li>
+<li><code>alm2</code>: score of ALOM program after excluding putative cleavable signal regions from the sequence.</li>
+<li><code>Class</code>, or the localization site is one of the following categories: cp (cytoplasm); im (inner membrane without signal sequence); pp (perisplasm); imU (inner membrane, uncleavable signal sequence); om (outer membrane); omL (outer membrane lipoprotein); imL (inner membrane lipoprotein); imS (inner membrane, cleavable signal sequence)</li>
+</ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>mack_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/dkon1/quant_life_quarto/main/data/mack_data.csv&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ecoli_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/dkon1/intro-ml-bio/refs/heads/main/labs/data/ecoli.csv&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Rows: 32209 Columns: 16
+<pre><code>Rows: 336 Columns: 9
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: &quot;,&quot;
-chr  (7): sitecode, section, reach, unittype, species, clip, notes
-dbl  (8): year, pass, unitnum, vert_index, pitnumber, length_1_mm, length_2_...
-date (1): sampledate
+chr (2): Sequence, class
+dbl (7): mcg, gvh, lip, chg, aac, alm1, alm2
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 </div>
 </div>
 <ol type="1">
-<li><p>Clean the data to remove any outliers or missing values, and filter the data to contain observations from only one species, either: ‘Cutthroat trout’ or ‘Coastal giant salamander’ . Split the data set into training and test sets of equal size. Set up a <code>tidymodels</code> recipe to predict the variable `section` (make sure it’s converted to a factor) using the numeric variables <code>length_1_mm</code> and <code>weight_g</code>.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>mack_clean <span class="ot">&lt;-</span> mack_data <span class="sc">|&gt;</span> </span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">==</span> <span class="st">&#39;Coastal giant salamander&#39;</span>) <span class="sc">|&gt;</span>  </span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(section, length_1_mm, weight_g) <span class="sc">|&gt;</span> </span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">section =</span> <span class="fu">factor</span>(section))</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Put 3/4 of the data into the training set </span></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>mack_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(mack_clean, <span class="at">prop =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>)</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Create data frames for the two sets:</span></span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>mack_train <span class="ot">&lt;-</span> <span class="fu">training</span>(mack_split)</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>mack_test  <span class="ot">&lt;-</span> <span class="fu">testing</span>(mack_split)</span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>mack_recipe <span class="ot">&lt;-</span> </span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(section <span class="sc">~</span> ., <span class="at">data =</span> mack_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div></li>
-<li><p>Train a <em>generalized linear model</em> (using engine “glm”) to predict the variable <code>section</code>; specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.</p></li>
+<li>Split the data set into training and test sets of equal size. Set up a <code>tidymodels</code> recipe to predict the variable <code>class</code> (make sure it’s converted to a factor) using all the other variables.</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>glm_spec <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>() <span class="sc">|&gt;</span>  </span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_engine</span>(<span class="st">&quot;glm&quot;</span>)</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>workflow_glm <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(glm_spec) <span class="sc">|&gt;</span> </span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(mack_recipe)</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>fit_mack <span class="ot">&lt;-</span> workflow_glm <span class="sc">|&gt;</span> </span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(mack_train)</span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="co">#fit_mack %&gt;% </span></span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a> <span class="co"># extract_fit_parsnip() </span></span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="ot">&lt;-</span> <span class="fu">augment</span>(fit_mack, <span class="at">new_data =</span> mack_test) </span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="sc">|&gt;</span>  <span class="fu">accuracy</span>(<span class="at">truth =</span> section, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 3
-  .metric  .estimator .estimate
-  &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
-1 accuracy binary         0.546</code></pre>
+
 </div>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="sc">|&gt;</span>  <span class="fu">conf_mat</span>(<span class="at">truth =</span> section, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>          Truth
-Prediction   CC   OG
-        CC  549  453
-        OG  984 1179</code></pre>
-</div>
+<ol start="2" type="1">
+<li>Train a <em>Naive Bayes model</em> to predict the variable class: specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.</li>
+</ol>
+<div class="cell">
+
 </div>
 <ol start="3" type="1">
-<li><p>Train a <em>Naive Bayes model</em> to predict the variable <code>section</code>: specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.</p>
+<li><p>You should observe a problem with running the NB classifier (if you don’t, re-run the split in part 1 until you see a problem). The problem is caused by the fact that some of the categories in <code>class</code> have very few observations so sometimes none of them end up in either the training or test sets. Copy your data cleaning pipeline from question 1 to the window below and modify it to keep only the categories with sufficient number of observations, and then re-run the Naive Bayes training and testing pipeline and print out the accuracy score and the confusion matrix.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>nb_spec <span class="ot">&lt;-</span> <span class="fu">naive_Bayes</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;naivebayes&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_args</span>(<span class="at">usekernel =</span> <span class="cn">FALSE</span>) </span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>workflow_nb <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(nb_spec) <span class="sc">|&gt;</span> </span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(mack_recipe)</span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>fit_mack <span class="ot">&lt;-</span> workflow_nb <span class="sc">|&gt;</span> </span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(mack_train)</span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a><span class="co">#fit_mack %&gt;% </span></span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a> <span class="co"># extract_fit_parsnip() </span></span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="ot">&lt;-</span> <span class="fu">augment</span>(fit_mack, <span class="at">new_data =</span> mack_test) </span>
-<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="sc">|&gt;</span>  <span class="fu">accuracy</span>(<span class="at">truth =</span> section, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 3
-  .metric  .estimator .estimate
-  &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
-1 accuracy binary         0.555</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="sc">|&gt;</span>  <span class="fu">conf_mat</span>(<span class="at">truth =</span> section, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>          Truth
-Prediction   CC   OG
-        CC  446  322
-        OG 1087 1310</code></pre>
-</div>
+
 </div></li>
-<li><p>Train a <em>linear discriminant model</em> to predict the variable <code>section</code>: specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.</p>
+<li><p>Use a <em>linear discriminant model</em> to predict the variable <code>class</code>: specify the model, create a workflow, fit it to the training set, print out the fitted parameters, and evaluate its performance on the test set.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>ld_spec <span class="ot">&lt;-</span> <span class="fu">discrim_linear</span>(</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">mode =</span> <span class="st">&quot;classification&quot;</span>,</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">penalty =</span> <span class="cn">NULL</span>,</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">regularization_method =</span> <span class="cn">NULL</span>,</span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">engine =</span> <span class="st">&quot;MASS&quot;</span></span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>workflow_ld <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(ld_spec) <span class="sc">|&gt;</span> </span>
-<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(mack_recipe)</span>
-<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>fit_mack <span class="ot">&lt;-</span> workflow_ld <span class="sc">|&gt;</span> </span>
-<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(mack_train)</span>
-<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a><span class="co">#fit_mack %&gt;% </span></span>
-<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a> <span class="co"># extract_fit_parsnip() </span></span>
-<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="ot">&lt;-</span> <span class="fu">augment</span>(fit_mack, <span class="at">new_data =</span> mack_test) </span>
-<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="sc">|&gt;</span>  <span class="fu">accuracy</span>(<span class="at">truth =</span> section, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 3
-  .metric  .estimator .estimate
-  &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
-1 accuracy binary         0.547</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="sc">|&gt;</span>  <span class="fu">conf_mat</span>(<span class="at">truth =</span> section, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>          Truth
-Prediction   CC   OG
-        CC  549  450
-        OG  984 1182</code></pre>
-</div>
+
 </div></li>
-<li><p>Train a <em>quadratic discriminant model</em> to predict the variable <code>section</code>: specify the model, create a workflow, fit it to the training set, and report its accuracy on the test set.</p></li>
+<li><p>You should notice a new problem with running the LDA classifier (if you don’t, re-run the split in part 3 until you see a problem). This time the problem is caused by some variables which are not varying across categories of the response variable, thus making discriminant calculation invalid. Copy your data cleaning pipeline from question 3 to the window below and modify it to select only the variables that have nonzero variance across class, and then re-run the LDA training and testing pipeline and print out the accuracy score and the confusion matrix.</p></li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a> qd_spec <span class="ot">&lt;-</span> <span class="fu">discrim_quad</span>(</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">mode =</span> <span class="st">&quot;classification&quot;</span>,</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">regularization_method =</span> <span class="cn">NULL</span>,</span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">engine =</span> <span class="st">&quot;MASS&quot;</span></span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>workflow_qd <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(qd_spec) <span class="sc">|&gt;</span> </span>
-<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(mack_recipe)</span>
-<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>fit_mack <span class="ot">&lt;-</span> workflow_qd <span class="sc">|&gt;</span> </span>
-<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(mack_train)</span>
-<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a><span class="co">#fit_neuro %&gt;% </span></span>
-<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a> <span class="co"># extract_fit_parsnip() </span></span>
-<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="ot">&lt;-</span> <span class="fu">augment</span>(fit_mack, <span class="at">new_data =</span> mack_test) </span>
-<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="sc">|&gt;</span>  <span class="fu">accuracy</span>(<span class="at">truth =</span> section, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 3
-  .metric  .estimator .estimate
-  &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
-1 accuracy binary         0.548</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>compare_pred <span class="sc">|&gt;</span>  <span class="fu">conf_mat</span>(<span class="at">truth =</span> section, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>          Truth
-Prediction  CC  OG
-        CC 822 718
-        OG 711 914</code></pre>
-</div>
+
 </div>
 </section>
 </section>
