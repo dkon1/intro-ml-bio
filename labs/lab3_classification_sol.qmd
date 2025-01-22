@@ -1,6 +1,6 @@
 ---
 title: "Classification methods (lab 4 for BIOS 26122)"
-author: "Your Name"
+author: "Dmitry Kondrashov"
 format: 
   html:
     self-contained: true
@@ -293,3 +293,121 @@ compare_pred |>  conf_mat(truth = section, estimate = .pred_class)
     ```{r}
 
     ```
+
+```{r}
+yeast_data <- read_csv("yeast.csv")
+```
+
+```{r}
+yeast_data <- yeast_data |> 
+  filter(name %in% c("NUC", "CYT")) |> 
+  mutate(name = as.factor(name))  
+   #|>  
+#  dplyr::select(section, length_1_mm, weight_g) |> 
+#  drop_na() |> mutate(section = factor(section))
+
+# Put 3/4 of the data into the training set 
+yeast_split <- initial_split(yeast_data, prop = 3/4)
+
+# Create data frames for the two sets:
+yeast_train <- training(yeast_split)
+yeast_test  <- testing(yeast_split)
+
+
+yeast_recipe <- 
+  recipe(name ~ ., data = yeast_train)
+```
+
+Variable names:
+
+1.  Sequence: Accession number for the SWISS-PROT database
+2.  mcg: McGeoch's method for signal sequence recognition.
+3.  gvh: von Heijne's method for signal sequence recognition.
+4.  lip: von Heijne's Signal Peptidase II consensus sequence score.
+5.  chg: Presence of charge on N-terminus of predicted lipoproteins.
+6.  aac: score of discriminant analysis of the amino acid content of outer membrane and periplasmic proteins.
+7.  alm1: score of the ALOM membrane spanning region prediction program.
+8.  alm2: score of ALOM program after excluding putative cleavable signal regions from the sequence.
+9.  Class, or the localization site is one of the following categories: cp (cytoplasm); im (inner membrane without signal sequence); pp (perisplasm); imU (inner membrane, uncleavable signal sequence); om (outer membrane); omL (outer membrane lipoprotein); imL (inner membrane lipoprotein); imS (inner membrane, cleavable signal sequence)
+
+```{r}
+ecoli_data <- read_csv("ecoli.csv")
+```
+
+```{r}
+ecoli_data <- ecoli_data  |> 
+ # filter(name %in% c("NUC", "CYT")) |> 
+  dplyr::select(-lip, -chg) |> 
+  filter(class %in% c("cp","im","pp","om","imU")) |> 
+  mutate(class= as.factor(class))  
+   #|>  
+#  dplyr::select(section, length_1_mm, weight_g) |> 
+#  drop_na() |> mutate(section = factor(section))
+
+# Put 3/4 of the data into the training set 
+ecoli_split <- initial_split(ecoli_data, prop = 0.5)
+
+# Create data frames for the two sets:
+ecoli_train <- training(ecoli_split)
+ecoli_test  <- testing(ecoli_split)
+
+
+ecoli_recipe <- 
+  recipe(class ~ ., data = ecoli_train) |> 
+  update_role(Sequence, new_role = "ID") 
+```
+
+```{r}
+nb_spec <- naive_Bayes() %>% 
+  set_mode("classification") %>% 
+  set_engine("naivebayes") %>% 
+  set_args(usekernel = FALSE) 
+
+
+workflow_nb <- workflow() |> 
+  add_model(nb_spec) |> 
+  add_recipe(ecoli_recipe)
+
+fit_ecoli <- workflow_nb |> 
+  fit(ecoli_train)
+
+#fit_mack %>% 
+ # extract_fit_parsnip() 
+
+compare_pred <- augment(fit_ecoli, new_data = ecoli_test) 
+
+compare_pred |>  accuracy(truth = class, estimate = .pred_class)
+
+compare_pred |>  conf_mat(truth = class, estimate = .pred_class)
+```
+
+```{r}
+ld_spec <- discrim_linear(
+  mode = "classification",
+  penalty = NULL,
+  regularization_method = NULL,
+  engine = "MASS"
+)
+
+workflow_ld <- workflow() |> 
+  add_model(ld_spec) |> 
+  add_recipe(ecoli_recipe)
+
+fit_ecoli <- workflow_ld |> 
+  fit(ecoli_train)
+
+#fit_mack %>% 
+ # extract_fit_parsnip() 
+
+compare_pred <- augment(fit_ecoli, new_data = ecoli_test) 
+
+compare_pred |>  accuracy(truth = class, estimate = .pred_class)
+
+compare_pred |>  conf_mat(truth = class, estimate = .pred_class)
+```
+
+Notes: this dataset present some problems for classification because some of the predictor variables don't vary! The other problem is that some of the classes are too rare and this makes NB break when there is none in the trainin set. This is a good example of needing to clean the dataset to remove some variables (and potentially simplify the classes) to improve prediction.
+
+```{r}
+
+```

@@ -61,26 +61,26 @@ You are welcome to email the instructors with personal requests, but please ask 
 
 ## Weekly Schedule
 
-| Week | Day | Topic | Date |
-|----|----|----|----|
-| Week 1 | Tuesday | Learning and the bias-variance tradeoff (chapter 2 ISLR) | 7-Jan-25 |
-| Week 1 | Thursday | K nearest neighbors (chapter 2 ISLR) | 9-Jan-25 |
-| Week 2 | Tuesday | Linear regression (chapter 3 of ISLR) | 14-Jan-25 |
-| Week 2 | Thursday | Linear regression (chapter 3 of ISLR) | 16-Jan-25 |
-| Week 3 | Tuesday | Classification: Naïve Bayes (chapter 4 of ISLR) | 21-Jan-25 |
-| Week 3 | Thursday | Classification: logistic regression (chapter 4 of ISLR) | 23-Jan-25 |
-| Week 4 | Tuesday | Cross-validation (chapter 5 of ISLR) | 28-Jan-25 |
-| Week 4 | Thursday | Bootstrap (chapter 5 of ISLR) | 30-Jan-25 |
-| Week 5 | Tuesday | Linear model selection (chapter 6 of ISLR) | 4-Feb-25 |
-| Week 5 | Thursday | Regularization and regression in high dimensions (chapter 6 of ISLR) | 6-Feb-25 |
-| Week 6 | Tuesday | Decision trees (chapter 8 of ISLR) | 11-Feb-25 |
-| Week 6 | Thursday | Random forests (chapter 8 of ISLR) | 13-Feb-25 |
-| Week 7 | Tuesday | Multiple hypothesis testing (chapter 13 of ISLR) | 18-Feb-25 |
-| Week 7 | Thursday | False discovery rate and resampling (chapter 13 of ISLR) | 20-Feb-25 |
-| Week 8 | Tuesday | PCA and dimensionality reduction (chapter 12 of ISLR) | 25-Feb-25 |
-| Week 8 | Thursday | Clustering methods (chapter 12 of ISLR) | 27-Feb-25 |
-| Week 9 | Tuesday | TBA | 4-Mar-25 |
-| Week 9 | Thursday | TBA | 6-Mar-25 |
+| Week   | Day      | Topic                                                                | Date      |
+|--------|----------|----------------------------------------------------------------------|-----------|
+| Week 1 | Tuesday  | Learning and the bias-variance tradeoff (chapter 2 ISLR)             | 7-Jan-25  |
+| Week 1 | Thursday | K nearest neighbors (chapter 2 ISLR)                                 | 9-Jan-25  |
+| Week 2 | Tuesday  | Linear regression (chapter 3 of ISLR)                                | 14-Jan-25 |
+| Week 2 | Thursday | Linear regression (chapter 3 of ISLR)                                | 16-Jan-25 |
+| Week 3 | Tuesday  | Classification: Naïve Bayes (chapter 4 of ISLR)                      | 21-Jan-25 |
+| Week 3 | Thursday | Classification: logistic regression (chapter 4 of ISLR)              | 23-Jan-25 |
+| Week 4 | Tuesday  | Cross-validation (chapter 5 of ISLR)                                 | 28-Jan-25 |
+| Week 4 | Thursday | Bootstrap (chapter 5 of ISLR)                                        | 30-Jan-25 |
+| Week 5 | Tuesday  | Linear model selection (chapter 6 of ISLR)                           | 4-Feb-25  |
+| Week 5 | Thursday | Regularization and regression in high dimensions (chapter 6 of ISLR) | 6-Feb-25  |
+| Week 6 | Tuesday  | Decision trees (chapter 8 of ISLR)                                   | 11-Feb-25 |
+| Week 6 | Thursday | Random forests (chapter 8 of ISLR)                                   | 13-Feb-25 |
+| Week 7 | Tuesday  | Multiple hypothesis testing (chapter 13 of ISLR)                     | 18-Feb-25 |
+| Week 7 | Thursday | False discovery rate and resampling (chapter 13 of ISLR)             | 20-Feb-25 |
+| Week 8 | Tuesday  | PCA and dimensionality reduction (chapter 12 of ISLR)                | 25-Feb-25 |
+| Week 8 | Thursday | Clustering methods (chapter 12 of ISLR)                              | 27-Feb-25 |
+| Week 9 | Tuesday  | TBA                                                                  | 4-Mar-25  |
+| Week 9 | Thursday | TBA                                                                  | 6-Mar-25  |
 
 ## Assessments
 
