@@ -1,10 +1,11 @@
 ---
-title: "Classification methods (lab 4 for BIOS 26122)"
+title: "Classification methods (lab 3 for BIOS 26122)"
 author: "Dmitry Kondrashov"
 format: 
   html:
     self-contained: true
 editor: visual
+error: true
 ---
 
 ## Description

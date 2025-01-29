@@ -2720,7 +2720,7 @@ dbl (7): mcg, gvh, lip, chg, aac, alm1, alm2
 
 </div>
 <ol start="3" type="1">
-<li><p>You should observe a problem with running the NB classifier (if you don’t, re-run the split in part 1 until you see a problem). The problem is caused by the fact that some of the categories in <code>class</code> have very few observations so sometimes none of them end up in either the training or test sets. Copy your data cleaning pipeline from question 1 to the window below and modify it to keep only the categories with sufficient number of observations, and then re-run the Naive Bayes training and testing pipeline and print out the accuracy score and the confusion matrix.</p>
+<li><p>You should observe a problem with running the NB classifier (if you don’t, re-run the data cleaning chunk in part 1 until you see a problem). The problem is caused by the fact that some of the categories in <code>class</code> have very few observations so sometimes none of them end up in either the training or test sets. Copy your data cleaning pipeline from question 1 to the window below and modify it to keep only the categories with sufficient number of observations, and then re-run the Naive Bayes training and testing pipeline and print out the accuracy score and the confusion matrix.</p>
 <div class="cell">
 
 </div></li>
@@ -2728,7 +2728,7 @@ dbl (7): mcg, gvh, lip, chg, aac, alm1, alm2
 <div class="cell">
 
 </div></li>
-<li><p>You should notice a new problem with running the LDA classifier (if you don’t, re-run the split in part 3 until you see a problem). This time the problem is caused by some variables which are not varying across categories of the response variable, thus making discriminant calculation invalid. Copy your data cleaning pipeline from question 3 to the window below and modify it to select only the variables that have nonzero variance across class, and then re-run the LDA training and testing pipeline and print out the accuracy score and the confusion matrix.</p></li>
+<li><p>You should notice a new problem with running the LDA classifier (if you don’t, re-run the data cleaning chunk in part 3 until you see a problem). This time the problem is caused by some variables which are not varying across categories of the response variable, thus making discriminant calculation invalid. Copy your data cleaning pipeline from question 3 to the window below and modify it to select only the variables that have nonzero variance across class, and then re-run the LDA training and testing pipeline and print out the accuracy score and the confusion matrix.</p></li>
 </ol>
 <div class="cell">
 
