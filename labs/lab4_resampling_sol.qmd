@@ -193,7 +193,7 @@ mack_data <- read_csv("https://raw.githubusercontent.com/dkon1/quant_life_quarto
     percentile_intervals
     ```
 
-3.  Repeat the same process as in question 1, but by training a quadratic regression model on the bootsrapped splits of the data set; for this you'll need to define a new auxiliary function with a quadratic model, then calculate and print out the parameters of the quadratic regression from the bootstrap calculation.\
+3.  Repeat the same process as in question 1, but by training a quadratic regression model on the bootsrapped splits of the data set; for this you'll need to define a new auxiliary function with a quadratic model, then calculate and print out the parameters of the quadratic regression from the bootstrap calculation.
 
 ```{r}
 quad_bootstrap <- function(split) {
@@ -214,17 +214,17 @@ percentile_intervals <- int_pctl(quad_boot_models, coef_info)
 percentile_intervals
 ```
 
-3.  Perform linear regression using `lm`() on the cleaned mack data set with the same variables, and print out the confidence intervals (at 95% level) for the two coefficients from the calculated statistics (you can use the function `confint`).
+4.  Perform linear regression using `lm`() on the cleaned mack data set with the same variables, and print out the confidence intervals (at 95% level) for the two coefficients from the calculated statistics (you can use the function `confint`).
 
-    ```{r}
-    lm_out <- lm(weight_g ~ length_1_mm, data = mack_clean)
-    summary(lm_out)
+```{r}
+lm_out <- lm(weight_g ~ length_1_mm, data = mack_clean)
+summary(lm_out)
 
-    print(confint(lm_out, "(Intercept)", level=0.95))
-    print(confint(lm_out, "length_1_mm", level=0.95))
-    ```
+print(confint(lm_out, "(Intercept)", level=0.95))
+print(confint(lm_out, "length_1_mm", level=0.95))
+```
 
-4.  Perform quadratic regression using `lm` on the same variables and again print out the confidence intervals for the three coefficients.
+5.  Perform quadratic regression using `lm` on the same variables and again print out the confidence intervals for the three coefficients.
 
 ```{r}
 quad_out <- lm(weight_g ~ poly(length_1_mm, degree = 2, raw = TRUE), data = mack_clean)
@@ -235,7 +235,7 @@ print(confint(quad_out, "poly(length_1_mm, degree = 2, raw = TRUE)1", level=0.95
 print(confint(quad_out, "poly(length_1_mm, degree = 2, raw = TRUE)2", level=0.95))
 ```
 
-5.  Compare the estimates for the parameters of the linear regression and quadratic regression between the bootstrap version and the classical linear regression statistics.
+6.  Compare the estimates for the parameters of the linear regression and quadratic regression between the bootstrap version and the classical linear regression statistics.
 
 The point estimates are similar, but the bootstrapped confidence intervals are consistently wider (especially in the quadratic case). This is typical for using a non-parametric empirical distribution compared to a theoretical distribution (e.g. for the t-statistic) because it doesn't have the same computational power.
 
@@ -247,13 +247,13 @@ Let us use the awesome power of the bootstrap to construct an empirical distribu
 
     ```{r}
     null_dist <-mack_clean |> 
-      specify(weight_g   ~ section) |> 
+      specify(weight_g ~ section) |> 
       hypothesize(null = "independence") |> 
       generate(reps = 500, type = "permute") |> 
       calculate(stat="diff in means", order = c("CC", "OG"))
 
     d_hat <- mack_clean |> 
-      specify(weight_g  ~ section) |> 
+      specify(weight_g ~ section) |> 
       calculate(stat="diff in means", order = c("CC", "OG"))
     ```
 
