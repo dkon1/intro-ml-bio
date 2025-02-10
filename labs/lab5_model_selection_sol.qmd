@@ -1,5 +1,5 @@
 ---
-title: "Regularization for regression (lab 6 for BIOS 26122)"
+title: "Regularization for regression (lab 5 for BIOS 26122)"
 author: "Dmitry Kondrashov"
 format: 
   html:
@@ -19,6 +19,7 @@ The use of these models is demonstrated in the week 6 tutorials using the tools 
 library(tidyverse)
 library(tidymodels)
 library(faraway)
+library(glmnet)
 ```
 
 The data set `fat` loaded below from the package `faraway` contains variables age, weight, height, and 10 body circumference measurements measured for 252 men. There are four potential response variables `brozek`, `free`, `siri`, and `density`, which are all highly related measures of body fat percentage.
