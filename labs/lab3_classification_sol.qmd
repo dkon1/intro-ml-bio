@@ -27,6 +27,7 @@ The use of these models is demonstrated in the week 4 tutorials using the tools 
 library(tidyverse)
 library(tidymodels)
 library(discrim)
+library(naivebayes)
 ```
 
 ### Neuroblastoma data
