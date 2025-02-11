@@ -40,7 +40,7 @@ fat_clean <- fat |>
 
 
 # Put 3/4 of the data into the training set 
-fat_split <- initial_split(fat_clean, prop = 0.75)
+fat_split <- initial_split(fat_clean, prop = 0.5)
 
 # Create data frames for the two sets:
 fat_train <- training(fat_split)
@@ -70,9 +70,9 @@ summary(lm_out)
 2.  Calculate the r squared of the predictions on the test set and report them. How does it compare to the r-squared from the summary of lm? Do you see evidence of overfitting?
 
 ```{r}
-compare_pred <- augment(fit_lm, new_data = fat_test) 
 
-compare_pred |> rsq(brozek, .pred)
+r2 <- cor(predict(lm_out, newdata = fat_test), fat_test$brozek)^2
+print(r2)
 ```
 
 The r-squared from lm (calculated on the training set) is 0.75 (will vary for different splits) but the r-squared calculated on the test set is about 0.5, so there is evidence of overfitting.
