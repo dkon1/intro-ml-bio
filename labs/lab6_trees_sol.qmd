@@ -1,0 +1,254 @@
+---
+title: "Tree-based methods (lab 6 for BIOS 26122)"
+author: "Dmitry Kondrashov"
+format: 
+  html:
+    self-contained: true
+editor: visual
+error: true
+---
+
+## Description
+
+The goal of this assignment is to perform classification tasks using decision trees and random forest methods. You will learn to do the following:
+
+1.  Use decision trees and interpret them
+
+2.  Use k-fold cross-validation to estimate prediction quality
+
+3.  Train random forests for classification
+
+4.  Understand variable importance scores
+
+The use of these models is demonstrated in the week 6 tutorial using the tools from package `tidymodels`.
+
+```{r setup}
+#| include: false
+#| echo: false
+library(tidyverse)
+library(tidymodels)
+library(discrim)
+library(naivebayes)
+```
+
+## Part 1: basic decision trees
+
+### Neuroblastoma data
+
+The following data set is gene expression data from tumors of patients with neuroblastoma (a type of cancer), accession number [**GSE62564**](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE62564). It contains 22 phenotypic scores, 6 of which (MYCN, STC1, P4HA1, BHLHE40, HIF1A and ST8SIA1) are gene expressions measured in log2RPM (log 2 reads per million). The other 16 are quantified by R package GSVA (Gene Set Enrichment Analysis).
+
+```{r}
+neuro_blast <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/r2_gse62564_GSVA_Metadata_selected.csv")
+```
+
+1.  Clean the data to remove missing values and convert the variable `high_risk` into a factor. Split the data set into training and test sets of equal size. Set up a tidymodels recipe to predict the variable `high_risk`with all the variables except for `sample id` as predictors, and a model specification for decision trees and classification.
+
+    ```{r}
+    neuro_clean <- neuro_blast |>  drop_na() |>
+      mutate(high_risk = factor(high_risk))
+
+    # Put 1/2 of the data into the training set 
+    neuro_split <- initial_split(neuro_clean, prop = 0.75)
+
+    # Create data frames for the two sets:
+    neuro_train <- training(neuro_split)
+    neuro_test  <- testing(neuro_split)
+
+    # create recipe for prediction
+    neuro_recipe <- 
+      recipe(high_risk ~ ., data = neuro_train) |>  
+      update_role(`sample id`, new_role = "ID")
+
+    # create classification tree spec
+    tree_spec <- decision_tree()  |> 
+      set_engine("rpart") |> 
+      set_mode("classification")
+
+    ```
+
+2.  Train a *decision tree* model to predict the variable `high_risk`: create a workflow, fit it to the training set and display the best-fit decisions tree, and evaluate its performance on the test set by printing out its accuracy, the roc area under the curve, and the confusion matrix.
+
+```{r}
+workflow_tree <- workflow() |> 
+  add_model(tree_spec) |> 
+  add_recipe(neuro_recipe)
+
+class_tree_fit <- workflow_tree |> 
+  fit(neuro_train)
+
+class_tree_fit |> 
+  extract_fit_engine() |> 
+  rpart.plot(roundint=FALSE)
+
+
+compare_pred <- augment(class_tree_fit, new_data = neuro_test) 
+
+compare_pred |>  yardstick::accuracy(truth = high_risk, estimate = .pred_class)
+
+compare_pred |> yardstick::roc_auc(truth = high_risk, .pred_no)
+
+compare_pred |>  yardstick::conf_mat(truth = high_risk, estimate = .pred_class)
+```
+
+### Liver injury data
+
+The following data set contains multiple variables based on assays of different chemical compounds in patients (predictors) and a categorical variable `class` describing the degree of liver damage: 'none', 'mild', 'severe'.
+
+```{r}
+data("hepatic_injury_qsar", package = "modeldata")
+#glimpse(hepatic_injury_qsar)
+```
+
+3.  Clean the data set to remove any missing values and split it into training and test sets of equal size. Set up a tidymodels recipe to predict the variable `class` with all the other variables as predictors, and a model specification for decision trees and classification.
+
+    ```{r}
+    liver_data <- hepatic_injury_qsar |> drop_na() |> mutate(class=factor(class))
+      
+    liver_split <- initial_split(liver_data, prop = 0.75) 
+
+    liver_train <- training(liver_split)
+    liver_test <- testing(liver_split)
+
+    liver_recipe <- recipe(class ~ ., data = liver_train) #|>  
+    #  update_role(, new_role = "ID")
+    ```
+
+4.  Train a *decision tree* model to predict the variable `class`: create a workflow, fit it to the training set and display the best-fit decisions tree, and evaluate its performance on the test set by printing out its accuracy and the confusion matrix.
+
+    ```{r}
+    liver_workflow <-  workflow() |> 
+      add_model(class_tree_spec) |> 
+      add_recipe(liver_recipe)
+
+    class_tree_fit <- liver_workflow |> 
+      fit(liver_train)
+
+    class_tree_fit |> 
+      extract_fit_engine() |> 
+      rpart.plot(roundint=FALSE)
+
+    liver_class_pred <- augment(class_tree_fit, new_data = liver_test) 
+
+    liver_class_pred |> yardstick::accuracy(truth = class, estimate = .pred_class)
+
+    liver_class_pred |> yardstick::conf_mat(truth = class, estimate = .pred_class)
+    ```
+
+5.  You might notice that the results in the last question are highly dependent on the random split of training/test set. Use k-fold cross-validation (with a reasonable value of k) to obtain a more reliable estimate of the performance of the decision tree classification.
+
+```{r}
+folds <- vfold_cv(liver_data, v = 10)
+
+liver_fit <- 
+   liver_workflow |>  
+  fit_resamples(folds)
+
+print("The average metrics for the decision tree model are:")
+print(collect_metrics(liver_fit))
+```
+
+### Random forests and variable importance
+
+We will use more advanced techniques to improve the classification performance of decision trees.
+
+1.  Change your model specification to use the `randomForest` engine with `mtry = .cols` to generate a bagging tree model. Fit it on the neuroblastoma training set, calculate the predictions on the test set and print out the metrics. Make a plot of the variable importance scores.
+
+```{r}
+
+bagging_spec <- rand_forest(mtry = .cols())  |> 
+  set_engine("randomForest", importance = TRUE) |> 
+  set_mode("classification")
+
+
+workflow_bag <- workflow() |> 
+  add_model(bagging_spec) |> 
+  add_recipe(neuro_recipe)
+
+bag_tree_fit <- workflow_bag |> 
+  fit(neuro_train)
+
+
+compare_pred <- augment(bag_tree_fit, new_data = neuro_test) 
+
+compare_pred |>  yardstick::accuracy(truth = high_risk, estimate = .pred_class)
+
+compare_pred |> yardstick::roc_auc(truth = high_risk, .pred_no)
+
+vip(bag_tree_fit)
+```
+
+2.  Repeat the process in the last question for a random forest with a smaller value of `mtry` (e.g. 5). Compare the prediction quality between the bagged tree and random forest, as well as the regular decision tree in part 1, and comment on which variables are most prominent according to the decision tree model and the random forest importance.
+
+    ```{r}
+    rf_spec <- rand_forest(mtry = 5)  |> 
+      set_engine("randomForest", importance = TRUE) |> 
+      set_mode("classification")
+
+
+    workflow_rf <- workflow() |> 
+      add_model(rf_spec) |> 
+      add_recipe(neuro_recipe)
+
+    rf_tree_fit <- workflow_bag |> 
+      fit(neuro_train)
+
+
+    compare_pred <- augment(rf_tree_fit, new_data = neuro_test) 
+
+    compare_pred |>  yardstick::accuracy(truth = high_risk, estimate = .pred_class)
+
+    compare_pred |> yardstick::roc_auc(truth = high_risk, .pred_no)
+
+    vip(rf_tree_fit)
+    ```
+
+    ### Liver injury data
+
+3.  Train the bagging forest model (with mtry equal to the number of variables) on the liver data using k-fold cross-validation, print all the validation metrics and compare them to the prediction quality of the decision tree model in part 1.
+
+    ```{r}
+    liver_workflow <- workflow() |> 
+      add_model(bagging_spec) |> 
+      add_recipe(liver_recipe)
+
+    folds <- vfold_cv(liver_data, v = 10)
+
+    liver_fit <- 
+       liver_workflow |>  
+      fit_resamples(folds)
+
+    print(collect_metrics(liver_fit))
+    ```
+
+4.  Train the random forest model (with mtry equal to 5 or similar) on the liver data using k-fold cross-validation, print all the validation metrics and compare them to the prediction quality of the decision tree model in part 1.
+
+    ```{r}
+    liver_workflow <- workflow() |> 
+      add_model(rf_spec) |> 
+      add_recipe(liver_recipe)
+
+    folds <- vfold_cv(liver_data, v = 10)
+
+    liver_fit <- 
+       liver_workflow |>  
+      fit_resamples(folds)
+
+    print(collect_metrics(liver_fit))
+
+    ```
+
+5.  Choose your preferred value of mtry and train the random forest again on the liver damage training set. Then plot the importance scores for the top ten variables and compare them to the top variables in the decision tree model in part 1.
+
+```{r}
+
+liver_workflow <- workflow() |> 
+  add_model(bagging_spec) |> 
+  add_recipe(liver_recipe)
+
+bag_tree_fit <- liver_workflow |> 
+  fit(liver_train)
+
+vip(bag_tree_fit)
+
+
+```
