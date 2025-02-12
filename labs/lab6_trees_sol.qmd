@@ -252,3 +252,5 @@ vip(bag_tree_fit)
 
 
 ```
+
+The variables are not in the same order as they appear on the decision tree - here the top ones are usually bio_assay_100 and chem_fp_001, while the first one does not appear in the decision tree!
