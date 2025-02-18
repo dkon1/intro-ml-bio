@@ -29,6 +29,7 @@ library(ggfortify) # for autoplot
 library(factoextra)
 library(NbClust)
 library(tidyclust)
+library(janitor)
 ```
 
 ## Breast cancer data
@@ -100,8 +101,8 @@ kmeans_spec <- k_means(num_clusters = 2) |>
 
 kmeans_rec <- recipe(~., data = wisc_pred) |> 
   step_normalize(all_numeric()) |> 
- step_pca(all_numeric(), num_comp = 2) #%>%
-#  prep() %>%
+ step_pca(all_numeric(), num_comp = 2) #|>
+#  prep() |>
  # bake(new_data = NULL)
 
 workflow_km <- workflow() |> 
@@ -122,20 +123,20 @@ table(wisc_class$Diagnosis, wisc_km$.pred_cluster)
 4.  Choose either the complete set of variables or the reduced set of principal components, and perform hyperparameter tuning to find the optimal value of k in k-means using `tidymodels` tools. Make a plot of within SSE (sum of squared errors within clusters) as a function of k and use the elbow method to determine the optimal value of k.
 
 ```{r}
-kmeans_spec_tuned <- kmeans_spec %>% 
+kmeans_spec_tuned <- kmeans_spec |> 
   set_args(num_clusters = tune())
 
 
 pca_recipe <- 
-  recipe(formula =  ~ ., data = wisc_pred) %>% 
-  step_novel(all_nominal_predictors()) %>% 
-  step_dummy(all_nominal_predictors()) %>% 
-  step_zv(all_predictors()) %>% 
-  step_normalize(all_predictors()) %>%
+  recipe(formula =  ~ ., data = wisc_pred) |> 
+  step_novel(all_nominal_predictors()) |> 
+  step_dummy(all_nominal_predictors()) |> 
+  step_zv(all_predictors()) |> 
+  step_normalize(all_predictors()) |>
   step_pca(all_predictors(), threshold = 0.9) 
 
-kmeans_wf <- workflow() %>%
-  add_model(kmeans_spec_tuned) %>%
+kmeans_wf <- workflow() |>
+  add_model(kmeans_spec_tuned) |>
   add_recipe(pca_recipe)
 
 splits <- bootstraps(wisc_pred, times = 10)
@@ -148,10 +149,10 @@ tune_res <- tune_cluster(
   grid = num_clusters_grid
 )
 
-tune_res %>%
+tune_res |>
   collect_metrics()
 
-tune_res %>%
+tune_res |>
   autoplot()
 ```
 
@@ -201,15 +202,15 @@ fviz_pca_ind(neuro_pca,
 ```{r}
 
 neuro_rec <- neuro_pred |> 
-  recipe(formula =  ~ .) %>% 
-  step_novel(all_nominal_predictors()) %>% 
-  step_dummy(all_nominal_predictors()) %>% 
-  step_zv(all_predictors()) %>% 
-  step_normalize(all_predictors()) %>%
+  recipe(formula =  ~ .) |> 
+  step_novel(all_nominal_predictors()) |> 
+  step_dummy(all_nominal_predictors()) |> 
+  step_zv(all_predictors()) |> 
+  step_normalize(all_predictors()) |>
   step_pca(all_predictors(), num_comp = 2) 
 
-kmeans_wf <- workflow() %>%
-  add_model(kmeans_spec) %>%
+kmeans_wf <- workflow() |>
+  add_model(kmeans_spec) |>
   add_recipe(neuro_rec)
 
 kmeans_fit <- kmeans_wf  |> 
@@ -230,8 +231,8 @@ table(neuro_km$.pred_cluster, neuro_risk$high_risk)
 hclust_spec <- hier_clust(linkage_method = "single")
   
 
-hclust_wf <- workflow() %>%
-  add_model(hclust_spec) %>%
+hclust_wf <- workflow() |>
+  add_model(hclust_spec) |>
   add_recipe(neuro_rec)
 
 hclust_fit <- hclust_wf  |> 
@@ -253,8 +254,8 @@ table(neuro_hc$.pred_cluster, neuro_risk$high_risk)
 hclust_spec <- hier_clust(linkage_method = "complete")
   
 
-hclust_wf <- workflow() %>%
-  add_model(hclust_spec) %>%
+hclust_wf <- workflow() |>
+  add_model(hclust_spec) |>
   add_recipe(neuro_rec)
 
 hclust_fit <- hclust_wf  |> 
@@ -274,8 +275,8 @@ table(neuro_hc$.pred_cluster, neuro_risk$high_risk)
 hclust_spec <- hier_clust(linkage_method = "average")
   
 
-hclust_wf <- workflow() %>%
-  add_model(hclust_spec) %>%
+hclust_wf <- workflow() |>
+  add_model(hclust_spec) |>
   add_recipe(neuro_rec)
 
 hclust_fit <- hclust_wf  |> 
@@ -292,4 +293,108 @@ table(neuro_hc$.pred_cluster, neuro_risk$high_risk)
 
 5.  Report how the clustering quality (as judged by comparison with the true value of risk) depends on the type of clustering algorithm. Discuss how the relative performance of the methods depends on the geometry of the point distribution you observed in the plots.
 
-The clustering quality is better for the k-means method than any of the hierarchical methods, but all of the do poorly compared to the clustering on the neuroblastoma data. The reason is likely due to the categories not being well separated in the plots, and the fact that the actual clusters are fairly spherical, so k-means is more appropriate than agglomerative methods.
+The clustering quality is better for the k-means method than any of the hierarchical methods, but all of the do poorly compared to the clustering on the Wisconsin data. The reason is likely due to the categories not being well separated in the plots, and the fact that the actual clusters are fairly spherical, so k-means is more appropriate than agglomerative methods.
+
+```{r}
+data("hepatic_injury_qsar", package = "modeldata")
+#glimpse(hepatic_injury_qsar)
+```
+
+```{r}
+liver_data <- hepatic_injury_qsar |> drop_na() |> dplyr::select(-class)
+
+liver_class <- hepatic_injury_qsar |>  dplyr::select(class) |> 
+  drop_na() |>
+  mutate(class = factor(class))
+
+
+liver_pca <- liver_data  |> 
+  prcomp(scale = TRUE)
+
+
+tidy(liver_pca, matrix = "eigenvalues") |> filter(PC < 6) |> 
+  ggplot(aes(PC, percent)) +
+  geom_col()
+
+fviz_pca_ind(liver_pca,
+             col.ind = factor(liver_class$class),
+             label = 'none',
+             addEllipses=TRUE, 
+             ellipse.level=0.9, 
+             palette = "Dark2")
+
+```
+
+Identify the variables that have zero variance and remove them
+
+```{r}
+zerovar <- hepatic_injury_qsar |>  dplyr::select(-class) |> 
+  summarise_all(var) |>  
+  select_if(function(.) . == 0) |> 
+  names()
+
+liver_clean <- hepatic_injury_qsar |> dplyr::select(-class, -zerovar) |> 
+  drop_na()
+  
+liver_pca <- liver_clean  |> 
+  prcomp(scale = TRUE)
+
+
+tidy(liver_pca, matrix = "eigenvalues") |> filter(PC < 6) |> 
+  ggplot(aes(PC, percent)) +
+  geom_col()
+
+fviz_pca_ind(liver_pca,
+             col.ind = factor(liver_class$class),
+             label = 'none',
+             addEllipses=TRUE, 
+             ellipse.level=0.9, 
+             palette = "Dark2")
+```
+
+```{r}
+liver_rec <- liver_clean |> 
+  recipe(formula =  ~ .) |> 
+  step_novel(all_nominal_predictors()) |> 
+  step_dummy(all_nominal_predictors()) |> 
+  step_zv(all_predictors()) |> 
+  step_normalize(all_predictors()) #|>
+#  step_pca(all_predictors(), num_comp = 2) 
+
+kmeans_spec <- k_means(num_clusters = 3) |>
+  set_engine("stats")
+
+kmeans_wf <- workflow() |>
+  add_model(kmeans_spec) |>
+  add_recipe(liver_rec)
+
+kmeans_fit <- kmeans_wf  |> 
+  fit(liver_clean)
+
+liver_km <- predict(kmeans_fit, new_data = liver_clean)
+
+fviz_cluster(list(data = scale(liver_clean), cluster = liver_km$.pred_cluster),
+ellipse.type = "norm", geom = "point", stand = FALSE, palette = "jco", ggtheme = theme_classic())
+
+table(liver_km$.pred_cluster, liver_class$class)
+```
+
+```{r}
+hclust_spec <- hier_clust(linkage_method = "complete")
+  
+
+hclust_wf <- workflow() |>
+  add_model(hclust_spec) |>
+  add_recipe(liver_rec)
+
+hclust_fit <- hclust_wf  |> 
+  fit(liver_clean)
+
+liver_hc <- predict(hclust_fit, new_data = liver_clean, num_clusters = 3)
+
+fviz_cluster(list(data = scale(liver_clean), cluster = liver_hc$.pred_cluster),
+ellipse.type = "norm", geom = "point", stand = FALSE, palette = "jco", ggtheme = theme_classic())
+
+print("The confusion matrix for hierarchical clustering using single linkage method:")
+table(liver_hc$.pred_cluster, liver_class$class)
+```
