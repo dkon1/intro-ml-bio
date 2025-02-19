@@ -56,7 +56,7 @@ wisc_data = read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/
      drop_na()
     ```
 
-2.  Perform PCA on the raw (unscaled) data and make a Scree plot of the eigenvalues. Plot the data points projected onto the first principal components colored by their Diagnosis.
+2.  Perform PCA on the raw (unscaled) data and make a Scree plot of the eigenvalues. Plot the data points projected onto the first two principalcomponents colored by their Diagnosis.
 
 ```{r}
 wisc_pca <- wisc_pred  |> 
@@ -74,7 +74,7 @@ fviz_pca_ind(wisc_pca,
              palette = "Dark2")
 ```
 
-3.  Perform PCA on the scaled variables and make a Scree plot of the eigenvalues. Plot the data points projected onto the first principal components colored by their Diagnosis.
+3.  Perform PCA on the scaled variables and make a Scree plot of the eigenvalues. Plot the data points projected onto the first two principalcomponents colored by their Diagnosis.
 
     ```{r}
     wisc_pca <- wisc_pred  |> 
@@ -105,7 +105,7 @@ data("hepatic_injury_qsar", package = "modeldata")
 #glimpse(hepatic_injury_qsar)
 ```
 
-5.  Clean the data to remove any missing values, and select only the **predictor variables that are non-constant (with nonzero variance)** to be used for clustering and assign them to a new tibble. Assign the variable `class` to a separate tibble. Perform PCA on the data after scaling the variables, and make a Scree plot of the eigenvalues. Plot the data points projected onto the first principal components colored by value of `class`.
+5.  Clean the data to remove any missing values, and select only the **predictor variables that are non-constant (with nonzero variance)** to be used for clustering and assign them to a new tibble. Assign the variable `class` to a separate tibble. Perform PCA on the data after scaling the variables, and make a Scree plot of the eigenvalues. Plot the data points projected onto the first two principalcomponents colored by value of `class`.
 
     ```{r}
     # identify variables with zero variance
@@ -123,7 +123,7 @@ data("hepatic_injury_qsar", package = "modeldata")
 
     ```
 
-6.  Perform PCA on the raw (unscaled) data and make a Scree plot of the eigenvalues. Plot the data points projected onto the first principal components colored by `class`.
+6.  Perform PCA on the raw (unscaled) data and make a Scree plot of the eigenvalues. Plot the data points projected onto the first two principalcomponents colored by `class`.
 
     ```{r}
     liver_pca <- liver_clean  |> 
@@ -141,7 +141,7 @@ data("hepatic_injury_qsar", package = "modeldata")
                  palette = "Dark2")
     ```
 
-7.  Perform PCA on the scaled variables and make a Scree plot of the eigenvalues. Plot the data points projected onto the first principal components colored by their `class`.
+7.  Perform PCA on the scaled variables and make a Scree plot of the eigenvalues. Plot the data points projected onto the first two principalcomponents colored by their `class`.
 
     ```{r}
     liver_pca <- liver_clean  |> 
@@ -233,7 +233,7 @@ table(wisc_diag$Diagnosis, wisc_km$.pred_cluster)
     table(wisc_diag$Diagnosis, wisc_km$.pred_cluster)
     ```
 
-5.  Choose either the complete set of variables or the reduced set of principal components, and perform hyperparameter tuning to find the optimal value of k in k-means using `tidymodels` tools. Make a plot of within SSE (sum of squared errors within clusters) as a function of k and use the elbow method to determine the optimal value of k.
+5.  Choose either the complete set of variables or the reduced set of principal components, and perform hyperparameter tuning to find the optimal value of k in k-means using `tidymodels` tools. Make a plot of within SSE (sum of squared errors within clusters) as a function of k (try values between 1 and 10) and use the elbow method to determine the optimal value of k.
 
 ```{r}
 kmeans_spec_tuned <- kmeans_spec |> 
@@ -389,7 +389,7 @@ print("The confusion matrix for hierarchical clustering using single linkage met
 table(liver_hc$.pred_cluster, liver_class$class)
 ```
 
-10\. Try using other linkage methods (e.g. "complete" and "average") and report the same confusion matrix for both.
+11. Try using other linkage methods (e.g. "complete" and "average") and report the same confusion matrix for both.
 
 ```{r}
 hclust_spec <- hier_clust(linkage_method = "complete")

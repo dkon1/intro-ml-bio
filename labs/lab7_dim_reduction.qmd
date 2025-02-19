@@ -1,6 +1,6 @@
 ---
 title: "Unsupervised learning: PCA and clustering (lab 7 for BIOS 26122)"
-author: "Your Name"
+author: "YOUR NAME"
 format: 
   html:
     self-contained: true
@@ -29,7 +29,10 @@ library(ggfortify) # for autoplot
 library(factoextra)
 library(NbClust)
 library(tidyclust)
+library(janitor)
 ```
+
+## Part 1: Dimensionality reduction using PCA
 
 ## Breast cancer data
 
@@ -40,67 +43,127 @@ wisc_data = read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/
 
 ```
 
-1.  Clean the data set by removing the non-predictor variables (hint: to make things run smoothly you should also fix a few weird variable names!) and removing any missing values, and place the Diagnosis variable into a separate data frame. Perform PCA on the data (after scaling the variables), and make a Scree plot of the eigenvalues. Plot the data points projected onto the first principal components colored by their Diagnosis.
+1.  Clean the data set by filtering out any missing values, selecting out the non-predictor variables and fixing a few variable names that have weird characters (the easiest way to do this is to use the function `clean_names()` from the package `janitor`) and assign this to a new tibble. Assign the `Diagnosis` variable into a separate data frame.
+
+    ```{r}
+
+    ```
+
+2.  Perform PCA on the raw (unscaled) data and make a Scree plot of the eigenvalues. Plot the data points projected onto the first principal components colored by their Diagnosis.
 
 ```{r}
 
 ```
 
-2.  Perform k-means clustering with k=2 on this data set using all the scaled variables. Make a plot of all the data points colored by their assigned cluster label. Print out a confusion matrix of the assigned cluster labels with the Diagnosis value for all the points.
+3.  Perform PCA on the scaled variables and make a Scree plot of the eigenvalues. Plot the data points projected onto the first principal components colored by their Diagnosis.
+
+    ```{r}
+
+    ```
+
+4.  Discuss the PCA results on the scaled and unscaled Wisconsin data by comparing the fraction of variance captured by the first two PCs, and by comparing the plot of the data points projected onto the first two PCs.
+
+YOUR ANSWER HERE
+
+### Liver injury data
+
+The following data set contains multiple (376) numeric variables based on assays of different chemical compounds in patients (predictors) and a categorical variable `class` describing the degree of liver damage: 'none', 'mild', 'severe'.
+
+```{r}
+data("hepatic_injury_qsar", package = "modeldata")
+#glimpse(hepatic_injury_qsar)
+```
+
+5.  Clean the data to remove any missing values, and select only the **predictor variables that are non-constant (with nonzero variance)** to be used for clustering and assign them to a new tibble. Assign the variable `class` to a separate tibble. Perform PCA on the data after scaling the variables, and make a Scree plot of the eigenvalues. Plot the data points projected onto the first two principal components colored by value of `class`.
+
+    ```{r}
+
+    ```
+
+6.  Perform PCA on the raw (unscaled) data and make a Scree plot of the eigenvalues. Plot the data points projected onto the first two principal components colored by `class`.
+
+    ```{r}
+
+    ```
+
+7.  Perform PCA on the scaled variables and make a Scree plot of the eigenvalues. Plot the data points projected onto the first two principal components colored by their `class`.
+
+    ```{r}
+
+    ```
+
+8.  Discuss the PCA results on the scaled and unscaled liver injury data by comparing the fraction of variance captured by the first two PCs, and by comparing the plot of the data points projected onto the first two PCs.
+
+    YOUR ANSWER HERE
+
+## Part 2: clustering
+
+### Breast cancer data
+
+1.  Perform k-means clustering with k=2 on the Wisconsin data set using all the raw variables. Make a plot of all the data points colored by their assigned cluster label. Print out a confusion matrix of the assigned cluster labels with the `Diagnosis` value for all the points, and report the number of points assigned to the "wrong" cluster (since cluster labels are arbitrary, either cluster 1 or 2 may correspond to Diagnosis 'M' or 'B').
 
 ```{r}
 
 ```
 
-3.  Perform k-means clustering with k=2 on this data set using only the first few PCs from PCA (you can do this by creating a recipe with `step_pca`). Make a plot of all the data points colored by their assigned cluster label. Print out a confusion matrix of the assigned cluster labels with the Diagnosis value for all the points.
+2.  Perform k-means clustering with k=2 on this data set using only the first few PCs from PCA (you can do this by creating a recipe with `step_pca`) on the **unscaled** data. Make a plot of all the data points colored by their assigned cluster label. Print out a confusion matrix of the assigned cluster labels with the Diagnosis value for all the points and report the number of points assigned to the "wrong" cluster (since cluster labels are arbitrary, either cluster 1 or 2 may correspond to Diagnosis 'M' or 'B').
 
 ```{r}
 
 ```
 
-4.  Choose either the complete set of variables or the reduced set of principal components, and perform hyperparameter tuning to find the optimal value of k in k-means using `tidymodels` tools. Make a plot of within SSE (sum of squared errors within clusters) as a function of k and use the elbow method to determine the optimal value of k.
+4.  Perform k-means clustering with k=2 on this data set using only the first few PCs from PCA (you can do this by creating a recipe with `step_pca`) on the **scaled** data. Make a plot of all the data points colored by their assigned cluster label. Print out a confusion matrix of the assigned cluster labels with the Diagnosis value for all the points and report the number of points assigned to the "wrong" cluster (since cluster labels are arbitrary, either cluster 1 or 2 may correspond to Diagnosis 'M' or 'B').
+
+    ```{r}
+
+    ```
+
+5.  Choose either the complete set of variables or the reduced set of principal components, and perform hyperparameter tuning to find the optimal value of k in k-means using `tidymodels` tools. Make a plot of within SSE (sum of squared errors within clusters) as a function of k (try values between 1 and 10) and use the elbow method to determine the optimal value of k.
 
 ```{r}
 
 ```
 
-5.  Compare the performance of clustering with and without reducing dimensionality, in terms of its agreement with the true labels (from Diagnosis). Explain the meaning of the elbow method for hyperparameter tuning and whether the result is surprising.
+6.  Compare the performance of clustering with and without reducing dimensionality, in terms of its agreement with the true labels (from Diagnosis). Explain the meaning of the elbow method for hyperparameter tuning and whether the result is surprising.
 
-YOUR ANSWERS HERE
+YOUR ANSWER HERE
 
-## Dimensionality reduction of neuroblastoma data
+## Liver injury data
 
-The following data set is gene expression data from tumors of patients with neuroblastoma (a type of cancer), accession number [**GSE62564**](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE62564). It contains 22 phenotypic scores, 6 of which (MYCN, STC1, P4HA1, BHLHE40, HIF1A and ST8SIA1) are gene expressions measured in log2RPM (log 2 reads per million). The other 16 are quantified by R package GSVA (Gene Set Enrichment Analysis).
-
-```{r}
-neuro_blast <- read_csv("https://raw.githubusercontent.com/dkon1/intro-ml-bio/main/labs/data/r2_gse62564_GSVA_Metadata_selected.csv")
-```
-
-1.  Clean the data to remove any outliers or missing values, and select only the predictor variables for dimensionality reduction, and leave `high risk` in a separate tibble. Perform PCA on the data (after scaling the variables), and make a Scree plot of the eigenvalues. Plot the data points projected onto the first principal components colored by `high risk` value.
-
-```{r}
-
-
-```
-
-2.  Perform k-means clustering with k=2 on this data set using a few of the PCs. Make a plot of all the data points colored by their assigned cluster label. Print out a confusion matrix of the assigned cluster labels with the `high risk` value for all the points.
+7.  Perform k-means clustering with k=3 on the liver injury data set using all the scaled variables. Make a plot of all the data points colored by their assigned cluster label. Print out a confusion matrix of the assigned cluster labels with the `class` value for all the points.
 
 ```{r}
 
 ```
 
-3.  Perform hierarchical clustering on the same data set using the method "single".
+8.  Perform k-means clustering with k=3 on the liver injury data set using the scaled and PCA-reduced dimensions (use the function `step_pca()` with the option `threshold` to specify the fraction of variance you want retain in the reduced dimensions. Make a plot of all the data points colored by their assigned cluster label. Print out a confusion matrix of the assigned cluster labels with the `class` value for all the points.
 
 ```{r}
 
 ```
 
-4.  Try using other linkage methods (e.g. "complete" and "average") and report the same confusion matrix for both.
+9.  Use the reduced set of principal components and perform hyperparameter tuning to find the optimal value of k in k-means using `tidymodels` tools. Make a plot of within SSE (sum of squared errors within clusters) as a function of k (try values between 1 and 10) and use the elbow method to determine the optimal value of k.
+
+    ```{r}
+
+    ```
+
+10. Perform hierarchical clustering on the same data set using the method "single" using the scaled and PCA-reduced dimensions (use the function `step_pca()` with the option `threshold` to specify the fraction of variance you want retain in the reduced dimensions. Make a plot of all the data points colored by their assigned cluster label. Print out a confusion matrix of the assigned cluster labels with the `class` value for all the points.
 
 ```{r}
 
 ```
 
-5.  Report how the clustering quality (as judged by comparison with the true value of risk) depends on the type of clustering algorithm. Discuss how the relative performance of the methods depends on the geometry of the point distribution you observed in the plots.
+11\. Try using other linkage methods (e.g. "complete" and "average") and report the same confusion matrix for both.
 
-YOUR ANSWERS HERE
+```{r}
+
+```
+
+```{r}
+
+```
+
+12. Report how the clustering quality (as judged by comparison with the true value of `class`) depends on the type of clustering algorithm.
+
+    YOUR ANSWER HERE
