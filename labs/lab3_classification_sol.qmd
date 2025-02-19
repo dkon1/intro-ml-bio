@@ -77,7 +77,7 @@ fit_neuro <- workflow_glm |>
 
 compare_pred <- augment(fit_neuro, new_data = neuro_test) 
 
-compare_pred |>  accuracy(truth = high_risk, estimate = .pred_class)
+compare_pred |>  yardstick::accuracy(truth = high_risk, estimate = .pred_class)
 
 compare_pred |>  conf_mat(truth = high_risk, estimate = .pred_class)
 ```
@@ -103,7 +103,7 @@ compare_pred |>  conf_mat(truth = high_risk, estimate = .pred_class)
 
     compare_pred <- augment(fit_neuro, new_data = neuro_test) 
 
-    compare_pred |>  accuracy(truth = high_risk, estimate = .pred_class)
+    compare_pred |>  yardstick::accuracy(truth = high_risk, estimate = .pred_class)
 
     compare_pred |>  conf_mat(truth = high_risk, estimate = .pred_class)
     ```
@@ -129,7 +129,7 @@ compare_pred |>  conf_mat(truth = high_risk, estimate = .pred_class)
 
     compare_pred <- augment(fit_neuro, new_data = neuro_test) 
 
-    compare_pred |>  accuracy(truth = high_risk, estimate = .pred_class)
+    compare_pred |>  yardstick::accuracy(truth = high_risk, estimate = .pred_class)
 
     compare_pred |>  conf_mat(truth = high_risk, estimate = .pred_class)
     ```
@@ -155,7 +155,7 @@ fit_neuro <- workflow_qd |>
 
 compare_pred <- augment(fit_neuro, new_data = neuro_test) 
 
-compare_pred |>  accuracy(truth = high_risk, estimate = .pred_class)
+compare_pred |>  yardstick::accuracy(truth = high_risk, estimate = .pred_class)
 
 compare_pred |>  conf_mat(truth = high_risk, estimate = .pred_class)
 ```
@@ -218,7 +218,7 @@ ecoli_recipe <-
 
     compare_pred <- augment(fit_ecoli, new_data = ecoli_test) 
 
-    compare_pred |>  accuracy(truth = class, estimate = .pred_class)
+    compare_pred |>  yardstick::accuracy(truth = class, estimate = .pred_class)
 
     compare_pred |>  conf_mat(truth = class, estimate = .pred_class)
 
@@ -255,7 +255,7 @@ ecoli_recipe <-
 
     compare_pred <- augment(fit_ecoli, new_data = ecoli_test) 
 
-    compare_pred |>  accuracy(truth = class, estimate = .pred_class)
+    compare_pred |>  yardstick::accuracy(truth = class, estimate = .pred_class)
 
     compare_pred |>  conf_mat(truth = class, estimate = .pred_class)
     ```
@@ -280,7 +280,7 @@ ecoli_recipe <-
 
     compare_pred <- augment(fit_ecoli, new_data = ecoli_test) 
 
-    compare_pred |>  accuracy(truth = class, estimate = .pred_class)
+    compare_pred |>  yardstick::accuracy(truth = class, estimate = .pred_class)
 
     compare_pred |>  conf_mat(truth = class, estimate = .pred_class)
     ```
@@ -314,7 +314,7 @@ fit_ecoli <- workflow_ld |>
 
 compare_pred <- augment(fit_ecoli, new_data = ecoli_test) 
 
-compare_pred |>  accuracy(truth = class, estimate = .pred_class)
+compare_pred |>  yardstick::accuracy(truth = class, estimate = .pred_class)
 
 compare_pred |>  conf_mat(truth = class, estimate = .pred_class)
 ```
