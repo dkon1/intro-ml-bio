@@ -9,6 +9,7 @@ editor: visual
 ```{r}
 #| include: false
 library(tidyverse)
+
 ```
 
 ## Description
@@ -43,19 +44,19 @@ gen_ind_test <- function(probA, probB, samp_size) {
 
 ```
 
-2.  Calculate the FWER (family-wise error rate) for a simulation of 10 repeated hypothesis tests with equal probabilities of disease and sample size 200 (as in question 1) by using a for loop (or making a function and then using replicate) to repeat the simulation 100 times, and report the fraction of times that *at least one of the hypotheses was rejected at significance level 1*. Repeat the calculation for 50, 100, and 500 hypothesis tests and report the FWER as a function the number of hypotheses tested.
+2.  Calculate the FWER (family-wise error rate) for a simulation of k repeated hypothesis tests with equal probabilities of disease and sample size 200 (as in question 1) by using a for loop or making a function and then using replicate to repeat the simulation 100 times, and report the the FWER (fraction of times that *at least one of the 100 hypotheses was rejected at significance level alpha = 0.01*) out of 500 repetitions.
 
 ```{r}
 
 ```
 
-3.  Use the Bonferroni correction for the p-values and repeat the calculation in question 2: report the FWER for repeated testing of 10, 50, 100, and 500 true null hypotheses.
+3.  Use the Bonferroni correction for the p-values and repeat the calculation in question 2: report the FWER (fraction of times that *at least one of the 100 hypotheses was rejected at significance level alpha = 0.01*) out of 500 repetitions.
 
 ```{r}
 
 ```
 
-4.  Use the Holm correction for the p-values and repeat the calculation in question 3: report the FWER for repeated testing of 10, 50, 100, and 500 true null hypotheses.
+4.  Use the Holm and Benjamini-Hochberg corrections for the p-values and repeat the calculation in question 3: report the FWER (fraction of times that *at least one of the 100 hypotheses was rejected at significance level alpha = 0.01*) out of 500 repetitions.
 
 ```{r}
 
@@ -71,9 +72,10 @@ gen_ind_test <- function(probA, probB, samp_size) {
 
 6.  Let us simulate a scenario where some fraction of the hypotheses are true (equal probabilities of disease) and some are false (different probabilities). Let us call the fraction of true hypotheses our prior. Set the prior probability to be 90%, and simulate 1000 hypotheses: 90% true and 10% false, with a small effect (probabilities of 0.1 and 0.2).
 
-```{=html}
-<!-- -->
+```{r}
+
 ```
+
 a)  Report the fraction of rejected null hypotheses using alpha = 0.01 *without any p-value adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
 
 b)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Bonferroni adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
@@ -88,9 +90,8 @@ d)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using th
 
 7.  Let us simulate a scenario where some fraction of the hypotheses are true (equal probabilities of disease) and some are false (different probabilities). Let us call the fraction of true hypotheses our prior. Set the prior probability to be 99%, and simulate 1000 hypotheses: 99% true and 1% false, with a small effect (probabilities of 0.1 and 0.2).
 
-```{=html}
 <!-- -->
-```
+
 a)  Report the fraction of rejected null hypotheses using alpha = 0.01 *without any p-value adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
 
 b)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Bonferroni adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
@@ -99,18 +100,15 @@ c)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using th
 
 d)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Benjamini-Hochberg adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
 
-    ```{r}
+```{r}
 
-    ```
 
-```{=html}
-<!-- -->
 ```
+
 8.  Let us simulate a scenario where some fraction of the hypotheses are true (equal probabilities of disease) and some are false (different probabilities). Let us call the fraction of true hypotheses our prior. Set the prior probability to be 90%, and simulate 1000 hypotheses: 90% true and 10% false, with a large effect (probabilities of 0.1 and 0.4).
 
-```{=html}
 <!-- -->
-```
+
 a)  Report the fraction of rejected null hypotheses using alpha = 0.01 *without any p-value adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
 
 b)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Bonferroni adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
@@ -119,18 +117,14 @@ c)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using th
 
 d)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Benjamini-Hochberg adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
 
-    ```{r}
+```{r}
 
-    ```
-
-```{=html}
-<!-- -->
 ```
+
 9.  Let us simulate a scenario where some fraction of the hypotheses are true (equal probabilities of disease) and some are false (different probabilities). Let us call the fraction of true hypotheses our prior. Set the prior probability to be 99%, and simulate 1000 hypotheses: 99% true and 1% false, with a large effect (probabilities of 0.1 and 0.4).
 
-```{=html}
 <!-- -->
-```
+
 a)  Report the fraction of rejected null hypotheses using alpha = 0.01 *without any p-value adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
 
 b)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using the Bonferroni adjustment* for each set of hypotheses, and report the total False Discovery Rate (the fraction of false positives out of all positive results.
@@ -145,4 +139,4 @@ d)  Report the fraction of rejected null hypotheses using alpha = 0.01 *using th
 
 10. Discuss the results you reported in the four questions above. Describe the influence of the following parameters: the effect size, the prior probability of the hypothesis being true, and the choice of p-value adjustment. Comment on your conclusions for what you would choose to do for a data set with a small effect size and a large prior probability for the null.
 
-YOUR ANSWERS HERE
+    YOUR ANSWERS
